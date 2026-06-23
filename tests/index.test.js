@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
 	barChart,
+	commandResult,
 	createCliStyle,
 	diagnosticReport,
 	divider,
@@ -17,6 +18,7 @@ import {
 	stepProgress,
 	stripAnsi,
 	table,
+	taskSummary,
 } from "../src/index.js";
 
 describe("Initialisation", () => {
@@ -157,6 +159,21 @@ describe("Render contracts", () => {
 		})).toContain("✓ Success unit");
 	});
 
+	test("Exports command and task result patterns", () => {
+		expect(commandResult({
+			result: "success",
+			summary: "Tests passed",
+		}, {
+			colour: false,
+		})).toContain("✓ Success Tests passed");
+		expect(taskSummary({
+			result: "partial",
+			task: "Add patterns",
+		}, {
+			colour: false,
+		})).toContain("◐ Partial Add patterns");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -210,6 +227,10 @@ describe("Render contracts", () => {
 		expect(output).toContain("Diagnostic report");
 		expect(output).toContain("│ Project diagnostics");
 		expect(output).toContain("│ ⚠ Warning Coverage below target");
+		expect(output).toContain("│ Unit test command");
+		expect(output).toContain("│ ✓ Success Unit tests passed");
+		expect(output).toContain("│ Pattern implementation");
+		expect(output).toContain("│ ◐ Partial Add command and task patterns");
 		expect(output).toContain("| Project diagnostics");
 		expect(output).toContain("| ! Warning Coverage below target");
 	});

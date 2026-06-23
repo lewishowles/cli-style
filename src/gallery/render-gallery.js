@@ -1,4 +1,6 @@
+import { commandResult } from "../patterns/command-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
+import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
@@ -159,6 +161,18 @@ function renderVariant(title, options) {
  *     Pattern gallery output.
  */
 function renderPatterns(options) {
+	const command = commandResult({
+		command: "bun run test:unit",
+		details: [
+			"121 tests passed",
+			"Log saved to .agent/diagnostics/test-unit.log",
+		],
+		duration: "158 ms",
+		exitCode: 0,
+		result: resultTypes.SUCCESS,
+		summary: "Unit tests passed",
+		title: "Unit test command",
+	}, options);
 	const report = diagnosticReport({
 		checks: [
 			{
@@ -190,6 +204,19 @@ function renderPatterns(options) {
 		],
 		title: "Project diagnostics",
 	}, options);
+	const summary = taskSummary({
+		completed: [
+			"Added command result renderer",
+			"Added task summary renderer",
+		],
+		remaining: [
+			"Review gallery output",
+		],
+		result: resultTypes.PARTIAL,
+		summary: "Implementation complete",
+		task: "Add command and task patterns",
+		title: "Pattern implementation",
+	}, options);
 
 	return [
 		divider({
@@ -199,6 +226,12 @@ function renderPatterns(options) {
 		"",
 		"Diagnostic report",
 		frameExample(report, options),
+		"",
+		"Command result",
+		frameExample(command, options),
+		"",
+		"Task summary",
+		frameExample(summary, options),
 	].join("\n");
 }
 

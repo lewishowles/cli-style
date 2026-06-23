@@ -1,6 +1,13 @@
 import { profiles } from "../profiles/profiles.js";
 import { status } from "../primitives/status.js";
 import { resultTypes } from "../theme/results.js";
+import {
+	formatLabel,
+	isNonEmptyString,
+	isRecord,
+	renderSection,
+	renderTitle,
+} from "./helpers.js";
 
 // Diagnostic reports use a stable title when the caller does not provide one.
 const defaultTitle = "Diagnostic report";
@@ -45,11 +52,7 @@ export function diagnosticReport(report, options = {}) {
 	const title = typeof report.title === "string" && report.title !== ""
 		? report.title
 		: defaultTitle;
-	const renderedTitle = options.profile === profiles.AGENT
-		? `# ${title}`
-		: title;
-
-	return [renderedTitle, ...sections].join("\n\n");
+	return [renderTitle(title, options), ...sections].join("\n\n");
 }
 
 /**
@@ -138,79 +141,4 @@ function renderNextActions(nextActions, options) {
 	const lines = validActions.map((action, index) => `${index + 1}. ${action}`);
 
 	return renderSection("Next actions", lines, options, false);
-}
-
-/**
- * Render a titled report section.
- *
- * @param  {string}  title
- *     Section title.
- * @param  {string[]}  lines
- *     Section content.
- * @param  {object}  options
- *     Rendering options.
- * @param  {boolean}  listItems
- *     Whether agent output should use bullet items.
- * @returns  {string}
- *     Rendered report section.
- */
-function renderSection(title, lines, options, listItems = true) {
-	if (lines.length === 0) {
-		return "";
-	}
-
-	const heading = options.profile === profiles.AGENT
-		? `## ${title}`
-		: title;
-	const content = options.profile === profiles.AGENT && listItems
-		? lines.map((line) => `- ${line}`)
-		: lines;
-
-	return [heading, ...content].join("\n");
-}
-
-/**
- * Join a primary label and optional detail.
- *
- * @param  {string}  label
- *     Primary label.
- * @param  {*}  detail
- *     Optional detail value.
- * @param  {object}  options
- *     Rendering options.
- * @returns  {string}
- *     Combined status detail.
- */
-function formatLabel(label, detail, options) {
-	if (!isNonEmptyString(detail)) {
-		return label;
-	}
-
-	const separator = options.unicode === false ? " - " : " — ";
-
-	return `${label}${separator}${detail}`;
-}
-
-/**
- * Check whether a value is a non-array object.
- *
- * @param  {*}  value
- *     Value to check.
- * @returns  {boolean}
- *     Whether the value is a record.
- */
-function isRecord(value) {
-	return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-/**
- * Check whether a value contains usable text.
- *
- * @param  {*}  value
- *     Value to check.
- * @returns  {boolean}
- *     Whether the value is a non-empty string.
- */
-function isNonEmptyString(value) {
-	return typeof value === "string" && value !== "";
 }
