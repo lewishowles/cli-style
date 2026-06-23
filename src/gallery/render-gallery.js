@@ -1,6 +1,7 @@
 import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
+import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
 import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
@@ -179,6 +180,14 @@ function renderPrimitives(options) {
 		renderTableExample({
 			...options,
 			width: 18,
+		}),
+		"",
+		"Feedback",
+		hint("tone: info", options),
+		emptyState("No results", "tone: muted", options),
+		errorBlock("Failed", ["tone: danger"], {
+			...options,
+			panelWidth: 40,
 		}),
 		"",
 		"Rows",

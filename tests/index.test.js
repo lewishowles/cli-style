@@ -4,6 +4,9 @@ import {
 	barChart,
 	createCliStyle,
 	divider,
+	emptyState,
+	errorBlock,
+	hint,
 	panel,
 	profiles,
 	progressBar,
@@ -124,6 +127,20 @@ describe("Render contracts", () => {
 		})).toBe("Name\n─────\nBuild");
 	});
 
+	test("Exports feedback primitives", () => {
+		expect(hint("Review output.", {
+			colour: false,
+		})).toBe("i Hint: Review output.");
+		expect(emptyState("No results", "", {
+			colour: false,
+		})).toBe("– No results");
+		expect(errorBlock("Failed", ["Stopped"], {
+			colour: false,
+			profile: "ci",
+			unicode: false,
+		})).toBe("x Error: Failed\nStopped");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
@@ -152,6 +169,9 @@ describe("Render contracts", () => {
 		expect(output).toContain("type-check  passed");
 		expect(output).toContain("Check   type-check");
 		expect(output).toContain("Result  warning");
+		expect(output).toContain("i Hint: tone: info");
+		expect(output).toContain("- No results tone: muted");
+		expect(output).toContain("|  x Error: Failed");
 		expect(output).toContain("Package   @lewishowles/components");
 	});
 
