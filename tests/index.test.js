@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+	barChart,
 	createCliStyle,
 	divider,
 	panel,
@@ -92,6 +93,19 @@ describe("Render contracts", () => {
 		})).toBe("[██░░] 50% (2/4)");
 	});
 
+	test("Exports bar chart primitive", () => {
+		expect(barChart({
+			barWidth: 4,
+			colour: false,
+			rows: [
+				{
+					label: "Items",
+					value: 2,
+				},
+			],
+		})).toBe("Items  ████ 2");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
@@ -113,6 +127,9 @@ describe("Render contracts", () => {
 		expect(output).toContain("[--------------------] 0% (0/100)");
 		expect(output).toContain("[##########----------] 50% (50/100)");
 		expect(output).toContain("[####################] 100% (100/100)");
+		expect(output).toContain("positive  #################### 10");
+		expect(output).toContain("warning   ############         6");
+		expect(output).toContain("negative  ######               -3");
 		expect(output).toContain("Package   @lewishowles/components");
 	});
 

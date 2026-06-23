@@ -1,3 +1,4 @@
+import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
 import { panel } from "../primitives/panel.js";
@@ -167,6 +168,9 @@ function renderPrimitives(options) {
 		"Progress bars",
 		...renderProgressExamples(options),
 		"",
+		"Bar charts",
+		renderBarChartExample(options),
+		"",
 		"Rows",
 		row("Package", "@lewishowles/components", {
 			...options,
@@ -181,6 +185,35 @@ function renderPrimitives(options) {
 			labelWidth: 8,
 		}),
 	].join("\n");
+}
+
+/**
+ * Render a chart that exposes positive, warning, and negative colours.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Bar chart example.
+ */
+function renderBarChartExample(options) {
+	return barChart({
+		...options,
+		rows: [
+			{
+				label: "positive",
+				value: 10,
+			},
+			{
+				label: "warning",
+				tone: "warning",
+				value: 6,
+			},
+			{
+				label: "negative",
+				value: -3,
+			},
+		],
+	});
 }
 
 /**
