@@ -7,6 +7,7 @@ export { isProfile } from "./profiles/profiles.js";
 export { renderHelp } from "./cli/help.js";
 export { renderGallery } from "./gallery/render-gallery.js";
 
+export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
 export {
 	chartColours,
 	chipColours,
