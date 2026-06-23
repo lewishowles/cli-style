@@ -1,7 +1,4 @@
-import {
-	isProfile,
-	profiles,
-} from "../profiles/profiles.js";
+import { isProfile, profiles } from "../profiles/profiles.js";
 
 /**
  * Resolve the active output profile from explicit options, flags, and environment.

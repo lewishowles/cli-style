@@ -1,9 +1,6 @@
 #!/usr/bin/env bun
 
-import {
-	renderGallery,
-	renderHelp,
-} from "../src/index.js";
+import { renderGallery, renderHelp } from "../src/index.js";
 
 // Command-line arguments passed to the package binary.
 const args = process.argv.slice(2);

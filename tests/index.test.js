@@ -1,15 +1,6 @@
-import {
-	describe,
-	expect,
-	test,
-} from "bun:test";
+import { describe, expect, test } from "bun:test";
 
-import {
-	createCliStyle,
-	profiles,
-	renderGallery,
-	renderHelp,
-} from "../src/index.js";
+import { createCliStyle, profiles, renderGallery, renderHelp } from "../src/index.js";
 
 describe("Initialisation", () => {
 	test("Creates a renderer with default options", () => {

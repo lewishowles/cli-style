@@ -22,8 +22,8 @@ bun run cli-style:gallery
 import { createCliStyle, renderGallery } from "@lewishowles/cli-style";
 
 const ui = createCliStyle({
-  profile: "human",
-  width: 80,
+	profile: "human",
+	width: 80,
 });
 
 const output = renderGallery();

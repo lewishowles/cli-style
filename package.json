@@ -24,8 +24,14 @@
 		"registry": "https://npm.pkg.github.com/"
 	},
 	"scripts": {
+		"check": "vp check --fix",
 		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
 		"test:unit": "bun test"
+	},
+	"devDependencies": {
+		"@stylistic/eslint-plugin": "^5.10.0",
+		"vite": "npm:@voidzero-dev/vite-plus-core@0.2.1",
+		"vite-plus": "0.2.1"
 	},
 	"engines": {
 		"node": ">=20"

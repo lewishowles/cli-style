@@ -1,26 +1,19 @@
-import {
-	describe,
-	expect,
-	test,
-} from "bun:test";
+import { describe, expect, test } from "bun:test";
 
-import {
-	getResultSymbol,
-	getResultToken,
-	resultTokens,
-	resultTypes,
-} from "../../src/index.js";
+import { getResultSymbol, getResultToken, resultTokens, resultTypes } from "../../src/index.js";
 
 describe("Result tokens", () => {
 	test("Defines each shared result state", () => {
-		expect(Object.keys(resultTokens).sort()).toEqual([
-			resultTypes.FAILED,
-			resultTypes.PARTIAL,
-			resultTypes.SKIPPED,
-			resultTypes.SUCCESS,
-			resultTypes.UNKNOWN,
-			resultTypes.WARNING,
-		].sort());
+		expect(Object.keys(resultTokens).sort()).toEqual(
+			[
+				resultTypes.FAILED,
+				resultTypes.PARTIAL,
+				resultTypes.SKIPPED,
+				resultTypes.SUCCESS,
+				resultTypes.UNKNOWN,
+				resultTypes.WARNING,
+			].sort(),
+		);
 	});
 
 	test("Falls back to unknown token for unsupported result types", () => {

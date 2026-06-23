@@ -1,13 +1,6 @@
-import {
-	describe,
-	expect,
-	test,
-} from "bun:test";
+import { describe, expect, test } from "bun:test";
 
-import {
-	profiles,
-	resolveProfile,
-} from "../../src/index.js";
+import { profiles, resolveProfile } from "../../src/index.js";
 
 describe("Profile resolution", () => {
 	test("Uses explicit profile when supported", () => {
