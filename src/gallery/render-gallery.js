@@ -1,11 +1,8 @@
-import { foreground, style } from "../formatters/ansi.js";
 import { chip } from "../primitives/chip.js";
+import { divider } from "../primitives/divider.js";
 import { row } from "../primitives/row.js";
 import { status } from "../primitives/status.js";
 import { resultTypes } from "../theme/results.js";
-
-// Gallery variant separators keep capability examples visually distinct.
-const variantSeparator = "----------------------------------------";
 
 // Chip tone examples should expose every configured pill colour.
 const chipToneExamples = [
@@ -103,45 +100,13 @@ export function renderGallery(options = {}) {
  */
 function renderVariant(title, options) {
 	return [
-		formatVariantHeading(title, options),
-		formatSeparator(options),
+		divider({
+			...options,
+			label: title,
+		}),
 		"",
 		renderPrimitives(options),
 	].join("\n");
-}
-
-/**
- * Format a gallery variant heading.
- *
- * @param  {string}  title
- *     Variant title.
- * @param  {object}  options
- *     Rendering options.
- * @returns  {string}
- *     Formatted heading.
- */
-function formatVariantHeading(title, options) {
-	if (options.colour !== true) {
-		return title;
-	}
-
-	return style(foreground(title, "info", options), "bold", options);
-}
-
-/**
- * Format a gallery separator line.
- *
- * @param  {object}  options
- *     Rendering options.
- * @returns  {string}
- *     Formatted separator.
- */
-function formatSeparator(options) {
-	if (options.colour !== true) {
-		return variantSeparator;
-	}
-
-	return foreground(variantSeparator, "border", options);
 }
 
 /**

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { createCliStyle, profiles, renderGallery, renderHelp, stripAnsi } from "../src/index.js";
+import { createCliStyle, divider, profiles, renderGallery, renderHelp, stripAnsi } from "../src/index.js";
 
 describe("Initialisation", () => {
 	test("Creates a renderer with default options", () => {
@@ -58,15 +58,21 @@ describe("Render contracts", () => {
 		expect(output).toContain("cli-style gallery");
 	});
 
+	test("Exports divider primitive", () => {
+		expect(divider({
+			colour: false,
+			dividerWidth: 4,
+		})).toBe("----");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
 		expect(output).toContain("CLI style gallery");
-		expect(output).toContain("Current terminal");
-		expect(output).toContain("No colour");
-		expect(output).toContain("No Unicode");
-		expect(output).toContain("Plain");
-		expect(output).toContain("----------------------------------------");
+		expect(output).toContain("Current terminal -----------------------");
+		expect(output).toContain("No colour ------------------------------");
+		expect(output).toContain("No Unicode -----------------------------");
+		expect(output).toContain("Plain ----------------------------------");
 		expect(output).toContain("Primitives");
 		expect(output).toContain("[neutral] [info] [success] [warning] [danger]");
 		expect(output).toContain("✓ Success tone: success");
