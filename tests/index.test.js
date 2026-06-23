@@ -7,21 +7,46 @@ describe("Initialisation", () => {
 		const ui = createCliStyle();
 
 		expect(ui.options).toEqual({
-			colour: "auto",
+			colour: false,
+			isCi: false,
+			isDumb: false,
+			isTty: false,
 			profile: profiles.HUMAN,
-			unicode: "auto",
+			unicode: true,
 			width: 80,
 		});
 	});
 
-	test("Allows renderer options to be overridden", () => {
+	test("Resolves profile and terminal capabilities from inputs", () => {
 		const ui = createCliStyle({
-			profile: profiles.CI,
-			width: 120,
+			env: {
+				CI: "true",
+			},
+			stdout: {
+				columns: 120,
+				isTTY: true,
+			},
 		});
 
 		expect(ui.options.profile).toBe(profiles.CI);
+		expect(ui.options.colour).toBe(true);
+		expect(ui.options.isCi).toBe(true);
 		expect(ui.options.width).toBe(120);
+	});
+
+	test("Allows resolved capability options to be overridden", () => {
+		const ui = createCliStyle({
+			colour: false,
+			stdout: {
+				isTTY: true,
+			},
+			unicode: false,
+			width: 64,
+		});
+
+		expect(ui.options.colour).toBe(false);
+		expect(ui.options.unicode).toBe(false);
+		expect(ui.options.width).toBe(64);
 	});
 });
 

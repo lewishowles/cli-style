@@ -1,26 +1,26 @@
+import { resolveProfile } from "./capability/resolve-profile.js";
+import { resolveTerminalCapabilities } from "./capability/terminal.js";
 import { profiles } from "./profiles/profiles.js";
-
-// Default style options used when callers do not provide explicit output constraints.
-const defaultOptions = {
-	colour: "auto",
-	profile: profiles.HUMAN,
-	unicode: "auto",
-	width: 80,
-};
 
 /**
  * Create a CLI style renderer with stable, testable defaults.
  *
  * @param  {object}  options
- *     Output profile, terminal capability, and width options.
+ *     Output profile, terminal capability, stream, environment, and width options.
  * @returns  {object}
  *     Renderer helpers and resolved options.
  */
 export function createCliStyle(options = {}) {
+	const capabilities = resolveTerminalCapabilities(options);
+
 	const resolvedOptions = {
-		...defaultOptions,
-		...options,
+		...capabilities,
+		profile: resolveProfile(options),
 	};
+
+	applyExplicitOption(resolvedOptions, options, "colour");
+	applyExplicitOption(resolvedOptions, options, "unicode");
+	applyExplicitOption(resolvedOptions, options, "width");
 
 	return {
 		options: resolvedOptions,
@@ -31,6 +31,23 @@ export function createCliStyle(options = {}) {
 			process.stdout.write(value);
 		},
 	};
+}
+
+/**
+ * Apply an explicit option override when provided.
+ *
+ * @param  {object}  target
+ *     Resolved options to update.
+ * @param  {object}  source
+ *     Caller-provided options.
+ * @param  {string}  key
+ *     Option key to copy.
+ * @returns  {void}
+ */
+function applyExplicitOption(target, source, key) {
+	if (Object.hasOwn(source, key)) {
+		target[key] = source[key];
+	}
 }
 
 export { profiles };
