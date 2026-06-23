@@ -7,4 +7,17 @@ export { isProfile } from "./profiles/profiles.js";
 export { renderHelp } from "./cli/help.js";
 export { renderGallery } from "./gallery/render-gallery.js";
 
+export {
+	chartColours,
+	chipColours,
+	colourTokens,
+	getColourToken,
+	getToneColour,
+	panelColours,
+	promptColours,
+	resolveColourValue,
+	tableColours,
+	terminalColours,
+	toneColours,
+} from "./theme/colours.js";
 export { getResultSymbol, getResultToken, resultTokens, resultTypes } from "./theme/results.js";
