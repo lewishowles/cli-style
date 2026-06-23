@@ -1,3 +1,4 @@
+import { agentTranscript } from "../patterns/agent-transcript.js";
 import { commandResult } from "../patterns/command-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { taskSummary } from "../patterns/task-summary.js";
@@ -217,6 +218,31 @@ function renderPatterns(options) {
 		task: "Add command and task patterns",
 		title: "Pattern implementation",
 	}, options);
+	const transcript = agentTranscript({
+		entries: [
+			{
+				content: "Run the focused unit tests.",
+				role: "user",
+			},
+			{
+				content: "Running project diagnostics.",
+				role: "agent",
+			},
+			{
+				content: [
+					"128 tests passed",
+					"0 tests failed",
+				],
+				name: "project-diagnostics",
+				role: "tool",
+			},
+			{
+				content: "Tests pass. Nothing remains.",
+				role: "agent",
+			},
+		],
+		title: "Focused verification",
+	}, options);
 
 	return [
 		divider({
@@ -232,6 +258,9 @@ function renderPatterns(options) {
 		"",
 		"Task summary",
 		frameExample(summary, options),
+		"",
+		"Agent transcript",
+		frameExample(transcript, options),
 	].join("\n");
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import {
+	agentTranscript,
 	barChart,
 	commandResult,
 	createCliStyle,
@@ -174,6 +175,19 @@ describe("Render contracts", () => {
 		})).toContain("◐ Partial Add patterns");
 	});
 
+	test("Exports agent transcript pattern", () => {
+		expect(agentTranscript({
+			entries: [
+				{
+					content: "Tests pass.",
+					role: "agent",
+				},
+			],
+		}, {
+			colour: false,
+		})).toContain("[Agent] Tests pass.");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -231,6 +245,9 @@ describe("Render contracts", () => {
 		expect(output).toContain("│ ✓ Success Unit tests passed");
 		expect(output).toContain("│ Pattern implementation");
 		expect(output).toContain("│ ◐ Partial Add command and task patterns");
+		expect(output).toContain("│ Focused verification");
+		expect(output).toContain("│ [Tool: project-diagnostics]");
+		expect(output).toContain("| [Tool: project-diagnostics]");
 		expect(output).toContain("| Project diagnostics");
 		expect(output).toContain("| ! Warning Coverage below target");
 	});

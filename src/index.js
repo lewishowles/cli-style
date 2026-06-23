@@ -8,6 +8,7 @@ export { renderHelp } from "./cli/help.js";
 export { renderGallery } from "./gallery/render-gallery.js";
 
 export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
+export { agentTranscript } from "./patterns/agent-transcript.js";
 export { commandResult } from "./patterns/command-result.js";
 export { diagnosticReport } from "./patterns/diagnostic-report.js";
 export { taskSummary } from "./patterns/task-summary.js";
