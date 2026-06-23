@@ -1,3 +1,4 @@
+import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
@@ -144,6 +145,55 @@ function renderVariant(title, options) {
 		}),
 		"",
 		renderPrimitives(options),
+		"",
+		renderPatterns(options),
+	].join("\n");
+}
+
+/**
+ * Render composed output pattern examples.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Pattern gallery output.
+ */
+function renderPatterns(options) {
+	return [
+		"Patterns",
+		"",
+		"Diagnostic report",
+		diagnosticReport({
+			checks: [
+				{
+					detail: "184 tests",
+					name: "unit",
+					result: resultTypes.SUCCESS,
+				},
+				{
+					detail: "2 failures",
+					name: "type-check",
+					result: resultTypes.FAILED,
+				},
+			],
+			findings: [
+				{
+					message: "Coverage below target",
+					result: resultTypes.WARNING,
+				},
+			],
+			nextActions: [
+				"Review failing checks",
+				"Re-run diagnostics",
+			],
+			skippedChecks: [
+				{
+					name: "e2e",
+					reason: "Browser unavailable",
+				},
+			],
+			title: "Project diagnostics",
+		}, options),
 	].join("\n");
 }
 

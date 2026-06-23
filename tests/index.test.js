@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	barChart,
 	createCliStyle,
+	diagnosticReport,
 	divider,
 	emptyState,
 	errorBlock,
@@ -143,6 +144,19 @@ describe("Render contracts", () => {
 		})).toBe("x Error: Failed\nStopped");
 	});
 
+	test("Exports diagnostic report pattern", () => {
+		expect(diagnosticReport({
+			checks: [
+				{
+					name: "unit",
+					result: "success",
+				},
+			],
+		}, {
+			colour: false,
+		})).toContain("✓ Success unit");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -192,6 +206,9 @@ describe("Render contracts", () => {
 		expect(output).toContain("1/3 OK complete");
 		expect(output).toContain("2/3 ... current");
 		expect(output).toContain("Package   @lewishowles/components");
+		expect(output).toContain("Patterns");
+		expect(output).toContain("Diagnostic report");
+		expect(output).toContain("Coverage below target");
 	});
 
 	test("Renders coloured primitive gallery when colour is enabled", () => {

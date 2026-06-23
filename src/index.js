@@ -8,6 +8,7 @@ export { renderHelp } from "./cli/help.js";
 export { renderGallery } from "./gallery/render-gallery.js";
 
 export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
+export { diagnosticReport } from "./patterns/diagnostic-report.js";
 export { barChart } from "./primitives/bar-chart.js";
 export { chip } from "./primitives/chip.js";
 export { divider } from "./primitives/divider.js";
