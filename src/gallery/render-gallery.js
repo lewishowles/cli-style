@@ -1,6 +1,7 @@
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
 import { panel } from "../primitives/panel.js";
+import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
 import { status } from "../primitives/status.js";
 import { resultTypes } from "../theme/results.js";
@@ -63,6 +64,30 @@ const panelToneExamples = [
 	"success",
 	"warning",
 	"danger",
+];
+
+// Progress examples expose common completion states and semantic tones.
+const progressExamples = [
+	{
+		tone: "info",
+		value: 0,
+	},
+	{
+		tone: "success",
+		value: 25,
+	},
+	{
+		tone: "warning",
+		value: 50,
+	},
+	{
+		tone: "danger",
+		value: 75,
+	},
+	{
+		tone: "success",
+		value: 100,
+	},
 ];
 
 /**
@@ -139,6 +164,9 @@ function renderPrimitives(options) {
 		"Panels",
 		...renderPanelExamples(options),
 		"",
+		"Progress bars",
+		...renderProgressExamples(options),
+		"",
 		"Rows",
 		row("Package", "@lewishowles/components", {
 			...options,
@@ -153,6 +181,23 @@ function renderPrimitives(options) {
 			labelWidth: 8,
 		}),
 	].join("\n");
+}
+
+/**
+ * Render common progress values and tones.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string[]}
+ *     Progress examples.
+ */
+function renderProgressExamples(options) {
+	return progressExamples.map((example) => progressBar({
+		...options,
+		max: 100,
+		tone: example.tone,
+		value: example.value,
+	}));
 }
 
 /**

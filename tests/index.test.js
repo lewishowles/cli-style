@@ -1,6 +1,15 @@
 import { describe, expect, test } from "bun:test";
 
-import { createCliStyle, divider, panel, profiles, renderGallery, renderHelp, stripAnsi } from "../src/index.js";
+import {
+	createCliStyle,
+	divider,
+	panel,
+	profiles,
+	progressBar,
+	renderGallery,
+	renderHelp,
+	stripAnsi,
+} from "../src/index.js";
 
 describe("Initialisation", () => {
 	test("Creates a renderer with default options", () => {
@@ -74,6 +83,15 @@ describe("Render contracts", () => {
 		})).toBe("▌           \n▌  Status   \n▌  Ready    \n▌           ");
 	});
 
+	test("Exports progress bar primitive", () => {
+		expect(progressBar({
+			barWidth: 4,
+			colour: false,
+			max: 4,
+			value: 2,
+		})).toBe("[██░░] 50% (2/4)");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
@@ -92,6 +110,9 @@ describe("Render contracts", () => {
 		expect(output).toContain("- Skipped tone: muted");
 		expect(output).toContain("▌  info");
 		expect(output).toContain("|  tone: danger");
+		expect(output).toContain("[--------------------] 0% (0/100)");
+		expect(output).toContain("[##########----------] 50% (50/100)");
+		expect(output).toContain("[####################] 100% (100/100)");
 		expect(output).toContain("Package   @lewishowles/components");
 	});
 

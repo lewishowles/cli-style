@@ -11,6 +11,7 @@ export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
 export { chip } from "./primitives/chip.js";
 export { divider } from "./primitives/divider.js";
 export { panel } from "./primitives/panel.js";
+export { progressBar } from "./primitives/progress-bar.js";
 export { row } from "./primitives/row.js";
 export { status } from "./primitives/status.js";
 export {
