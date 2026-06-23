@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { createCliStyle, profiles, renderGallery, renderHelp } from "../src/index.js";
+import { createCliStyle, profiles, renderGallery, renderHelp, stripAnsi } from "../src/index.js";
 
 describe("Initialisation", () => {
 	test("Creates a renderer with default options", () => {
@@ -58,10 +58,36 @@ describe("Render contracts", () => {
 		expect(output).toContain("cli-style gallery");
 	});
 
-	test("Renders gallery placeholder as a string", () => {
+	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
 		expect(output).toContain("CLI style gallery");
-		expect(output).toContain("Status: pending");
+		expect(output).toContain("Current terminal");
+		expect(output).toContain("No colour");
+		expect(output).toContain("No Unicode");
+		expect(output).toContain("Plain");
+		expect(output).toContain("----------------------------------------");
+		expect(output).toContain("Primitives");
+		expect(output).toContain("[neutral] [info] [success] [warning] [danger]");
+		expect(output).toContain("✓ Success tone: success");
+		expect(output).toContain("◐ Partial tone: warning");
+		expect(output).toContain("– Skipped tone: muted");
+		expect(output).toContain("? Unknown tone: muted");
+		expect(output).toContain("OK Success tone: success");
+		expect(output).toContain("- Skipped tone: muted");
+		expect(output).toContain("Package   @lewishowles/components");
+	});
+
+	test("Renders coloured primitive gallery when colour is enabled", () => {
+		const output = renderGallery({
+			colour: true,
+			unicode: true,
+		});
+
+		expect(output).toContain("\u001b[");
+		expect(stripAnsi(output)).toContain(" neutral   info   success   warning   danger ");
+		expect(stripAnsi(output)).toContain("✓ Success tone: success");
+		expect(stripAnsi(output)).toContain("◐ Partial tone: warning");
+		expect(stripAnsi(output)).toContain("OK Success tone: success");
 	});
 });
