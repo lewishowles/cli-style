@@ -15,6 +15,7 @@ export { panel } from "./primitives/panel.js";
 export { progressBar } from "./primitives/progress-bar.js";
 export { row } from "./primitives/row.js";
 export { status } from "./primitives/status.js";
+export { table } from "./primitives/table.js";
 export {
 	chartColours,
 	chipColours,

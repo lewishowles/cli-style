@@ -10,6 +10,7 @@ import {
 	renderGallery,
 	renderHelp,
 	stripAnsi,
+	table,
 } from "../src/index.js";
 
 describe("Initialisation", () => {
@@ -106,6 +107,23 @@ describe("Render contracts", () => {
 		})).toBe("Items  ████ 2");
 	});
 
+	test("Exports table primitive", () => {
+		expect(table({
+			colour: false,
+			columns: [
+				{
+					key: "name",
+					label: "Name",
+				},
+			],
+			rows: [
+				{
+					name: "Build",
+				},
+			],
+		})).toBe("Name\n─────\nBuild");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
@@ -130,6 +148,10 @@ describe("Render contracts", () => {
 		expect(output).toContain("positive  #################### 10");
 		expect(output).toContain("warning   ############         6");
 		expect(output).toContain("negative  ######               -3");
+		expect(output).toContain("Check       Result");
+		expect(output).toContain("type-check  passed");
+		expect(output).toContain("Check   type-check");
+		expect(output).toContain("Result  warning");
 		expect(output).toContain("Package   @lewishowles/components");
 	});
 

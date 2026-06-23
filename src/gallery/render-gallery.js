@@ -5,6 +5,7 @@ import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
 import { status } from "../primitives/status.js";
+import { table } from "../primitives/table.js";
 import { resultTypes } from "../theme/results.js";
 
 // Chip tone examples should expose every configured pill colour.
@@ -171,6 +172,15 @@ function renderPrimitives(options) {
 		"Bar charts",
 		renderBarChartExample(options),
 		"",
+		"Tables",
+		renderTableExample(options),
+		"",
+		"Narrow tables",
+		renderTableExample({
+			...options,
+			width: 18,
+		}),
+		"",
 		"Rows",
 		row("Package", "@lewishowles/components", {
 			...options,
@@ -185,6 +195,40 @@ function renderPrimitives(options) {
 			labelWidth: 8,
 		}),
 	].join("\n");
+}
+
+/**
+ * Render wide or narrow table diagnostics.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Table example.
+ */
+function renderTableExample(options) {
+	return table({
+		...options,
+		columns: [
+			{
+				key: "check",
+				label: "Check",
+			},
+			{
+				key: "result",
+				label: "Result",
+			},
+		],
+		rows: [
+			{
+				check: "type-check",
+				result: "passed",
+			},
+			{
+				check: "unit",
+				result: "warning",
+			},
+		],
+	});
 }
 
 /**
