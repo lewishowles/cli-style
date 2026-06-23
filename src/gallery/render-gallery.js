@@ -6,6 +6,7 @@ import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
 import { status } from "../primitives/status.js";
+import { step, stepProgress, stepStates } from "../primitives/step-progress.js";
 import { table } from "../primitives/table.js";
 import { resultTypes } from "../theme/results.js";
 
@@ -188,6 +189,19 @@ function renderPrimitives(options) {
 		errorBlock("Failed", ["tone: danger"], {
 			...options,
 			panelWidth: 40,
+		}),
+		"",
+		"Steps",
+		step("complete", stepStates.COMPLETE, options),
+		step("current", stepStates.CURRENT, options),
+		step("pending", stepStates.PENDING, options),
+		step("failed", resultTypes.FAILED, options),
+		"",
+		"Step progress",
+		stepProgress({
+			...options,
+			current: 1,
+			steps: ["complete", "current", "pending"],
 		}),
 		"",
 		"Rows",

@@ -12,6 +12,8 @@ import {
 	progressBar,
 	renderGallery,
 	renderHelp,
+	step,
+	stepProgress,
 	stripAnsi,
 	table,
 } from "../src/index.js";
@@ -141,6 +143,19 @@ describe("Render contracts", () => {
 		})).toBe("x Error: Failed\nStopped");
 	});
 
+	test("Exports step primitives", () => {
+		expect(step("Build", "current", {
+			colour: false,
+			unicode: false,
+		})).toBe("... Build");
+		expect(stepProgress({
+			colour: false,
+			current: 1,
+			steps: ["Install", "Build"],
+			unicode: false,
+		})).toBe("1/2 OK Install\n2/2 ... Build");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
@@ -172,6 +187,10 @@ describe("Render contracts", () => {
 		expect(output).toContain("i Hint: tone: info");
 		expect(output).toContain("- No results tone: muted");
 		expect(output).toContain("|  x Error: Failed");
+		expect(output).toContain("OK complete");
+		expect(output).toContain("... current");
+		expect(output).toContain("1/3 OK complete");
+		expect(output).toContain("2/3 ... current");
 		expect(output).toContain("Package   @lewishowles/components");
 	});
 
