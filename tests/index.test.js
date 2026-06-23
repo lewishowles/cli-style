@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
 	agentTranscript,
+	auditFinding,
 	barChart,
 	commandResult,
 	createCliStyle,
@@ -188,6 +189,15 @@ describe("Render contracts", () => {
 		})).toContain("[Agent] Tests pass.");
 	});
 
+	test("Exports audit finding pattern", () => {
+		expect(auditFinding({
+			finding: "Icon button is unnamed",
+			result: "failed",
+		}, {
+			colour: false,
+		})).toContain("× Failed Icon button is unnamed");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -247,7 +257,10 @@ describe("Render contracts", () => {
 		expect(output).toContain("│ ◐ Partial Add command and task patterns");
 		expect(output).toContain("│ Focused verification");
 		expect(output).toContain("│ [Tool: project-diagnostics]");
+		expect(output).toContain("│ Accessibility audit");
+		expect(output).toContain("│ × Failed Muted text has insufficient contrast");
 		expect(output).toContain("| [Tool: project-diagnostics]");
+		expect(output).toContain("| x Failed Muted text has insufficient contrast");
 		expect(output).toContain("| Project diagnostics");
 		expect(output).toContain("| ! Warning Coverage below target");
 	});

@@ -1,4 +1,5 @@
 import { agentTranscript } from "../patterns/agent-transcript.js";
+import { auditFinding } from "../patterns/audit-finding.js";
 import { commandResult } from "../patterns/command-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { taskSummary } from "../patterns/task-summary.js";
@@ -162,6 +163,20 @@ function renderVariant(title, options) {
  *     Pattern gallery output.
  */
 function renderPatterns(options) {
+	const audit = auditFinding({
+		evidence: [
+			"Text contrast measures 3.2:1",
+			"Body text requires at least 4.5:1",
+		],
+		finding: "Muted text has insufficient contrast",
+		location: "src/components/StatusCard.vue:42",
+		recommendation: "Use the standard foreground token.",
+		references: [
+			"WCAG 2.2 SC 1.4.3",
+		],
+		result: resultTypes.FAILED,
+		title: "Accessibility audit",
+	}, options);
 	const command = commandResult({
 		command: "bun run test:unit",
 		details: [
@@ -261,6 +276,9 @@ function renderPatterns(options) {
 		"",
 		"Agent transcript",
 		frameExample(transcript, options),
+		"",
+		"Audit finding",
+		frameExample(audit, options),
 	].join("\n");
 }
 
