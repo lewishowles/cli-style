@@ -9,6 +9,7 @@ export { renderGallery } from "./gallery/render-gallery.js";
 
 export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
 export { chip } from "./primitives/chip.js";
+export { row } from "./primitives/row.js";
 export { status } from "./primitives/status.js";
 export {
 	chartColours,
