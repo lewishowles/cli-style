@@ -1,12 +1,4 @@
-// Supported output profiles for terminal rendering.
-export const profiles = {
-	AGENT: "agent",
-	CI: "ci",
-	DIAGNOSTIC: "diagnostic",
-	HUMAN: "human",
-	JSON: "json",
-	PLAIN: "plain",
-};
+import { profiles } from "./profiles/profiles.js";
 
 // Default style options used when callers do not provide explicit output constraints.
 const defaultOptions = {
@@ -40,3 +32,5 @@ export function createCliStyle(options = {}) {
 		},
 	};
 }
+
+export { profiles };
