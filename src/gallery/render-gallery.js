@@ -1,5 +1,6 @@
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
+import { panel } from "../primitives/panel.js";
 import { row } from "../primitives/row.js";
 import { status } from "../primitives/status.js";
 import { resultTypes } from "../theme/results.js";
@@ -54,6 +55,14 @@ const statusExamples = [
 		detail: "tone: danger",
 		resultType: resultTypes.FAILED,
 	},
+];
+
+// Panel examples should expose every configured semantic accent.
+const panelToneExamples = [
+	"info",
+	"success",
+	"warning",
+	"danger",
 ];
 
 /**
@@ -127,6 +136,9 @@ function renderPrimitives(options) {
 		"Statuses",
 		...renderStatusExamples(options),
 		"",
+		"Panels",
+		...renderPanelExamples(options),
+		"",
 		"Rows",
 		row("Package", "@lewishowles/components", {
 			...options,
@@ -141,6 +153,23 @@ function renderPrimitives(options) {
 			labelWidth: 8,
 		}),
 	].join("\n");
+}
+
+/**
+ * Render all panel tone examples.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string[]}
+ *     Panel examples.
+ */
+function renderPanelExamples(options) {
+	return panelToneExamples.map((tone) => panel({
+		...options,
+		lines: [`tone: ${tone}`],
+		title: tone,
+		tone,
+	}));
 }
 
 /**

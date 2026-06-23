@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { createCliStyle, divider, profiles, renderGallery, renderHelp, stripAnsi } from "../src/index.js";
+import { createCliStyle, divider, panel, profiles, renderGallery, renderHelp, stripAnsi } from "../src/index.js";
 
 describe("Initialisation", () => {
 	test("Creates a renderer with default options", () => {
@@ -65,6 +65,15 @@ describe("Render contracts", () => {
 		})).toBe("----");
 	});
 
+	test("Exports panel primitive", () => {
+		expect(panel({
+			colour: false,
+			lines: ["Ready"],
+			panelWidth: 12,
+			title: "Status",
+		})).toBe("▌           \n▌  Status   \n▌  Ready    \n▌           ");
+	});
+
 	test("Renders primitive gallery as a string", () => {
 		const output = renderGallery();
 
@@ -81,6 +90,8 @@ describe("Render contracts", () => {
 		expect(output).toContain("? Unknown tone: muted");
 		expect(output).toContain("OK Success tone: success");
 		expect(output).toContain("- Skipped tone: muted");
+		expect(output).toContain("▌  info");
+		expect(output).toContain("|  tone: danger");
 		expect(output).toContain("Package   @lewishowles/components");
 	});
 
