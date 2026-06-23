@@ -1,0 +1,34 @@
+{
+	"name": "@lewishowles/cli-style",
+	"version": "0.0.0",
+	"description": "Shared terminal output styles for Lewis Howles tools, diagnostics, and package CLIs.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lewishowles/cli-style.git"
+	},
+	"bin": {
+		"cli-style": "./bin/cli-style.js"
+	},
+	"files": [
+		"bin",
+		"src",
+		"README.md"
+	],
+	"type": "module",
+	"sideEffects": false,
+	"exports": {
+		".": "./src/index.js"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/"
+	},
+	"scripts": {
+		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
+		"test:unit": "bun test"
+	},
+	"engines": {
+		"node": ">=20"
+	},
+	"packageManager": "bun@1.3.14"
+}
