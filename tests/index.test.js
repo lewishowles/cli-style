@@ -206,9 +206,12 @@ describe("Render contracts", () => {
 		expect(output).toContain("1/3 OK complete");
 		expect(output).toContain("2/3 ... current");
 		expect(output).toContain("Package   @lewishowles/components");
-		expect(output).toContain("Patterns");
+		expect(output).toContain("Patterns -------------------------------");
 		expect(output).toContain("Diagnostic report");
-		expect(output).toContain("Coverage below target");
+		expect(output).toContain("│ Project diagnostics");
+		expect(output).toContain("│ ⚠ Warning Coverage below target");
+		expect(output).toContain("| Project diagnostics");
+		expect(output).toContain("| ! Warning Coverage below target");
 	});
 
 	test("Renders coloured primitive gallery when colour is enabled", () => {

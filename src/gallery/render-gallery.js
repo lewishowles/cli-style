@@ -159,42 +159,66 @@ function renderVariant(title, options) {
  *     Pattern gallery output.
  */
 function renderPatterns(options) {
+	const report = diagnosticReport({
+		checks: [
+			{
+				detail: "184 tests",
+				name: "unit",
+				result: resultTypes.SUCCESS,
+			},
+			{
+				detail: "2 failures",
+				name: "type-check",
+				result: resultTypes.FAILED,
+			},
+		],
+		findings: [
+			{
+				message: "Coverage below target",
+				result: resultTypes.WARNING,
+			},
+		],
+		nextActions: [
+			"Review failing checks",
+			"Re-run diagnostics",
+		],
+		skippedChecks: [
+			{
+				name: "e2e",
+				reason: "Browser unavailable",
+			},
+		],
+		title: "Project diagnostics",
+	}, options);
+
 	return [
-		"Patterns",
+		divider({
+			...options,
+			label: "Patterns",
+		}),
 		"",
 		"Diagnostic report",
-		diagnosticReport({
-			checks: [
-				{
-					detail: "184 tests",
-					name: "unit",
-					result: resultTypes.SUCCESS,
-				},
-				{
-					detail: "2 failures",
-					name: "type-check",
-					result: resultTypes.FAILED,
-				},
-			],
-			findings: [
-				{
-					message: "Coverage below target",
-					result: resultTypes.WARNING,
-				},
-			],
-			nextActions: [
-				"Review failing checks",
-				"Re-run diagnostics",
-			],
-			skippedChecks: [
-				{
-					name: "e2e",
-					reason: "Browser unavailable",
-				},
-			],
-			title: "Project diagnostics",
-		}, options),
+		frameExample(report, options),
 	].join("\n");
+}
+
+/**
+ * Add gallery-only framing around one rendered example.
+ *
+ * @param  {string}  output
+ *     Rendered example output.
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Framed gallery example.
+ */
+function frameExample(output, options) {
+	const rail = options.unicode === false ? "|" : "│";
+
+	return output
+		.split("\n")
+		.map((line) => line === "" ? rail : `${rail} ${line}`)
+		.join("\n");
 }
 
 /**
