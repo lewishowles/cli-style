@@ -2,6 +2,7 @@ import { agentTranscript } from "../patterns/agent-transcript.js";
 import { auditFinding } from "../patterns/audit-finding.js";
 import { commandResult } from "../patterns/command-result.js";
 import { compactDataTable } from "../patterns/compact-data-table.js";
+import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
@@ -123,6 +124,7 @@ export const galleryFixtures = [
 	"audit-finding",
 	"compact-data-table",
 	"compact-data-table-narrow",
+	"confirmation-result",
 ];
 
 /**
@@ -307,6 +309,12 @@ function renderPatterns(options, fixture) {
 		...options,
 		width: 20,
 	});
+	const confirmation = confirmationResult({
+		action: "Delete project",
+		detail: "Project and 12 files removed.",
+		item: "Website refresh",
+		state: "confirmed",
+	}, options);
 	const command = commandResult({
 		command: "bun run test:unit",
 		details: [
@@ -394,6 +402,7 @@ function renderPatterns(options, fixture) {
 		"command-result": ["Command result", command],
 		"compact-data-table": ["Compact data table", compactTable],
 		"compact-data-table-narrow": ["Compact data table (narrow)", narrowCompactTable],
+		"confirmation-result": ["Confirmation result", confirmation],
 		"diagnostic-report": ["Diagnostic report", report],
 		"task-summary": ["Task summary", summary],
 	};
@@ -428,6 +437,9 @@ function renderPatterns(options, fixture) {
 		"",
 		"Compact data table (narrow)",
 		frameExample(narrowCompactTable, options),
+		"",
+		"Confirmation result",
+		frameExample(confirmation, options),
 	].join("\n");
 }
 

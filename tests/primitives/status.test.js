@@ -30,6 +30,15 @@ describe("status", () => {
 		expect(output).toBe("⚠ Warning");
 	});
 
+	test("Allows a pattern-specific status label", () => {
+		const output = status(resultTypes.SUCCESS, "Delete project", {
+			colour: false,
+			label: "Confirmed",
+		});
+
+		expect(output).toBe("✓ Confirmed Delete project");
+	});
+
 	test("Falls back to unknown status", () => {
 		const output = status("missing", "State unclear", {
 			colour: false,

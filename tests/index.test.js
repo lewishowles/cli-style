@@ -6,6 +6,7 @@ import {
 	barChart,
 	commandResult,
 	compactDataTable,
+	confirmationResult,
 	createCliStyle,
 	diagnosticReport,
 	divider,
@@ -217,6 +218,16 @@ describe("Render contracts", () => {
 		})).toContain("unit");
 	});
 
+	test("Exports confirmation result pattern", () => {
+		expect(confirmationResult({
+			action: "Delete project",
+			item: "Website refresh",
+			state: "confirmed",
+		}, {
+			colour: false,
+		})).toContain("✓ Confirmed Delete project — Website refresh");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -291,6 +302,7 @@ describe("Render contracts", () => {
 		expect(output).toContain("│ Package updates");
 		expect(output).toContain("│ Package     Status   Version");
 		expect(output).toContain("│ Package  components");
+		expect(output).toContain("│ ✓ Confirmed Delete project — Website refresh");
 		expect(output).toContain("| [Tool: project-diagnostics]");
 		expect(output).toContain("| x Failed Muted text has insufficient contrast");
 		expect(output).toContain("| Project diagnostics");
@@ -309,6 +321,9 @@ describe("Render contracts", () => {
 		const audit = renderGallery({}, {
 			fixture: "audit-finding",
 		});
+		const confirmation = renderGallery({}, {
+			fixture: "confirmation-result",
+		});
 
 		expect(noColour).toContain("No colour ------------------------------");
 		expect(noColour).not.toContain("\u001b[");
@@ -317,6 +332,8 @@ describe("Render contracts", () => {
 		expect(audit).toContain("Audit finding");
 		expect(audit).toContain("Accessibility audit");
 		expect(audit).not.toContain("Diagnostic report");
+		expect(confirmation).toContain("✓ Confirmed Delete project — Website refresh");
+		expect(confirmation).not.toContain("Audit finding");
 	});
 
 	test("Renders coloured primitive gallery when colour is enabled", () => {

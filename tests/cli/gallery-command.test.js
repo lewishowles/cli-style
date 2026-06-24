@@ -28,6 +28,7 @@ describe("parseGalleryRequest", () => {
 			section: undefined,
 			variant: "plain",
 		});
+		expect(parseGalleryRequest(["--fixture", "confirmation-result"]).fixture).toBe("confirmation-result");
 		expect(parseGalleryRequest(["--matrix"])).toEqual({
 			fixture: undefined,
 			interactive: false,

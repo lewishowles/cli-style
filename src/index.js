@@ -17,6 +17,7 @@ export { agentTranscript } from "./patterns/agent-transcript.js";
 export { auditFinding } from "./patterns/audit-finding.js";
 export { commandResult } from "./patterns/command-result.js";
 export { compactDataTable } from "./patterns/compact-data-table.js";
+export { confirmationResult } from "./patterns/confirmation-result.js";
 export { diagnosticReport } from "./patterns/diagnostic-report.js";
 export { taskSummary } from "./patterns/task-summary.js";
 export { barChart } from "./primitives/bar-chart.js";
