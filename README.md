@@ -47,6 +47,10 @@ Renderer methods should return strings. `ui.print()`, `ui.write()`, and CLI comm
 
 ```bash
 bun run cli-style:gallery
+bun ./bin/cli-style.js gallery no-colour
+bun ./bin/cli-style.js gallery --section patterns
+bun ./bin/cli-style.js gallery --fixture audit-finding
+bun ./bin/cli-style.js gallery --matrix
 ```
 
-The gallery command is read-only. The first version prints a placeholder until primitives and patterns exist.
+The gallery is read-only and shows the current terminal variant by default. Use `--interactive` to select a section or fixture with `fzf` when it is installed; otherwise the current-terminal gallery is shown.

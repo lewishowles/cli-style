@@ -1,6 +1,7 @@
 import { agentTranscript } from "../patterns/agent-transcript.js";
 import { auditFinding } from "../patterns/audit-finding.js";
 import { commandResult } from "../patterns/command-result.js";
+import { compactDataTable } from "../patterns/compact-data-table.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
@@ -99,59 +100,151 @@ const progressExamples = [
 	},
 ];
 
+// Gallery variants available through the public renderer and CLI.
+export const galleryVariants = [
+	"current",
+	"no-colour",
+	"no-unicode",
+	"plain",
+];
+
+// Gallery sections available for focused output.
+export const gallerySections = [
+	"primitives",
+	"patterns",
+];
+
+// Pattern fixtures available for focused output and interactive search.
+export const galleryFixtures = [
+	"diagnostic-report",
+	"command-result",
+	"task-summary",
+	"agent-transcript",
+	"audit-finding",
+	"compact-data-table",
+	"compact-data-table-narrow",
+];
+
 /**
  * Render the read-only style gallery.
  *
  * @param  {object}  options
  *     Rendering options.
+ * @param  {object}  request
+ *     Gallery selection request.
  * @returns  {string}
  *     Gallery output.
  */
-export function renderGallery(options = {}) {
+export function renderGallery(options = {}, request = {}) {
+	const variants = request.matrix === true
+		? galleryVariants
+		: [request.variant ?? "current"];
+
 	return [
 		"CLI style gallery",
-		"",
-		renderVariant("Current terminal", options),
-		"",
-		renderVariant("No colour", {
-			...options,
-			colour: false,
-		}),
-		"",
-		renderVariant("No Unicode", {
-			...options,
-			unicode: false,
-		}),
-		"",
-		renderVariant("Plain", {
-			...options,
-			colour: false,
-			unicode: false,
-		}),
+		...variants.flatMap((variant) => [
+			"",
+			renderVariant(variant, options, request),
+		]),
 	].join("\n");
 }
 
 /**
  * Render one gallery capability variant.
  *
- * @param  {string}  title
- *     Variant title.
+ * @param  {string}  variant
+ *     Variant name.
  * @param  {object}  options
  *     Rendering options.
+ * @param  {object}  request
+ *     Gallery selection request.
  * @returns  {string}
  *     Variant gallery output.
  */
-function renderVariant(title, options) {
+function renderVariant(variant, options, request) {
+	const resolvedVariant = resolveVariant(variant, options);
+	const sections = [];
+
+	if (request.fixture !== undefined) {
+		sections.push(renderPatterns(resolvedVariant.options, request.fixture));
+	} else {
+		if (request.section === undefined || request.section === "primitives") {
+			sections.push(renderPrimitives(resolvedVariant.options));
+		}
+
+		if (request.section === undefined || request.section === "patterns") {
+			sections.push(renderPatterns(resolvedVariant.options));
+		}
+	}
+
 	return [
 		divider({
-			...options,
-			label: title,
+			...resolvedVariant.options,
+			label: resolvedVariant.title,
 		}),
 		"",
-		renderPrimitives(options),
-		"",
-		renderPatterns(options),
+		...joinSections(sections),
 	].join("\n");
+}
+
+/**
+ * Resolve one gallery variant title and rendering options.
+ *
+ * @param  {string}  variant
+ *     Variant name.
+ * @param  {object}  options
+ *     Base rendering options.
+ * @returns  {object}
+ *     Variant title and options.
+ */
+function resolveVariant(variant, options) {
+	if (variant === "no-colour") {
+		return {
+			options: {
+				...options,
+				colour: false,
+			},
+			title: "No colour",
+		};
+	}
+
+	if (variant === "no-unicode") {
+		return {
+			options: {
+				...options,
+				unicode: false,
+			},
+			title: "No Unicode",
+		};
+	}
+
+	if (variant === "plain") {
+		return {
+			options: {
+				...options,
+				colour: false,
+				unicode: false,
+			},
+			title: "Plain",
+		};
+	}
+
+	return {
+		options,
+		title: "Current terminal",
+	};
+}
+
+/**
+ * Add spacing between non-empty gallery sections.
+ *
+ * @param  {string[]}  sections
+ *     Gallery sections.
+ * @returns  {string[]}
+ *     Sections with blank-line separators.
+ */
+function joinSections(sections) {
+	return sections.flatMap((section, index) => index === 0 ? [section] : ["", section]);
 }
 
 /**
@@ -159,10 +252,12 @@ function renderVariant(title, options) {
  *
  * @param  {object}  options
  *     Rendering options.
+ * @param  {string}  fixture
+ *     Optional fixture name.
  * @returns  {string}
  *     Pattern gallery output.
  */
-function renderPatterns(options) {
+function renderPatterns(options, fixture) {
 	const audit = auditFinding({
 		evidence: [
 			"Text contrast measures 3.2:1",
@@ -177,6 +272,41 @@ function renderPatterns(options) {
 		result: resultTypes.FAILED,
 		title: "Accessibility audit",
 	}, options);
+	const compactTableData = {
+		columns: [
+			{
+				key: "package",
+				label: "Package",
+			},
+			{
+				key: "status",
+				label: "Status",
+			},
+			{
+				key: "version",
+				label: "Version",
+			},
+		],
+		rows: [
+			{
+				package: "components",
+				status: "minor",
+				version: "2.8.0",
+			},
+			{
+				package: "helpers",
+				status: "current",
+				version: "4.1.0",
+			},
+		],
+		summary: "2 packages checked",
+		title: "Package updates",
+	};
+	const compactTable = compactDataTable(compactTableData, options);
+	const narrowCompactTable = compactDataTable(compactTableData, {
+		...options,
+		width: 20,
+	});
 	const command = commandResult({
 		command: "bun run test:unit",
 		details: [
@@ -258,6 +388,19 @@ function renderPatterns(options) {
 		],
 		title: "Focused verification",
 	}, options);
+	const fixtures = {
+		"agent-transcript": ["Agent transcript", transcript],
+		"audit-finding": ["Audit finding", audit],
+		"command-result": ["Command result", command],
+		"compact-data-table": ["Compact data table", compactTable],
+		"compact-data-table-narrow": ["Compact data table (narrow)", narrowCompactTable],
+		"diagnostic-report": ["Diagnostic report", report],
+		"task-summary": ["Task summary", summary],
+	};
+
+	if (fixture !== undefined) {
+		return renderPatternFixture(fixtures[fixture], options);
+	}
 
 	return [
 		divider({
@@ -279,6 +422,29 @@ function renderPatterns(options) {
 		"",
 		"Audit finding",
 		frameExample(audit, options),
+		"",
+		"Compact data table",
+		frameExample(compactTable, options),
+		"",
+		"Compact data table (narrow)",
+		frameExample(narrowCompactTable, options),
+	].join("\n");
+}
+
+/**
+ * Render one named pattern fixture.
+ *
+ * @param  {string[]}  fixture
+ *     Fixture label and output.
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Framed fixture output.
+ */
+function renderPatternFixture(fixture, options) {
+	return [
+		fixture[0],
+		frameExample(fixture[1], options),
 	].join("\n");
 }
 

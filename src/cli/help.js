@@ -4,13 +4,20 @@ const helpLines = [
 	"",
 	"Usage:",
 	"  cli-style --help",
-	"  cli-style gallery",
+	"  cli-style gallery [variant] [options]",
 	"",
 	"Commands:",
-	"  gallery    Print the read-only style gallery placeholder.",
+	"  gallery    Print the read-only style gallery.",
+	"",
+	"Gallery variants:",
+	"  current, no-colour, no-unicode, plain",
 	"",
 	"Options:",
-	"  -h, --help    Show this help.",
+	"  --section <name>    Show primitives or patterns.",
+	"  --fixture <name>    Show one named pattern fixture.",
+	"  --interactive       Select a section or fixture with fzf when available.",
+	"  --matrix            Show every capability variant.",
+	"  -h, --help          Show this help.",
 ];
 
 /**

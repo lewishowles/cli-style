@@ -1,6 +1,10 @@
 #!/usr/bin/env bun
 
 import { createCliStyle, renderGallery, renderHelp } from "../src/index.js";
+import {
+	parseGalleryRequest,
+	selectInteractiveGalleryRequest,
+} from "../src/cli/gallery-command.js";
 
 // Command-line arguments passed to the package binary.
 const args = process.argv.slice(2);
@@ -29,7 +33,15 @@ function print(value) {
 if (command === undefined || command === "--help" || command === "-h") {
 	print(renderHelp());
 } else if (command === "gallery") {
-	print(renderGallery(ui.options));
+	try {
+		const request = parseGalleryRequest(args.slice(1));
+		const selectedRequest = selectInteractiveGalleryRequest(request);
+
+		print(renderGallery(ui.options, selectedRequest));
+	} catch (error) {
+		console.error(error.message);
+		process.exitCode = 1;
+	}
 } else {
 	console.error(`Unknown command: ${command}`);
 	console.error("");

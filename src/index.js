@@ -5,12 +5,18 @@ export { resolveTerminalCapabilities } from "./capability/terminal.js";
 export { isProfile } from "./profiles/profiles.js";
 
 export { renderHelp } from "./cli/help.js";
-export { renderGallery } from "./gallery/render-gallery.js";
+export {
+	galleryFixtures,
+	gallerySections,
+	galleryVariants,
+	renderGallery,
+} from "./gallery/render-gallery.js";
 
 export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
 export { agentTranscript } from "./patterns/agent-transcript.js";
 export { auditFinding } from "./patterns/audit-finding.js";
 export { commandResult } from "./patterns/command-result.js";
+export { compactDataTable } from "./patterns/compact-data-table.js";
 export { diagnosticReport } from "./patterns/diagnostic-report.js";
 export { taskSummary } from "./patterns/task-summary.js";
 export { barChart } from "./primitives/bar-chart.js";

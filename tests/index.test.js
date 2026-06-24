@@ -5,6 +5,7 @@ import {
 	auditFinding,
 	barChart,
 	commandResult,
+	compactDataTable,
 	createCliStyle,
 	diagnosticReport,
 	divider,
@@ -198,6 +199,24 @@ describe("Render contracts", () => {
 		})).toContain("× Failed Icon button is unnamed");
 	});
 
+	test("Exports compact data table pattern", () => {
+		expect(compactDataTable({
+			columns: [
+				{
+					key: "check",
+					label: "Check",
+				},
+			],
+			rows: [
+				{
+					check: "unit",
+				},
+			],
+		}, {
+			colour: false,
+		})).toContain("unit");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -211,11 +230,21 @@ describe("Render contracts", () => {
 		})).toBe("1/2 OK Install\n2/2 ... Build");
 	});
 
-	test("Renders primitive gallery as a string", () => {
+	test("Renders the current-terminal gallery by default", () => {
 		const output = renderGallery();
 
 		expect(output).toContain("CLI style gallery");
 		expect(output).toContain("Current terminal -----------------------");
+		expect(output).not.toContain("No colour ------------------------------");
+		expect(output).not.toContain("No Unicode -----------------------------");
+		expect(output).not.toContain("Plain ----------------------------------");
+	});
+
+	test("Renders the full gallery matrix on request", () => {
+		const output = renderGallery({}, {
+			matrix: true,
+		});
+
 		expect(output).toContain("No colour ------------------------------");
 		expect(output).toContain("No Unicode -----------------------------");
 		expect(output).toContain("Plain ----------------------------------");
@@ -259,10 +288,35 @@ describe("Render contracts", () => {
 		expect(output).toContain("│ [Tool: project-diagnostics]");
 		expect(output).toContain("│ Accessibility audit");
 		expect(output).toContain("│ × Failed Muted text has insufficient contrast");
+		expect(output).toContain("│ Package updates");
+		expect(output).toContain("│ Package     Status   Version");
+		expect(output).toContain("│ Package  components");
 		expect(output).toContain("| [Tool: project-diagnostics]");
 		expect(output).toContain("| x Failed Muted text has insufficient contrast");
 		expect(output).toContain("| Project diagnostics");
 		expect(output).toContain("| ! Warning Coverage below target");
+	});
+
+	test("Filters gallery variants, sections, and fixtures", () => {
+		const noColour = renderGallery({
+			colour: true,
+		}, {
+			variant: "no-colour",
+		});
+		const patterns = renderGallery({}, {
+			section: "patterns",
+		});
+		const audit = renderGallery({}, {
+			fixture: "audit-finding",
+		});
+
+		expect(noColour).toContain("No colour ------------------------------");
+		expect(noColour).not.toContain("\u001b[");
+		expect(patterns).toContain("Patterns -------------------------------");
+		expect(patterns).not.toContain("Primitives");
+		expect(audit).toContain("Audit finding");
+		expect(audit).toContain("Accessibility audit");
+		expect(audit).not.toContain("Diagnostic report");
 	});
 
 	test("Renders coloured primitive gallery when colour is enabled", () => {
@@ -275,6 +329,6 @@ describe("Render contracts", () => {
 		expect(stripAnsi(output)).toContain(" neutral   info   success   warning   danger ");
 		expect(stripAnsi(output)).toContain("✓ Success tone: success");
 		expect(stripAnsi(output)).toContain("◐ Partial tone: warning");
-		expect(stripAnsi(output)).toContain("OK Success tone: success");
+		expect(stripAnsi(output)).not.toContain("OK Success tone: success");
 	});
 });
