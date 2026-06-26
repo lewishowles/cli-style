@@ -6,6 +6,7 @@ import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
+import { stripAnsi } from "../formatters/ansi.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
@@ -143,6 +144,7 @@ export function renderGallery(options = {}, request = {}) {
 	const galleryOptions = request.width === undefined
 		? options
 		: {
+			...galleryWidthOptions(request.width),
 			...options,
 			width: request.width,
 		};
@@ -150,13 +152,15 @@ export function renderGallery(options = {}, request = {}) {
 		? galleryVariants
 		: [request.variant ?? "current"];
 
-	return [
+	const output = [
 		"CLI style gallery",
 		...variants.flatMap((variant) => [
 			"",
 			renderVariant(variant, galleryOptions, request),
 		]),
 	].join("\n");
+
+	return request.width === undefined ? output : clampGalleryOutput(output, request.width);
 }
 
 /**
@@ -255,6 +259,63 @@ function resolveVariant(variant, options) {
  */
 function joinSections(sections) {
 	return sections.flatMap((section, index) => index === 0 ? [section] : ["", section]);
+}
+
+/**
+ * Return component widths derived from a gallery width request.
+ *
+ * @param  {number}  width
+ *     Requested gallery width.
+ * @returns  {object}
+ *     Width options for fixed-width renderers.
+ */
+function galleryWidthOptions(width) {
+	return {
+		barWidth: Math.max(width - 18, 1),
+		dividerWidth: width,
+		panelWidth: width,
+	};
+}
+
+/**
+ * Keep generated gallery lines inside a requested visible width.
+ *
+ * @param  {string}  output
+ *     Gallery output.
+ * @param  {number}  width
+ *     Requested visible width.
+ * @returns  {string}
+ *     Width-constrained output.
+ */
+function clampGalleryOutput(output, width) {
+	return output
+		.split("\n")
+		.map((line) => clampLine(line, width))
+		.join("\n");
+}
+
+/**
+ * Truncate one line to a visible width.
+ *
+ * @param  {string}  line
+ *     Output line.
+ * @param  {number}  width
+ *     Requested visible width.
+ * @returns  {string}
+ *     Truncated line.
+ */
+function clampLine(line, width) {
+	const plainLine = stripAnsi(line);
+
+	if (plainLine.length <= width) {
+		return line;
+	}
+
+	if (width <= 1) {
+		return plainLine.slice(0, width);
+	}
+
+	return `${plainLine.slice(0, width - 1)}~`;
 }
 
 /**

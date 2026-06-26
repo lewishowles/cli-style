@@ -361,6 +361,16 @@ describe("Render contracts", () => {
 		expect(output).toContain("Result  warning");
 	});
 
+	test("Constrains gallery output to a requested width", () => {
+		const output = renderGallery({}, {
+			matrix: true,
+			width: 16,
+		});
+		const widestLine = Math.max(...stripAnsi(output).split("\n").map((line) => line.length));
+
+		expect(widestLine).toBeLessThanOrEqual(16);
+	});
+
 	test("Renders coloured primitive gallery when colour is enabled", () => {
 		const output = renderGallery({
 			colour: true,
