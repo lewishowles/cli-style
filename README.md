@@ -53,6 +53,9 @@ bun ./bin/cli-style.js gallery --fixture audit-finding
 bun ./bin/cli-style.js gallery --profile agent
 bun ./bin/cli-style.js gallery --width 64
 bun ./bin/cli-style.js gallery --matrix
+bun examples/gallery.mjs
 ```
 
 The gallery is read-only and shows the current terminal variant by default. Use `--profile` and `--width` for deterministic focused review. Use `--interactive` to select a section or fixture with `fzf` when it is installed; otherwise the current-terminal gallery is shown.
+
+`examples/gallery.mjs` renders a fixed-width, no-colour, no-Unicode matrix for repeatable manual review.
