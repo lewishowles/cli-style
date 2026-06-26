@@ -19,18 +19,47 @@ bun run cli-style:gallery
 ## Usage
 
 ```js
-import { createCliStyle, renderGallery } from "@lewishowles/cli-style";
+import { createCliStyle, status } from "@lewishowles/cli-style";
 
 const ui = createCliStyle({
 	profile: "human",
 	width: 80,
 });
 
-const output = renderGallery();
+const output = status("success", "184 tests", {
+	...ui.options,
+	label: "Build passed",
+});
 ui.print(output);
 ```
 
 Renderer methods should return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
+
+## Custom rendering
+
+Use `cli-style render <renderer>` when shell, Python, or other non-JavaScript callers need the shared renderer implementation. The command reads one JSON object from stdin and writes rendered text to stdout.
+
+```bash
+bun ./bin/cli-style.js render status --profile diagnostic <<'JSON'
+{
+  "type": "success",
+  "label": "Build passed",
+  "detail": "184 tests"
+}
+JSON
+```
+
+```bash
+bun ./bin/cli-style.js render task-summary --plain <<'JSON'
+{
+  "title": "Task summary",
+  "completed": ["Added render command"],
+  "remaining": ["Add adapters"]
+}
+JSON
+```
+
+`render` supports the same text output flags as the gallery, including `--profile`, `--plain`, `--no-colour`, `--no-color`, `--no-unicode`, and `--width`. It rejects `--json` because this command is for text rendering from caller-provided JSON.
 
 ## Profiles
 

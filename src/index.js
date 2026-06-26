@@ -6,6 +6,11 @@ export { isProfile } from "./profiles/profiles.js";
 
 export { renderHelp } from "./cli/help.js";
 export {
+	parseRenderRequest,
+	rendererNames,
+	renderJsonInput,
+} from "./cli/render-command.js";
+export {
 	galleryFixtures,
 	gallerySections,
 	galleryVariants,

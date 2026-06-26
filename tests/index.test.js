@@ -80,6 +80,7 @@ describe("Render contracts", () => {
 
 		expect(output).toContain("Usage:");
 		expect(output).toContain("cli-style gallery");
+		expect(output).toContain("cli-style render");
 	});
 
 	test("Exports divider primitive", () => {

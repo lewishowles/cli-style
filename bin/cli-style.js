@@ -1,10 +1,16 @@
 #!/usr/bin/env bun
 
+import { Buffer } from "node:buffer";
+
 import { createCliStyle, renderGallery, renderHelp } from "../src/index.js";
 import {
 	parseGalleryRequest,
 	selectInteractiveGalleryRequest,
 } from "../src/cli/gallery-command.js";
+import {
+	parseRenderRequest,
+	renderJsonInput,
+} from "../src/cli/render-command.js";
 
 // Command-line arguments passed to the package binary.
 const args = process.argv.slice(2);
@@ -42,9 +48,35 @@ if (command === undefined || command === "--help" || command === "-h") {
 		console.error(error.message);
 		process.exitCode = 1;
 	}
+} else if (command === "render") {
+	try {
+		const request = parseRenderRequest(args.slice(1));
+		const input = await readStdin();
+
+		print(renderJsonInput(input, request, ui.options));
+	} catch (error) {
+		console.error(error.message);
+		process.exitCode = 1;
+	}
 } else {
 	console.error(`Unknown command: ${command}`);
 	console.error("");
 	console.error(renderHelp());
 	process.exitCode = 1;
+}
+
+/**
+ * Read all stdin data for custom render input.
+ *
+ * @returns  {Promise<string>}
+ *     Stdin text.
+ */
+async function readStdin() {
+	const chunks = [];
+
+	for await (const chunk of process.stdin) {
+		chunks.push(Buffer.from(chunk));
+	}
+
+	return Buffer.concat(chunks).toString("utf8");
 }
