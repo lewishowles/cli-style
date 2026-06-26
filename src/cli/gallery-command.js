@@ -28,17 +28,17 @@ export function parseGalleryRequest(args = []) {
 	const request = {
 		fixture: undefined,
 		interactive: false,
-		matrix: false,
 		section: undefined,
 		variant: "current",
+		variants: false,
 		width: undefined,
 	};
 
 	for (let index = 0; index < args.length; index += 1) {
 		const argument = args[index];
 
-		if (argument === "--matrix") {
-			request.matrix = true;
+		if (argument === "--variants" || argument === "--matrix") {
+			request.variants = true;
 		} else if (argument === "--interactive") {
 			request.interactive = true;
 		} else if (argument === "--section") {

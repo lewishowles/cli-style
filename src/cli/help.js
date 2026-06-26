@@ -18,7 +18,7 @@ const helpLines = [
 	"  --profile <name>    Render with a text profile.",
 	"  --width <columns>   Render with a fixed terminal width.",
 	"  --interactive       Select a section or fixture with fzf when available.",
-	"  --matrix            Show every capability variant.",
+	"  --variants          Show every capability variant.",
 	"  -h, --help          Show this help.",
 ];
 

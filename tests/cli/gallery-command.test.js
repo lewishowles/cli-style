@@ -7,38 +7,46 @@ describe("parseGalleryRequest", () => {
 		expect(parseGalleryRequest([])).toEqual({
 			fixture: undefined,
 			interactive: false,
-			matrix: false,
 			section: undefined,
 			variant: "current",
+			variants: false,
 			width: undefined,
 		});
 	});
 
-	test("Parses variants, sections, fixtures, and matrix mode", () => {
+	test("Parses variants, sections, fixtures, and variants mode", () => {
 		expect(parseGalleryRequest(["no-colour", "--section", "patterns"])).toEqual({
 			fixture: undefined,
 			interactive: false,
-			matrix: false,
 			section: "patterns",
 			variant: "no-colour",
+			variants: false,
 			width: undefined,
 		});
 		expect(parseGalleryRequest(["plain", "--fixture", "audit-finding"])).toEqual({
 			fixture: "audit-finding",
 			interactive: false,
-			matrix: false,
 			section: undefined,
 			variant: "plain",
+			variants: false,
 			width: undefined,
 		});
 		expect(parseGalleryRequest(["--fixture", "confirmation-result"]).fixture).toBe("confirmation-result");
 		expect(parseGalleryRequest(["--fixture", "next-step-block"]).fixture).toBe("next-step-block");
+		expect(parseGalleryRequest(["--variants"])).toEqual({
+			fixture: undefined,
+			interactive: false,
+			section: undefined,
+			variant: "current",
+			variants: true,
+			width: undefined,
+		});
 		expect(parseGalleryRequest(["--matrix"])).toEqual({
 			fixture: undefined,
 			interactive: false,
-			matrix: true,
 			section: undefined,
 			variant: "current",
+			variants: true,
 			width: undefined,
 		});
 	});
@@ -47,9 +55,9 @@ describe("parseGalleryRequest", () => {
 		expect(parseGalleryRequest(["--plain", "--profile", "agent", "--width", "32"])).toEqual({
 			fixture: undefined,
 			interactive: false,
-			matrix: false,
 			section: undefined,
 			variant: "current",
+			variants: false,
 			width: 32,
 		});
 		expect(parseGalleryRequest(["--profile=ci", "--width=48"]).width).toBe(48);
@@ -60,9 +68,9 @@ describe("parseGalleryRequest", () => {
 		expect(parseGalleryRequest(["--interactive"])).toEqual({
 			fixture: undefined,
 			interactive: true,
-			matrix: false,
 			section: undefined,
 			variant: "current",
+			variants: false,
 			width: undefined,
 		});
 	});

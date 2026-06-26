@@ -10,9 +10,9 @@ const reviewOptions = {
 	width: 64,
 };
 
-// Matrix request exercises every gallery capability variant with fixed sample data.
+// Variants request exercises every gallery capability variant with fixed sample data.
 const reviewRequest = {
-	matrix: true,
+	variants: true,
 };
 
 console.log(renderGallery(reviewOptions, reviewRequest));

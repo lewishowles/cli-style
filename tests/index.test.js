@@ -260,9 +260,9 @@ describe("Render contracts", () => {
 		expect(output).not.toContain("Plain ----------------------------------");
 	});
 
-	test("Renders the full gallery matrix on request", () => {
+	test("Renders all gallery variants on request", () => {
 		const output = renderGallery({}, {
-			matrix: true,
+			variants: true,
 		});
 
 		expect(output).toContain("No colour ------------------------------");
@@ -363,7 +363,7 @@ describe("Render contracts", () => {
 
 	test("Constrains gallery output to a requested width", () => {
 		const output = renderGallery({}, {
-			matrix: true,
+			variants: true,
 			width: 16,
 		});
 		const widestLine = Math.max(...stripAnsi(output).split("\n").map((line) => line.length));

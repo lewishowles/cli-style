@@ -148,7 +148,7 @@ export function renderGallery(options = {}, request = {}) {
 			...options,
 			width: request.width,
 		};
-	const variants = request.matrix === true
+	const variants = request.variants === true || request.matrix === true
 		? galleryVariants
 		: [request.variant ?? "current"];
 
