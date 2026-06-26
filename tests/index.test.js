@@ -13,6 +13,7 @@ import {
 	emptyState,
 	errorBlock,
 	hint,
+	nextStepBlock,
 	panel,
 	profiles,
 	progressBar,
@@ -228,6 +229,14 @@ describe("Render contracts", () => {
 		})).toContain("✓ Confirmed Delete project — Website refresh");
 	});
 
+	test("Exports next-step block pattern", () => {
+		expect(nextStepBlock({
+			next: "Run verification",
+		}, {
+			colour: false,
+		})).toContain("Next  Run verification");
+	});
+
 	test("Exports step primitives", () => {
 		expect(step("Build", "current", {
 			colour: false,
@@ -303,6 +312,7 @@ describe("Render contracts", () => {
 		expect(output).toContain("│ Package     Status   Version");
 		expect(output).toContain("│ Package  components");
 		expect(output).toContain("│ ✓ Confirmed Delete project — Website refresh");
+		expect(output).toContain("│ Next  Commit the completed pattern chunk");
 		expect(output).toContain("| [Tool: project-diagnostics]");
 		expect(output).toContain("| x Failed Muted text has insufficient contrast");
 		expect(output).toContain("| Project diagnostics");
@@ -324,6 +334,9 @@ describe("Render contracts", () => {
 		const confirmation = renderGallery({}, {
 			fixture: "confirmation-result",
 		});
+		const nextStep = renderGallery({}, {
+			fixture: "next-step-block",
+		});
 
 		expect(noColour).toContain("No colour ------------------------------");
 		expect(noColour).not.toContain("\u001b[");
@@ -334,6 +347,18 @@ describe("Render contracts", () => {
 		expect(audit).not.toContain("Diagnostic report");
 		expect(confirmation).toContain("✓ Confirmed Delete project — Website refresh");
 		expect(confirmation).not.toContain("Audit finding");
+		expect(nextStep).toContain("Next  Commit the completed pattern chunk");
+		expect(nextStep).not.toContain("Confirmation result");
+	});
+
+	test("Renders gallery with a width override", () => {
+		const output = renderGallery({}, {
+			section: "primitives",
+			width: 18,
+		});
+
+		expect(output).toContain("Check   type-check");
+		expect(output).toContain("Result  warning");
 	});
 
 	test("Renders coloured primitive gallery when colour is enabled", () => {

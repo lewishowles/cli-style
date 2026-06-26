@@ -4,6 +4,7 @@ import { commandResult } from "../patterns/command-result.js";
 import { compactDataTable } from "../patterns/compact-data-table.js";
 import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
+import { nextStepBlock } from "../patterns/next-step-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
@@ -125,6 +126,7 @@ export const galleryFixtures = [
 	"compact-data-table",
 	"compact-data-table-narrow",
 	"confirmation-result",
+	"next-step-block",
 ];
 
 /**
@@ -138,6 +140,12 @@ export const galleryFixtures = [
  *     Gallery output.
  */
 export function renderGallery(options = {}, request = {}) {
+	const galleryOptions = request.width === undefined
+		? options
+		: {
+			...options,
+			width: request.width,
+		};
 	const variants = request.matrix === true
 		? galleryVariants
 		: [request.variant ?? "current"];
@@ -146,7 +154,7 @@ export function renderGallery(options = {}, request = {}) {
 		"CLI style gallery",
 		...variants.flatMap((variant) => [
 			"",
-			renderVariant(variant, options, request),
+			renderVariant(variant, galleryOptions, request),
 		]),
 	].join("\n");
 }
@@ -358,6 +366,17 @@ function renderPatterns(options, fixture) {
 		],
 		title: "Project diagnostics",
 	}, options);
+	const nextStep = nextStepBlock({
+		alternatives: [
+			"Review the focused gallery fixture",
+		],
+		commands: [
+			"git status --short",
+			"bun run test:unit",
+		],
+		next: "Commit the completed pattern chunk",
+		reason: "Implementation and verification are complete.",
+	}, options);
 	const summary = taskSummary({
 		completed: [
 			"Added command result renderer",
@@ -404,6 +423,7 @@ function renderPatterns(options, fixture) {
 		"compact-data-table-narrow": ["Compact data table (narrow)", narrowCompactTable],
 		"confirmation-result": ["Confirmation result", confirmation],
 		"diagnostic-report": ["Diagnostic report", report],
+		"next-step-block": ["Next-step block", nextStep],
 		"task-summary": ["Task summary", summary],
 	};
 
@@ -440,6 +460,9 @@ function renderPatterns(options, fixture) {
 		"",
 		"Confirmation result",
 		frameExample(confirmation, options),
+		"",
+		"Next-step block",
+		frameExample(nextStep, options),
 	].join("\n");
 }
 

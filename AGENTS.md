@@ -53,4 +53,4 @@ Planned functionality:
 - Respect `NO_COLOR`, `--no-colour`, `--no-color`, `--plain`, non-TTY stdout, and `TERM=dumb`.
 - Progress bars must include numeric text.
 - Tables must degrade into readable key/value blocks at narrow widths.
-- `AGENT_CAPABILITIES.md` has not been generated yet. Generate it only after package scripts exist through the approved capability workflow.
+- Factual commands, generated paths, and command safety live in `WORKSPACE.md`.
