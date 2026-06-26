@@ -11,7 +11,9 @@
 		"cli-style": "./bin/cli-style.js"
 	},
 	"files": [
+		"adapters",
 		"bin",
+		"examples",
 		"src",
 		"README.md"
 	],

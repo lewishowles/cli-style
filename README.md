@@ -61,6 +61,41 @@ JSON
 
 `render` supports the same text output flags as the gallery, including `--profile`, `--plain`, `--no-colour`, `--no-color`, `--no-unicode`, and `--width`. It rejects `--json` because this command is for text rendering from caller-provided JSON.
 
+## Adapters
+
+Bash callers can source the adapter and pass JSON through stdin:
+
+```bash
+source /path/to/node_modules/@lewishowles/cli-style/adapters/bash/cli-style.sh
+
+cli_style_render status --profile diagnostic <<'JSON'
+{
+  "type": "success",
+  "label": "Build passed",
+  "detail": "184 tests"
+}
+JSON
+```
+
+Python callers can import the adapter and pass a dictionary:
+
+```python
+from cli_style import render
+
+output = render(
+	"status",
+	{
+		"type": "success",
+		"label": "Build passed",
+		"detail": "184 tests",
+	},
+	profile="diagnostic",
+)
+print(output)
+```
+
+Set `CLI_STYLE_BIN` in Bash or pass `binary=` in Python when `cli-style` is not on `PATH`. The adapters call `cli-style render`; they do not duplicate renderer logic.
+
 ## Profiles
 
 | Profile      | Behaviour                                                                                  |
@@ -83,6 +118,9 @@ bun ./bin/cli-style.js gallery --profile agent
 bun ./bin/cli-style.js gallery --width 64
 bun ./bin/cli-style.js gallery --variants
 bun examples/gallery.mjs
+bun examples/diagnostic.mjs
+bash examples/diagnostic.sh
+python3 examples/diagnostic.py
 ```
 
 The gallery is read-only and shows the current terminal variant by default. Use `--profile` and `--width` for deterministic focused review. Use `--interactive` to select a section or fixture with `fzf` when it is installed; otherwise the current-terminal gallery is shown.
