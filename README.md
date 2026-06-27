@@ -4,8 +4,8 @@ Shared terminal output styles for tools, diagnostics, and package CLIs.
 
 ## Requirements
 
-- Bun
-- Node.js 20 or newer
+- Bun and Node.js 20 or newer for JavaScript projects and local binary builds
+- The standalone binary for Bash or Python projects that should not install Bun
 
 ## Install
 
@@ -15,10 +15,10 @@ JavaScript projects can install the package directly:
 bun add @lewishowles/cli-style
 ```
 
-Bash and Python projects still need the package available somewhere, because their adapters call the `cli-style` binary. If the project already has Node or Bun tooling, add it as a dev dependency. Otherwise, link or vendor this package in a stable tools directory and point the adapters at that copy:
+Bash and Python projects call the `cli-style` binary through thin adapters. If the project already has Node or Bun tooling, add this package as a dev dependency and use the package binary. Otherwise, install or vendor the standalone binary and put it on `PATH`:
 
 ```bash
-export CLI_STYLE_BIN="/path/to/cli-style/bin/cli-style.js"
+export PATH="/path/to/cli-style/bin:$PATH"
 ```
 
 ## JavaScript
@@ -71,7 +71,7 @@ Build a local standalone binary when a repo should not need Bun at runtime:
 
 ```bash
 bun run build:binary
-./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json
+bun run smoke:binary
 ```
 
 The build writes `dist/bin/cli-style` and copies adapters to `dist/adapters`. Package those paths together for binary installs.
