@@ -74,7 +74,14 @@ bun run build:binary
 bun run smoke:binary
 ```
 
-The build writes `dist/bin/cli-style` and copies adapters to `dist/adapters`. Package those paths together for binary installs.
+Create a binary install tarball:
+
+```bash
+bun run package:binary
+tar -tzf dist/release/cli-style-*.tar.gz
+```
+
+The package contains `bin/cli-style` and `adapters/`. Install it into a repo-local tools directory, then call that repo-local `bin/cli-style` from scripts.
 
 ## Bash
 
