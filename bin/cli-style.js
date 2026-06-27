@@ -1,20 +1,17 @@
 #!/usr/bin/env bun
 
 import { Buffer } from "node:buffer";
-
 import { createCliStyle, renderGallery, renderHelp } from "../src/index.js";
+import { parseAdapterPathRequest, renderAdapterPath } from "../src/cli/adapter-path-command.js";
+import { parseRenderRequest, renderJsonInput } from "../src/cli/render-command.js";
+
 import {
 	parseGalleryRequest,
 	selectInteractiveGalleryRequest,
 } from "../src/cli/gallery-command.js";
-import {
-	parseRenderRequest,
-	renderJsonInput,
-} from "../src/cli/render-command.js";
 
 // Command-line arguments passed to the package binary.
 const args = process.argv.slice(2);
-
 // First positional command requested by the caller.
 const command = args[0];
 
@@ -38,6 +35,15 @@ function print(value) {
 
 if (command === undefined || command === "--help" || command === "-h") {
 	print(renderHelp());
+} else if (command === "adapter-path") {
+	try {
+		const request = parseAdapterPathRequest(args.slice(1));
+
+		print(renderAdapterPath(request));
+	} catch (error) {
+		console.error(error.message);
+		process.exitCode = 1;
+	}
 } else if (command === "gallery") {
 	try {
 		const request = parseGalleryRequest(args.slice(1));

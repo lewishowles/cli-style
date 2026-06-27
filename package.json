@@ -14,6 +14,7 @@
 		"adapters",
 		"bin",
 		"examples",
+		"scripts",
 		"src",
 		"README.md"
 	],
@@ -26,8 +27,10 @@
 		"access": "public"
 	},
 	"scripts": {
+		"build:binary": "scripts/build-binary.sh",
 		"check": "vp check --fix",
 		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
+		"smoke:binary": "./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json",
 		"test:unit": "bun test"
 	},
 	"devDependencies": {

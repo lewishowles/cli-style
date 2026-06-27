@@ -21,6 +21,24 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Bash adapter can be sourced from cli-style adapter-path", () => {
+		const result = spawnSync("bash", [
+			"-c",
+			[
+				"source \"$(bin/cli-style.js adapter-path bash)\"",
+				"CLI_STYLE_BIN=\"$PWD/bin/cli-style.js\" cli_style_render status --plain <<'JSON'",
+				"{\"type\":\"success\",\"label\":\"Build passed\",\"detail\":\"184 tests\"}",
+				"JSON",
+			].join("\n"),
+		], {
+			encoding: "utf8",
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
+		expect(result.stderr).toBe("");
+	});
+
 	test("Bash adapter fails clearly when cli-style is unavailable", () => {
 		const result = spawnSync("bash", [
 			"-c",
@@ -45,6 +63,25 @@ describe("Adapter smoke tests", () => {
 				"from adapters.python.cli_style import render",
 				"output = render('status', {'type': 'success', 'label': 'Build passed', 'detail': '184 tests'}, binary='./bin/cli-style.js', plain=True)",
 				"print(output)",
+			].join("\n"),
+		], {
+			encoding: "utf8",
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
+		expect(result.stderr).toBe("");
+	});
+
+	test("Python adapter can be imported from cli-style adapter-path", () => {
+		const result = spawnSync("bash", [
+			"-c",
+			[
+				"PYTHONPATH=\"$(bin/cli-style.js adapter-path python)\" python3 - <<'PY'",
+				"from cli_style import render",
+				"output = render('status', {'type': 'success', 'label': 'Build passed', 'detail': '184 tests'}, binary='./bin/cli-style.js', plain=True)",
+				"print(output)",
+				"PY",
 			].join("\n"),
 		], {
 			encoding: "utf8",

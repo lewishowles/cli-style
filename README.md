@@ -19,7 +19,6 @@ Bash and Python projects still need the package available somewhere, because the
 
 ```bash
 export CLI_STYLE_BIN="/path/to/cli-style/bin/cli-style.js"
-export PYTHONPATH="/path/to/cli-style/adapters/python:$PYTHONPATH"
 ```
 
 ## JavaScript
@@ -68,10 +67,19 @@ JSON
 
 `render` supports `--profile`, `--plain`, `--no-colour`, `--no-color`, `--no-unicode`, and `--width`. It rejects `--json`; JSON profile behaviour is for library calls and machine-readable commands.
 
+Build a local standalone binary when a repo should not need Bun at runtime:
+
+```bash
+bun run build:binary
+./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json
+```
+
+The build writes `dist/bin/cli-style` and copies adapters to `dist/adapters`. Package those paths together for binary installs.
+
 ## Bash
 
 ```bash
-source /path/to/node_modules/@lewishowles/cli-style/adapters/bash/cli-style.sh
+source "$(cli-style adapter-path bash)"
 
 cli_style_render status --profile diagnostic <<'JSON'
 {
@@ -95,7 +103,11 @@ JSON
 
 ## Python
 
-Add `/path/to/node_modules/@lewishowles/cli-style/adapters/python` to `PYTHONPATH`, then import the helper:
+Add the adapter directory to `PYTHONPATH`, then import the helper:
+
+```bash
+export PYTHONPATH="$(cli-style adapter-path python):$PYTHONPATH"
+```
 
 ```python
 from cli_style import render

@@ -6,6 +6,11 @@ export { isProfile } from "./profiles/profiles.js";
 
 export { renderHelp } from "./cli/help.js";
 export {
+	adapterNames,
+	parseAdapterPathRequest,
+	renderAdapterPath,
+} from "./cli/adapter-path-command.js";
+export {
 	parseRenderRequest,
 	rendererNames,
 	renderJsonInput,
