@@ -2,22 +2,27 @@
 
 Shared terminal output styles for tools, diagnostics, and package CLIs.
 
-This package is ready for first internal adoption. Start with low-risk, noisy command output before replacing user-facing package CLIs.
-
 ## Requirements
 
 - Bun
 - Node.js 20 or newer
 
-## Getting started
+## Install
+
+JavaScript projects can install the package directly:
 
 ```bash
-bun install
-bun test
-bun run cli-style:gallery
+bun add @lewishowles/cli-style
 ```
 
-## Usage
+Bash and Python projects still need the package available somewhere, because their adapters call the `cli-style` binary. If the project already has Node or Bun tooling, add it as a dev dependency. Otherwise, link or vendor this package in a stable tools directory and point the adapters at that copy:
+
+```bash
+export CLI_STYLE_BIN="/path/to/cli-style/bin/cli-style.js"
+export PYTHONPATH="/path/to/cli-style/adapters/python:$PYTHONPATH"
+```
+
+## JavaScript
 
 ```js
 import { createCliStyle, status } from "@lewishowles/cli-style";
@@ -31,17 +36,18 @@ const output = status("success", "184 tests", {
 	...ui.options,
 	label: "Build passed",
 });
+
 ui.print(output);
 ```
 
-Renderer methods should return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
+Renderer methods return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
 
-## Custom rendering
+## CLI
 
-Use `cli-style render <renderer>` when shell, Python, or other non-JavaScript callers need the shared renderer implementation. The command reads one JSON object from stdin and writes rendered text to stdout.
+Use `cli-style render <renderer>` when a script needs rendered text from JSON input.
 
 ```bash
-bun ./bin/cli-style.js render status --profile diagnostic <<'JSON'
+cli-style render status --profile diagnostic <<'JSON'
 {
   "type": "success",
   "label": "Build passed",
@@ -51,7 +57,7 @@ JSON
 ```
 
 ```bash
-bun ./bin/cli-style.js render task-summary --plain <<'JSON'
+cli-style render task-summary --plain <<'JSON'
 {
   "title": "Task summary",
   "completed": ["Added render command"],
@@ -60,11 +66,9 @@ bun ./bin/cli-style.js render task-summary --plain <<'JSON'
 JSON
 ```
 
-`render` supports the same text output flags as the gallery, including `--profile`, `--plain`, `--no-colour`, `--no-color`, `--no-unicode`, and `--width`. It rejects `--json` because this command is for text rendering from caller-provided JSON.
+`render` supports `--profile`, `--plain`, `--no-colour`, `--no-color`, `--no-unicode`, and `--width`. It rejects `--json`; JSON profile behaviour is for library calls and machine-readable commands.
 
-## Adapters
-
-Bash callers can source the adapter and pass JSON through stdin:
+## Bash
 
 ```bash
 source /path/to/node_modules/@lewishowles/cli-style/adapters/bash/cli-style.sh
@@ -78,7 +82,20 @@ cli_style_render status --profile diagnostic <<'JSON'
 JSON
 ```
 
-Python callers can import the adapter and pass a dictionary:
+Set `CLI_STYLE_BIN` when `cli-style` is not on `PATH`:
+
+```bash
+CLI_STYLE_BIN="/path/to/cli-style" cli_style_render status --plain <<'JSON'
+{
+  "type": "success",
+  "label": "Build passed"
+}
+JSON
+```
+
+## Python
+
+Add `/path/to/node_modules/@lewishowles/cli-style/adapters/python` to `PYTHONPATH`, then import the helper:
 
 ```python
 from cli_style import render
@@ -92,50 +109,45 @@ output = render(
 	},
 	profile="diagnostic",
 )
+
 print(output)
 ```
 
-Set `CLI_STYLE_BIN` in Bash or pass `binary=` in Python when `cli-style` is not on `PATH`. The adapters call `cli-style render`; they do not duplicate renderer logic.
+Pass `binary=` when `cli-style` is not on `PATH`:
+
+```python
+output = render(
+	"status",
+	{
+		"type": "success",
+		"label": "Build passed",
+	},
+	binary="/path/to/cli-style",
+	plain=True,
+)
+```
 
 ## Profiles
 
-| Profile      | Behaviour                                                                                  |
-| ------------ | ------------------------------------------------------------------------------------------ |
-| `human`      | Colour and Unicode when supported; compact but visually pleasant.                          |
-| `agent`      | Markdown-like, structured, easy to quote or parse.                                         |
-| `diagnostic` | Optimised for check summaries, findings, skipped checks, and next actions.                 |
-| `ci`         | Stable, grep-friendly, no decorative panels; colour off unless explicitly forced.          |
-| `plain`      | No ANSI, no Unicode dependency, simple text layout.                                        |
-| `json`       | Machine-readable only; library calls return structured data and CLI commands serialise it. |
+| Profile      | Behaviour                                                                         |
+| ------------ | --------------------------------------------------------------------------------- |
+| `human`      | Colour and Unicode when supported; compact but visually pleasant.                 |
+| `agent`      | Markdown-like, structured, easy to quote or parse.                                |
+| `diagnostic` | Optimised for check summaries, findings, skipped checks, and next actions.        |
+| `ci`         | Stable, grep-friendly, no decorative panels; colour off unless explicitly forced. |
+| `plain`      | No ANSI, no Unicode dependency, simple text layout.                               |
+| `json`       | Machine-readable only; library calls return structured data unchanged.            |
 
 ## Gallery
 
 ```bash
-bun run cli-style:gallery
-bun ./bin/cli-style.js gallery no-colour
-bun ./bin/cli-style.js gallery --section patterns
-bun ./bin/cli-style.js gallery --fixture audit-finding
-bun ./bin/cli-style.js gallery --profile agent
-bun ./bin/cli-style.js gallery --width 64
-bun ./bin/cli-style.js gallery --variants
-bun examples/gallery.mjs
-bun examples/diagnostic.mjs
-bash examples/diagnostic.sh
-python3 examples/diagnostic.py
+cli-style gallery
+cli-style gallery no-colour
+cli-style gallery --section patterns
+cli-style gallery --fixture audit-finding
+cli-style gallery --profile agent
+cli-style gallery --width 64
+cli-style gallery --variants
 ```
 
-The gallery is read-only and shows the current terminal variant by default. Use `--profile` and `--width` for deterministic focused review. Use `--interactive` to select a section or fixture with `fzf` when it is installed; otherwise the current-terminal gallery is shown.
-
-`examples/gallery.mjs` renders fixed-width, no-colour, no-Unicode variants for repeatable manual review.
-
-## Release
-
-The initial release version is `0.1.0`. Publish to GitHub Packages manually after CI passes:
-
-```bash
-bun install --frozen-lockfile
-.agent/scripts/project-diagnostics.py --check test:unit
-bun publish
-```
-
-Do not publish styled JSON-only machine output. First adoption target is `Configuration/Agents`, where setup and diagnostics commands print useful but non-critical output.
+Use the gallery to review current renderer output. Use `--interactive` to select a section or fixture with `fzf` when it is installed.
