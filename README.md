@@ -2,7 +2,7 @@
 
 Shared terminal output styles for tools, diagnostics, and package CLIs.
 
-The package is internal-first while the API and gallery settle. Do not adopt it in other repositories until the gallery has been reviewed.
+This package is ready for first internal adoption. Start with low-risk, noisy command output before replacing user-facing package CLIs.
 
 ## Requirements
 
@@ -12,6 +12,7 @@ The package is internal-first while the API and gallery settle. Do not adopt it 
 ## Getting started
 
 ```bash
+bun install
 bun test
 bun run cli-style:gallery
 ```
@@ -126,3 +127,15 @@ python3 examples/diagnostic.py
 The gallery is read-only and shows the current terminal variant by default. Use `--profile` and `--width` for deterministic focused review. Use `--interactive` to select a section or fixture with `fzf` when it is installed; otherwise the current-terminal gallery is shown.
 
 `examples/gallery.mjs` renders fixed-width, no-colour, no-Unicode variants for repeatable manual review.
+
+## Release
+
+The initial release version is `0.1.0`. Publish to GitHub Packages manually after CI passes:
+
+```bash
+bun install --frozen-lockfile
+.agent/scripts/project-diagnostics.py --check test:unit
+bun publish
+```
+
+Do not publish styled JSON-only machine output. First adoption target is `Configuration/Agents`, where setup and diagnostics commands print useful but non-critical output.
