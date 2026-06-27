@@ -5,10 +5,10 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/lewishowles/cli-style.git"
+		"url": "git+https://github.com/lewishowles/cli-style.git"
 	},
 	"bin": {
-		"cli-style": "./bin/cli-style.js"
+		"cli-style": "bin/cli-style.js"
 	},
 	"files": [
 		"adapters",
