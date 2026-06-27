@@ -19,11 +19,19 @@ esac
 
 case "$architecture" in
 	arm64|aarch64) architecture="arm64" ;;
-	x86_64|amd64) architecture="x64" ;;
+	x64|x86_64|amd64) architecture="x64" ;;
 	*) printf 'Unsupported architecture: %s\n' "$architecture" >&2; exit 1 ;;
 esac
 
-scripts/build-binary.sh
+case "$platform-$architecture" in
+	darwin-arm64) compile_target="bun-darwin-arm64" ;;
+	darwin-x64)   compile_target="bun-darwin-x64" ;;
+	linux-arm64)  compile_target="bun-linux-arm64" ;;
+	linux-x64)    compile_target="bun-linux-x64" ;;
+	*) printf 'Unsupported binary target: %s-%s\n' "$platform" "$architecture" >&2; exit 1 ;;
+esac
+
+BUN_COMPILE_TARGET="$compile_target" scripts/build-binary.sh
 
 mkdir -p dist/release
 
