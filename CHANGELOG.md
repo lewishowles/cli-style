@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 - 2026-06-29
+
+### Added
+
+- Added an `unchanged` status result type for muted no-op rows.
+
 ## 0.2.1 - 2026-06-29
 
 ### Added

@@ -31,6 +31,16 @@ describe("status", () => {
 		expect(output).toBe("→ Syncing external skill vue-use");
 	});
 
+	test("Renders unchanged no-op status", () => {
+		const output = status(resultTypes.UNCHANGED, "already exists", {
+			colour: false,
+			label: "AGENTS.md",
+			unicode: true,
+		});
+
+		expect(output).toBe("↪ AGENTS.md already exists");
+	});
+
 	test("Renders status without detail text", () => {
 		const output = status(resultTypes.WARNING, "", {
 			colour: false,

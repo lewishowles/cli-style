@@ -63,6 +63,10 @@ const statusExamples = [
 	},
 	{
 		detail: "tone: muted",
+		resultType: resultTypes.UNCHANGED,
+	},
+	{
+		detail: "tone: muted",
 		resultType: resultTypes.SKIPPED,
 	},
 	{

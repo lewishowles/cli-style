@@ -5,6 +5,7 @@ export const resultTypes = {
 	PARTIAL: "partial",
 	SKIPPED: "skipped",
 	SUCCESS: "success",
+	UNCHANGED: "unchanged",
 	UNKNOWN: "unknown",
 	WARNING: "warning",
 };
@@ -55,6 +56,15 @@ export const resultTokens = {
 			unicode: "✓",
 		},
 		tone: "success",
+	},
+	[resultTypes.UNCHANGED]: {
+		exitCode: null,
+		label: "Unchanged",
+		symbols: {
+			ascii: "-",
+			unicode: "↪",
+		},
+		tone: "muted",
 	},
 	[resultTypes.UNKNOWN]: {
 		exitCode: null,

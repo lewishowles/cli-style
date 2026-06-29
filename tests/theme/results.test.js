@@ -11,6 +11,7 @@ describe("Result tokens", () => {
 				resultTypes.PARTIAL,
 				resultTypes.SKIPPED,
 				resultTypes.SUCCESS,
+				resultTypes.UNCHANGED,
 				resultTypes.UNKNOWN,
 				resultTypes.WARNING,
 			].sort(),
@@ -30,6 +31,7 @@ describe("Symbol fallback", () => {
 		expect(getResultSymbol(resultTypes.INFO)).toBe("→");
 		expect(getResultSymbol(resultTypes.WARNING)).toBe("⚠");
 		expect(getResultSymbol(resultTypes.FAILED)).toBe("×");
+		expect(getResultSymbol(resultTypes.UNCHANGED)).toBe("↪");
 		expect(getResultSymbol(resultTypes.SKIPPED)).toBe("–");
 	});
 
@@ -42,6 +44,7 @@ describe("Symbol fallback", () => {
 		expect(getResultSymbol(resultTypes.INFO, options)).toBe(">");
 		expect(getResultSymbol(resultTypes.WARNING, options)).toBe("!");
 		expect(getResultSymbol(resultTypes.FAILED, options)).toBe("x");
+		expect(getResultSymbol(resultTypes.UNCHANGED, options)).toBe("-");
 		expect(getResultSymbol(resultTypes.SKIPPED, options)).toBe("-");
 	});
 });
