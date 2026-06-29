@@ -1,6 +1,7 @@
 // Result states shared by primitive and pattern renderers.
 export const resultTypes = {
 	FAILED: "failed",
+	INFO: "info",
 	PARTIAL: "partial",
 	SKIPPED: "skipped",
 	SUCCESS: "success",
@@ -18,6 +19,15 @@ export const resultTokens = {
 			unicode: "×",
 		},
 		tone: "danger",
+	},
+	[resultTypes.INFO]: {
+		exitCode: null,
+		label: "Info",
+		symbols: {
+			ascii: ">",
+			unicode: "→",
+		},
+		tone: "info",
 	},
 	[resultTypes.PARTIAL]: {
 		exitCode: null,

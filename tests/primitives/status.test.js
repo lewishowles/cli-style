@@ -21,6 +21,16 @@ describe("status", () => {
 		expect(output).toBe("OK Success Build passed");
 	});
 
+	test("Renders informational progress status", () => {
+		const output = status(resultTypes.INFO, "vue-use", {
+			colour: false,
+			label: "Syncing external skill",
+			unicode: true,
+		});
+
+		expect(output).toBe("→ Syncing external skill vue-use");
+	});
+
 	test("Renders status without detail text", () => {
 		const output = status(resultTypes.WARNING, "", {
 			colour: false,

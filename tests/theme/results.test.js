@@ -7,6 +7,7 @@ describe("Result tokens", () => {
 		expect(Object.keys(resultTokens).sort()).toEqual(
 			[
 				resultTypes.FAILED,
+				resultTypes.INFO,
 				resultTypes.PARTIAL,
 				resultTypes.SKIPPED,
 				resultTypes.SUCCESS,
@@ -26,6 +27,7 @@ describe("Result tokens", () => {
 describe("Symbol fallback", () => {
 	test("Uses Unicode symbols by default", () => {
 		expect(getResultSymbol(resultTypes.SUCCESS)).toBe("✓");
+		expect(getResultSymbol(resultTypes.INFO)).toBe("→");
 		expect(getResultSymbol(resultTypes.WARNING)).toBe("⚠");
 		expect(getResultSymbol(resultTypes.FAILED)).toBe("×");
 		expect(getResultSymbol(resultTypes.SKIPPED)).toBe("–");
@@ -37,6 +39,7 @@ describe("Symbol fallback", () => {
 		};
 
 		expect(getResultSymbol(resultTypes.SUCCESS, options)).toBe("OK");
+		expect(getResultSymbol(resultTypes.INFO, options)).toBe(">");
 		expect(getResultSymbol(resultTypes.WARNING, options)).toBe("!");
 		expect(getResultSymbol(resultTypes.FAILED, options)).toBe("x");
 		expect(getResultSymbol(resultTypes.SKIPPED, options)).toBe("-");

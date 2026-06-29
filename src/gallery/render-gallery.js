@@ -50,6 +50,10 @@ const statusExamples = [
 		resultType: resultTypes.SUCCESS,
 	},
 	{
+		detail: "tone: info",
+		resultType: resultTypes.INFO,
+	},
+	{
 		detail: "tone: warning",
 		resultType: resultTypes.WARNING,
 	},

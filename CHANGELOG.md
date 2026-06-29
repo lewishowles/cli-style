@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added an `info` status result type for neutral progress rows.
+
 ## 0.2.0 - 2026-06-27
 
 ### Added
