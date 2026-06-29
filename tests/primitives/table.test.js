@@ -124,7 +124,7 @@ describe("table", () => {
 			width: 80,
 		});
 
-		expect(output).toContain("\u001b[38;2;148;163;170mName ");
+		expect(output).toContain("\u001b[38;2;111;127;135mName ");
 		expect(output).toContain("\u001b[38;2;42;58;66m");
 		expect(output).toContain("\u001b[38;2;232;238;240mBuild");
 		expect(stripAnsi(output)).toBe([
