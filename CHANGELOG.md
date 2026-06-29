@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 - 2026-06-29
+
+### Added
+
+- Added `createReporter()` for grouped setup and diagnostics output.
+- Added `severityOrder` and `getHighestSeverityResult()` for group result summaries.
+- Added shared `normaliseWidth()` helpers for width-aware renderers.
+- Added reporter output to the style gallery.
+
+### Changed
+
+- Darkened the muted colour token so unchanged rows are easier to distinguish from normal foreground text.
+
 ## 0.2.2 - 2026-06-29
 
 ### Added
