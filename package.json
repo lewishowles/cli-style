@@ -1,6 +1,6 @@
 {
 	"name": "@lewishowles/cli-style",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Shared terminal output styles for Lewis Howles tools, diagnostics, and package CLIs.",
 	"license": "MIT",
 	"repository": {
