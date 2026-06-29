@@ -1,6 +1,7 @@
 import { resolveProfile } from "./capability/resolve-profile.js";
 import { resolveTerminalCapabilities } from "./capability/terminal.js";
 import { profiles } from "./profiles/profiles.js";
+import { createReporter } from "./reporters/create-reporter.js";
 
 /**
  * Create a CLI style renderer with stable, testable defaults.
@@ -27,6 +28,10 @@ export function createCliStyle(options = {}) {
 		print: (value) => {
 			console.log(value);
 		},
+		reporter: (reporterOptions = {}) => createReporter({
+			...resolvedOptions,
+			...reporterOptions,
+		}),
 		write: (value) => {
 			process.stdout.write(value);
 		},

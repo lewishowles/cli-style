@@ -10,6 +10,18 @@ export const resultTypes = {
 	WARNING: "warning",
 };
 
+// Highest-priority result first for grouped summaries.
+export const severityOrder = [
+	resultTypes.FAILED,
+	resultTypes.WARNING,
+	resultTypes.PARTIAL,
+	resultTypes.UNKNOWN,
+	resultTypes.SUCCESS,
+	resultTypes.SKIPPED,
+	resultTypes.INFO,
+	resultTypes.UNCHANGED,
+];
+
 // Display tokens for result states before colour rendering exists.
 export const resultTokens = {
 	[resultTypes.FAILED]: {
@@ -96,6 +108,28 @@ export const resultTokens = {
  */
 export function getResultToken(resultType) {
 	return resultTokens[resultType] ?? resultTokens[resultTypes.UNKNOWN];
+}
+
+/**
+ * Resolve the highest-priority result from a list.
+ *
+ * @param  {string[]}  resultList
+ *     Result types to compare.
+ * @returns  {string}
+ *     Highest-priority result, or unknown when no known result is present.
+ */
+export function getHighestSeverityResult(resultList) {
+	if (!Array.isArray(resultList) || resultList.length === 0) {
+		return resultTypes.UNKNOWN;
+	}
+
+	for (const resultType of severityOrder) {
+		if (resultList.includes(resultType)) {
+			return resultType;
+		}
+	}
+
+	return resultTypes.UNKNOWN;
 }
 
 /**

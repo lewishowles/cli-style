@@ -1,6 +1,13 @@
 import { describe, expect, test } from "bun:test";
 
-import { getResultSymbol, getResultToken, resultTokens, resultTypes } from "../../src/index.js";
+import {
+	getHighestSeverityResult,
+	getResultSymbol,
+	getResultToken,
+	resultTokens,
+	resultTypes,
+	severityOrder,
+} from "../../src/index.js";
 
 describe("Result tokens", () => {
 	test("Defines each shared result state", () => {
@@ -22,6 +29,28 @@ describe("Result tokens", () => {
 		const token = getResultToken("missing");
 
 		expect(token).toBe(resultTokens[resultTypes.UNKNOWN]);
+	});
+
+	test("Defines result severity order for grouped output", () => {
+		expect(severityOrder).toEqual([
+			resultTypes.FAILED,
+			resultTypes.WARNING,
+			resultTypes.PARTIAL,
+			resultTypes.UNKNOWN,
+			resultTypes.SUCCESS,
+			resultTypes.SKIPPED,
+			resultTypes.INFO,
+			resultTypes.UNCHANGED,
+		]);
+	});
+
+	test("Resolves the highest-priority result", () => {
+		expect(getHighestSeverityResult([
+			resultTypes.UNCHANGED,
+			resultTypes.SUCCESS,
+			resultTypes.WARNING,
+		])).toBe(resultTypes.WARNING);
+		expect(getHighestSeverityResult([])).toBe(resultTypes.UNKNOWN);
 	});
 });
 

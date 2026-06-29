@@ -8,6 +8,7 @@ import {
 	compactDataTable,
 	confirmationResult,
 	createCliStyle,
+	createReporter,
 	diagnosticReport,
 	divider,
 	emptyState,
@@ -19,6 +20,7 @@ import {
 	progressBar,
 	renderGallery,
 	renderHelp,
+	renderGroup,
 	step,
 	stepProgress,
 	stripAnsi,
@@ -71,6 +73,16 @@ describe("Initialisation", () => {
 		expect(ui.options.colour).toBe(false);
 		expect(ui.options.unicode).toBe(false);
 		expect(ui.options.width).toBe(64);
+	});
+
+	test("Creates reporters with resolved options", () => {
+		const ui = createCliStyle({
+			colour: false,
+			unicode: false,
+		});
+		const reporter = ui.reporter();
+
+		expect(reporter.status("info", "Checking")).toBe("> Checking");
 	});
 });
 
@@ -150,6 +162,20 @@ describe("Render contracts", () => {
 			profile: "ci",
 			unicode: false,
 		})).toBe("x Error: Failed\nStopped");
+	});
+
+	test("Exports reporter helpers", () => {
+		expect(createReporter({
+			colour: false,
+		}).status("success", "Done.")).toBe("✓ Done.");
+		expect(renderGroup("Checks", [
+			{
+				result: "success",
+				label: "unit",
+			},
+		], {
+			colour: false,
+		})).toBe("✓ Checks 1 success");
 	});
 
 	test("Exports diagnostic report pattern", () => {
@@ -300,6 +326,12 @@ describe("Render contracts", () => {
 		expect(output).toContain("Patterns -------------------------------");
 		expect(output).toContain("Diagnostic report");
 		expect(output).toContain("│ Project diagnostics");
+		expect(output).toContain("│ → Setting up Claude + Codex (project)");
+		expect(output).toContain("│ ↪ Project files 2 already present");
+		expect(output).toContain("│ ↪ Agent scripts 4 already linked");
+		expect(output).toContain("│ ↪ Claude files 2 already current");
+		expect(output).toContain("| > Setting up Claude + Codex (project)");
+		expect(output).toContain("| - Agent scripts 4 already linked");
 		expect(output).toContain("│ ⚠ Warning Coverage below target");
 		expect(output).toContain("│ Unit test command");
 		expect(output).toContain("│ ✓ Success Unit tests passed");
@@ -338,6 +370,9 @@ describe("Render contracts", () => {
 		const nextStep = renderGallery({}, {
 			fixture: "next-step-block",
 		});
+		const reporter = renderGallery({}, {
+			fixture: "reporter",
+		});
 
 		expect(noColour).toContain("No colour ------------------------------");
 		expect(noColour).not.toContain("\u001b[");
@@ -350,6 +385,9 @@ describe("Render contracts", () => {
 		expect(confirmation).not.toContain("Audit finding");
 		expect(nextStep).toContain("Next  Commit the completed pattern chunk");
 		expect(nextStep).not.toContain("Confirmation result");
+		expect(reporter).toContain("Reporter");
+		expect(reporter).toContain("→ Setting up Claude + Codex (project)");
+		expect(reporter).not.toContain("Diagnostic report");
 	});
 
 	test("Renders gallery with a width override", () => {

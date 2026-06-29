@@ -23,6 +23,7 @@ export {
 } from "./gallery/render-gallery.js";
 
 export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
+export { defaultWidth, minimumWidth, normaliseWidth } from "./formatters/width.js";
 export { agentTranscript } from "./patterns/agent-transcript.js";
 export { auditFinding } from "./patterns/audit-finding.js";
 export { commandResult } from "./patterns/command-result.js";
@@ -42,6 +43,12 @@ export { status } from "./primitives/status.js";
 export { step, stepProgress, stepStates } from "./primitives/step-progress.js";
 export { table } from "./primitives/table.js";
 export {
+	createReporter,
+	renderGroup,
+	renderReporterStatus,
+	renderSection,
+} from "./reporters/create-reporter.js";
+export {
 	chartColours,
 	chipColours,
 	colourTokens,
@@ -54,4 +61,11 @@ export {
 	terminalColours,
 	toneColours,
 } from "./theme/colours.js";
-export { getResultSymbol, getResultToken, resultTokens, resultTypes } from "./theme/results.js";
+export {
+	getHighestSeverityResult,
+	getResultSymbol,
+	getResultToken,
+	resultTokens,
+	resultTypes,
+	severityOrder,
+} from "./theme/results.js";

@@ -17,6 +17,7 @@ import { row } from "../primitives/row.js";
 import { status } from "../primitives/status.js";
 import { step, stepProgress, stepStates } from "../primitives/step-progress.js";
 import { table } from "../primitives/table.js";
+import { createReporter } from "../reporters/create-reporter.js";
 import { resultTypes } from "../theme/results.js";
 
 // Chip tone examples should expose every configured pill colour.
@@ -128,6 +129,7 @@ export const gallerySections = [
 // Pattern fixtures available for focused output and interactive search.
 export const galleryFixtures = [
 	"diagnostic-report",
+	"reporter",
 	"command-result",
 	"task-summary",
 	"agent-transcript",
@@ -435,6 +437,64 @@ function renderPatterns(options, fixture) {
 		],
 		title: "Project diagnostics",
 	}, options);
+	const reporter = createReporter(options);
+
+	reporter.section("Setting up Claude + Codex", "(project)");
+	reporter.group("Project files", [
+		{
+			detail: "already exists",
+			label: "AGENTS.md",
+			result: resultTypes.UNCHANGED,
+		},
+		{
+			detail: "already exists",
+			label: "WORKSPACE.md",
+			result: resultTypes.UNCHANGED,
+		},
+	], {
+		summary: "2 already present",
+	});
+	reporter.group("Agent scripts", [
+		{
+			detail: "already linked",
+			label: "project-diagnostics.py",
+			result: resultTypes.UNCHANGED,
+		},
+		{
+			detail: "already linked",
+			label: "generated-file-guard.py",
+			result: resultTypes.UNCHANGED,
+		},
+		{
+			detail: "already linked",
+			label: "repo-context.py",
+			result: resultTypes.UNCHANGED,
+		},
+		{
+			detail: "already linked",
+			label: "change-impact.py",
+			result: resultTypes.UNCHANGED,
+		},
+	], {
+		summary: "4 already linked",
+	});
+	reporter.group("Claude files", [
+		{
+			detail: "already exists",
+			label: ".claude/",
+			result: resultTypes.UNCHANGED,
+		},
+		{
+			detail: "already up to date",
+			label: ".claude/.claudeignore",
+			result: resultTypes.UNCHANGED,
+		},
+	], {
+		summary: "2 already current",
+	});
+	reporter.status(resultTypes.SUCCESS, "Done.");
+
+	const reporterOutput = reporter.render();
 	const nextStep = nextStepBlock({
 		alternatives: [
 			"Review the focused gallery fixture",
@@ -493,6 +553,7 @@ function renderPatterns(options, fixture) {
 		"confirmation-result": ["Confirmation result", confirmation],
 		"diagnostic-report": ["Diagnostic report", report],
 		"next-step-block": ["Next-step block", nextStep],
+		"reporter": ["Reporter", reporterOutput],
 		"task-summary": ["Task summary", summary],
 	};
 
@@ -508,6 +569,9 @@ function renderPatterns(options, fixture) {
 		"",
 		"Diagnostic report",
 		frameExample(report, options),
+		"",
+		"Reporter",
+		frameExample(reporterOutput, options),
 		"",
 		"Command result",
 		frameExample(command, options),

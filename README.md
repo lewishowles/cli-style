@@ -41,6 +41,43 @@ ui.print(output);
 
 Renderer methods return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
 
+## Reporter
+
+Use a reporter when a script needs grouped output rather than one row per file.
+
+```js
+import { createReporter } from "@lewishowles/cli-style";
+
+const reporter = createReporter({
+	colour: false,
+});
+
+reporter.section("Setting up Claude + Codex", "(project)");
+reporter.group("Agent scripts", [
+	{
+		label: "project-diagnostics.py",
+		result: "unchanged",
+	},
+	{
+		label: "repo-context.py",
+		result: "unchanged",
+	},
+], {
+	summary: "2 already linked",
+});
+reporter.status("success", "Done.");
+
+console.log(reporter.render());
+```
+
+Groups can include verbose detail rows when a caller opts in:
+
+```js
+const reporter = createReporter({
+	verbose: process.env.AGENTS_VERBOSE === "1",
+});
+```
+
 ## CLI
 
 Use `cli-style render <renderer>` when a script needs rendered text from JSON input.

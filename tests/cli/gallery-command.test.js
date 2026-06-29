@@ -33,6 +33,7 @@ describe("parseGalleryRequest", () => {
 		});
 		expect(parseGalleryRequest(["--fixture", "confirmation-result"]).fixture).toBe("confirmation-result");
 		expect(parseGalleryRequest(["--fixture", "next-step-block"]).fixture).toBe("next-step-block");
+		expect(parseGalleryRequest(["--fixture", "reporter"]).fixture).toBe("reporter");
 		expect(parseGalleryRequest(["--variants"])).toEqual({
 			fixture: undefined,
 			interactive: false,

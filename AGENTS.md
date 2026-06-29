@@ -48,6 +48,7 @@ Planned functionality:
 ## Gotchas
 
 - Do not style machine-readable JSON.
+- Add every new renderer, pattern, reporter, token family, or visual state to `cli-style gallery` in the same chunk so output can be reviewed visually before adoption.
 - Do not rely on colour alone. Every severity needs text and a symbol.
 - Keep CI output stable and grep-friendly.
 - Respect `NO_COLOR`, `--no-colour`, `--no-color`, `--plain`, non-TTY stdout, and `TERM=dumb`.
