@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 - 2026-06-30
+
+### Added
+
+- Added `reporter.divider()` for compact phase headings in grouped CLI output.
+- Added `renderReporterDivider()` for rendering reporter phase dividers without a reporter instance.
+
+### Changed
+
+- Updated reporter docs and gallery examples to use dividers for major phases and reserve panels for framed content blocks.
+
 ## 0.3.0 - 2026-06-29
 
 ### Added
