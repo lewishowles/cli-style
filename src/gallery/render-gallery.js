@@ -439,7 +439,7 @@ function renderPatterns(options, fixture) {
 	}, options);
 	const reporter = createReporter(options);
 
-	reporter.section("Setting up Claude + Codex", "(project)");
+	reporter.divider("Project setup", "Claude + Codex");
 	reporter.group("Project files", [
 		{
 			detail: "already exists",

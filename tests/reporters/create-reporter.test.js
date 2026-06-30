@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
 	createReporter,
 	renderGroup,
+	renderReporterDivider,
 	renderReporterStatus,
 	renderSection,
 	resultTypes,
@@ -13,6 +14,13 @@ describe("Render contracts", () => {
 		expect(renderSection("Setting up Claude", "(global)", {
 			colour: false,
 		})).toBe("→ Setting up Claude (global)");
+	});
+
+	test("Renders phase dividers", () => {
+		expect(renderReporterDivider("External skills", "Sync upstream skills", {
+			colour: false,
+			dividerWidth: 48,
+		})).toBe("External skills · Sync upstream skills ---------");
 	});
 
 	test("Renders status rows with caller labels", () => {
@@ -76,7 +84,7 @@ describe("Render contracts", () => {
 			colour: false,
 		});
 
-		reporter.section("Setting up Claude + Codex", "(project)");
+		reporter.divider("Project setup", "Claude + Codex");
 		reporter.group("Agent scripts", [
 			{
 				label: "project-diagnostics.py",
@@ -88,7 +96,7 @@ describe("Render contracts", () => {
 		reporter.status("success", "Done.");
 
 		expect(reporter.render()).toBe([
-			"→ Setting up Claude + Codex (project)",
+			"Project setup · Claude + Codex ---------",
 			"↪ Agent scripts 4 already linked",
 			"✓ Done.",
 		].join("\n"));

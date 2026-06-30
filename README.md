@@ -52,7 +52,7 @@ const reporter = createReporter({
 	colour: false,
 });
 
-reporter.section("Setting up Claude + Codex", "(project)");
+reporter.divider("Project setup", "Claude + Codex");
 reporter.group("Agent scripts", [
 	{
 		label: "project-diagnostics.py",
@@ -69,6 +69,8 @@ reporter.status("success", "Done.");
 
 console.log(reporter.render());
 ```
+
+Use `reporter.divider()` for major phases. Use `reporter.section()` when you want a normal `info` status row inside a phase. Panels are for framed content blocks, not headings.
 
 Groups can include verbose detail rows when a caller opts in:
 

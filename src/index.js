@@ -45,6 +45,7 @@ export { table } from "./primitives/table.js";
 export {
 	createReporter,
 	renderGroup,
+	renderReporterDivider,
 	renderReporterStatus,
 	renderSection,
 } from "./reporters/create-reporter.js";

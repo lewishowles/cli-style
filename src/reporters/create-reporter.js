@@ -1,4 +1,5 @@
 import { isNonEmptyString } from "../patterns/helpers.js";
+import { divider } from "../primitives/divider.js";
 import { status as renderStatus } from "../primitives/status.js";
 import {
 	getHighestSeverityResult,
@@ -32,6 +33,10 @@ export function createReporter(options = {}) {
 	const lines = [];
 
 	return {
+		divider: (label, detail = "", dividerOptions = {}) => append(lines, renderReporterDivider(label, detail, {
+			...reporterOptions,
+			...dividerOptions,
+		})),
 		group: (label, items = [], groupOptions = {}) => append(lines, renderGroup(label, items, {
 			...reporterOptions,
 			...groupOptions,
@@ -47,6 +52,25 @@ export function createReporter(options = {}) {
 			...statusOptions,
 		})),
 	};
+}
+
+/**
+ * Render a reporter phase divider.
+ *
+ * @param  {string}  label
+ *     Divider label.
+ * @param  {string}  detail
+ *     Optional supporting detail.
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Rendered divider.
+ */
+export function renderReporterDivider(label, detail = "", options = {}) {
+	return divider({
+		...options,
+		label: formatLabel(label, detail),
+	});
 }
 
 /**
@@ -131,6 +155,24 @@ function append(lines, value) {
 	lines.push(value);
 
 	return value;
+}
+
+/**
+ * Combine a label and optional detail for compact phase dividers.
+ *
+ * @param  {string}  label
+ *     Main label.
+ * @param  {string}  detail
+ *     Optional supporting detail.
+ * @returns  {string}
+ *     Combined label.
+ */
+function formatLabel(label, detail) {
+	if (!isNonEmptyString(detail)) {
+		return label;
+	}
+
+	return `${label} · ${detail}`;
 }
 
 /**

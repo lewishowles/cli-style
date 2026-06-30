@@ -21,6 +21,7 @@ import {
 	renderGallery,
 	renderHelp,
 	renderGroup,
+	renderReporterDivider,
 	step,
 	stepProgress,
 	stripAnsi,
@@ -176,6 +177,10 @@ describe("Render contracts", () => {
 		], {
 			colour: false,
 		})).toBe("✓ Checks 1 success");
+		expect(renderReporterDivider("Checks", "Unit tests", {
+			colour: false,
+			dividerWidth: 32,
+		})).toBe("Checks · Unit tests ------------");
 	});
 
 	test("Exports diagnostic report pattern", () => {
@@ -326,11 +331,11 @@ describe("Render contracts", () => {
 		expect(output).toContain("Patterns -------------------------------");
 		expect(output).toContain("Diagnostic report");
 		expect(output).toContain("│ Project diagnostics");
-		expect(output).toContain("│ → Setting up Claude + Codex (project)");
+		expect(output).toContain("│ Project setup · Claude + Codex ---------");
 		expect(output).toContain("│ ↪ Project files 2 already present");
 		expect(output).toContain("│ ↪ Agent scripts 4 already linked");
 		expect(output).toContain("│ ↪ Claude files 2 already current");
-		expect(output).toContain("| > Setting up Claude + Codex (project)");
+		expect(output).toContain("| Project setup · Claude + Codex ---------");
 		expect(output).toContain("| - Agent scripts 4 already linked");
 		expect(output).toContain("│ ⚠ Warning Coverage below target");
 		expect(output).toContain("│ Unit test command");
@@ -386,7 +391,7 @@ describe("Render contracts", () => {
 		expect(nextStep).toContain("Next  Commit the completed pattern chunk");
 		expect(nextStep).not.toContain("Confirmation result");
 		expect(reporter).toContain("Reporter");
-		expect(reporter).toContain("→ Setting up Claude + Codex (project)");
+		expect(reporter).toContain("Project setup · Claude + Codex ---------");
 		expect(reporter).not.toContain("Diagnostic report");
 	});
 
