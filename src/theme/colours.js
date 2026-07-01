@@ -5,7 +5,7 @@ export const colourTokens = {
 	border: "#2a3a42",
 	danger: "#ff7272",
 	info: "#8bbdff",
-	muted: "#6f7f87",
+	muted: "#7a8a92",
 	success: "#8fdf72",
 	surface: "#0f181b",
 	surfaceRaised: "#132024",

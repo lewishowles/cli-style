@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Lightened the muted colour token so secondary text stays readable on dark surfaces.
+
 ## 0.4.1 - 2026-07-01
 
 ### Fixed

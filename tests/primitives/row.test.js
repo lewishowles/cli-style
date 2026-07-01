@@ -33,7 +33,7 @@ describe("row", () => {
 			colour: true,
 		});
 
-		expect(output).toBe("\u001b[38;2;111;127;135mPackage\u001b[0m  @lewishowles/components");
+		expect(output).toBe("\u001b[38;2;122;138;146mPackage\u001b[0m  @lewishowles/components");
 		expect(stripAnsi(output)).toBe("Package  @lewishowles/components");
 	});
 
@@ -44,7 +44,7 @@ describe("row", () => {
 		});
 
 		expect(output).toBe(
-			"\u001b[38;2;111;127;135mStatus\u001b[0m  \u001b[38;2;143;223;114mpassed\u001b[0m",
+			"\u001b[38;2;122;138;146mStatus\u001b[0m  \u001b[38;2;143;223;114mpassed\u001b[0m",
 		);
 		expect(stripAnsi(output)).toBe("Status  passed");
 	});
