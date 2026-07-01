@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 - 2026-07-01
+
+### Fixed
+
+- Updated grouped reporter summaries so skipped rows outrank success rows while warnings and failures still take precedence.
+- Added the project-local vite-plus pre-commit hook setup so commits run the existing staged checks.
+
 ## 0.4.0 - 2026-06-30
 
 ### Added
