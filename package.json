@@ -32,6 +32,7 @@
 		"check": "vp check --fix",
 		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
 		"package:binary": "scripts/package-binary.sh",
+		"prepare": "vp config",
 		"smoke:binary": "./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json",
 		"test:unit": "bun test"
 	},
