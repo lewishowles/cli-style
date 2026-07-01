@@ -1,13 +1,7 @@
 import { profiles } from "../profiles/profiles.js";
 import { status } from "../primitives/status.js";
 import { resultTypes } from "../theme/results.js";
-import {
-	formatLabel,
-	isNonEmptyString,
-	isRecord,
-	renderSection,
-	renderTitle,
-} from "./helpers.js";
+import { formatLabel, isNonEmptyString, isRecord, renderSection, renderTitle } from "./helpers.js";
 
 // Diagnostic reports use a stable title when the caller does not provide one.
 const defaultTitle = "Diagnostic report";
@@ -49,9 +43,10 @@ export function diagnosticReport(report, options = {}) {
 		renderSkippedChecks(report.skippedChecks, options),
 		renderNextActions(report.nextActions, options),
 	].filter((section) => section !== "");
-	const title = typeof report.title === "string" && report.title !== ""
-		? report.title
-		: defaultTitle;
+
+	const title =
+		typeof report.title === "string" && report.title !== "" ? report.title : defaultTitle;
+
 	return [renderTitle(title, options), ...sections].join("\n\n");
 }
 
@@ -69,11 +64,10 @@ function renderChecks(checks, options) {
 	const validChecks = Array.isArray(checks)
 		? checks.filter((check) => isRecord(check) && isNonEmptyString(check.name))
 		: [];
-	const lines = validChecks.map((check) => status(
-		check.result,
-		formatLabel(check.name, check.detail, options),
-		options,
-	));
+
+	const lines = validChecks.map((check) =>
+		status(check.result, formatLabel(check.name, check.detail, options), options),
+	);
 
 	return renderSection("Checks", lines, options);
 }
@@ -92,11 +86,8 @@ function renderFindings(findings, options) {
 	const validFindings = Array.isArray(findings)
 		? findings.filter((finding) => isRecord(finding) && isNonEmptyString(finding.message))
 		: [];
-	const lines = validFindings.map((finding) => status(
-		finding.result,
-		finding.message,
-		options,
-	));
+
+	const lines = validFindings.map((finding) => status(finding.result, finding.message, options));
 
 	return renderSection("Findings", lines, options);
 }
@@ -115,11 +106,10 @@ function renderSkippedChecks(skippedChecks, options) {
 	const validChecks = Array.isArray(skippedChecks)
 		? skippedChecks.filter((check) => isRecord(check) && isNonEmptyString(check.name))
 		: [];
-	const lines = validChecks.map((check) => status(
-		resultTypes.SKIPPED,
-		formatLabel(check.name, check.reason, options),
-		options,
-	));
+
+	const lines = validChecks.map((check) =>
+		status(resultTypes.SKIPPED, formatLabel(check.name, check.reason, options), options),
+	);
 
 	return renderSection("Skipped checks", lines, options);
 }
@@ -135,9 +125,7 @@ function renderSkippedChecks(skippedChecks, options) {
  *     Rendered next-action section.
  */
 function renderNextActions(nextActions, options) {
-	const validActions = Array.isArray(nextActions)
-		? nextActions.filter(isNonEmptyString)
-		: [];
+	const validActions = Array.isArray(nextActions) ? nextActions.filter(isNonEmptyString) : [];
 	const lines = validActions.map((action, index) => `${index + 1}. ${action}`);
 
 	return renderSection("Next actions", lines, options, false);

@@ -22,9 +22,11 @@ const report = {
 	title: "Diagnostics",
 };
 
-console.log(diagnosticReport(report, {
-	colour: false,
-	profile: "diagnostic",
-	unicode: true,
-	width: 80,
-}));
+console.log(
+	diagnosticReport(report, {
+		colour: false,
+		profile: "diagnostic",
+		unicode: true,
+		width: 80,
+	}),
+);

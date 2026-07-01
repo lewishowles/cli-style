@@ -81,12 +81,7 @@ const statusExamples = [
 ];
 
 // Panel examples should expose every configured semantic accent.
-const panelToneExamples = [
-	"info",
-	"success",
-	"warning",
-	"danger",
-];
+const panelToneExamples = ["info", "success", "warning", "danger"];
 
 // Progress examples expose common completion states and semantic tones.
 const progressExamples = [
@@ -113,18 +108,10 @@ const progressExamples = [
 ];
 
 // Gallery variants available through the public renderer and CLI.
-export const galleryVariants = [
-	"current",
-	"no-colour",
-	"no-unicode",
-	"plain",
-];
+export const galleryVariants = ["current", "no-colour", "no-unicode", "plain"];
 
 // Gallery sections available for focused output.
-export const gallerySections = [
-	"primitives",
-	"patterns",
-];
+export const gallerySections = ["primitives", "patterns"];
 
 // Pattern fixtures available for focused output and interactive search.
 export const galleryFixtures = [
@@ -151,23 +138,23 @@ export const galleryFixtures = [
  *     Gallery output.
  */
 export function renderGallery(options = {}, request = {}) {
-	const galleryOptions = request.width === undefined
-		? options
-		: {
-			...galleryWidthOptions(request.width),
-			...options,
-			width: request.width,
-		};
-	const variants = request.variants === true || request.matrix === true
-		? galleryVariants
-		: [request.variant ?? "current"];
+	const galleryOptions =
+		request.width === undefined
+			? options
+			: {
+					...galleryWidthOptions(request.width),
+					...options,
+					width: request.width,
+				};
+
+	const variants =
+		request.variants === true || request.matrix === true
+			? galleryVariants
+			: [request.variant ?? "current"];
 
 	const output = [
 		"CLI style gallery",
-		...variants.flatMap((variant) => [
-			"",
-			renderVariant(variant, galleryOptions, request),
-		]),
+		...variants.flatMap((variant) => ["", renderVariant(variant, galleryOptions, request)]),
 	].join("\n");
 
 	return request.width === undefined ? output : clampGalleryOutput(output, request.width);
@@ -268,7 +255,7 @@ function resolveVariant(variant, options) {
  *     Sections with blank-line separators.
  */
 function joinSections(sections) {
-	return sections.flatMap((section, index) => index === 0 ? [section] : ["", section]);
+	return sections.flatMap((section, index) => (index === 0 ? [section] : ["", section]));
 }
 
 /**
@@ -339,20 +326,19 @@ function clampLine(line, width) {
  *     Pattern gallery output.
  */
 function renderPatterns(options, fixture) {
-	const audit = auditFinding({
-		evidence: [
-			"Text contrast measures 3.2:1",
-			"Body text requires at least 4.5:1",
-		],
-		finding: "Muted text has insufficient contrast",
-		location: "src/components/StatusCard.vue:42",
-		recommendation: "Use the standard foreground token.",
-		references: [
-			"WCAG 2.2 SC 1.4.3",
-		],
-		result: resultTypes.FAILED,
-		title: "Accessibility audit",
-	}, options);
+	const audit = auditFinding(
+		{
+			evidence: ["Text contrast measures 3.2:1", "Body text requires at least 4.5:1"],
+			finding: "Muted text has insufficient contrast",
+			location: "src/components/StatusCard.vue:42",
+			recommendation: "Use the standard foreground token.",
+			references: ["WCAG 2.2 SC 1.4.3"],
+			result: resultTypes.FAILED,
+			title: "Accessibility audit",
+		},
+		options,
+	);
+
 	const compactTableData = {
 		columns: [
 			{
@@ -383,167 +369,188 @@ function renderPatterns(options, fixture) {
 		summary: "2 packages checked",
 		title: "Package updates",
 	};
+
 	const compactTable = compactDataTable(compactTableData, options);
+
 	const narrowCompactTable = compactDataTable(compactTableData, {
 		...options,
 		width: 20,
 	});
-	const confirmation = confirmationResult({
-		action: "Delete project",
-		detail: "Project and 12 files removed.",
-		item: "Website refresh",
-		state: "confirmed",
-	}, options);
-	const command = commandResult({
-		command: "bun run test:unit",
-		details: [
-			"121 tests passed",
-			"Log saved to .agent/diagnostics/test-unit.log",
-		],
-		duration: "158 ms",
-		exitCode: 0,
-		result: resultTypes.SUCCESS,
-		summary: "Unit tests passed",
-		title: "Unit test command",
-	}, options);
-	const report = diagnosticReport({
-		checks: [
-			{
-				detail: "184 tests",
-				name: "unit",
-				result: resultTypes.SUCCESS,
-			},
-			{
-				detail: "2 failures",
-				name: "type-check",
-				result: resultTypes.FAILED,
-			},
-		],
-		findings: [
-			{
-				message: "Coverage below target",
-				result: resultTypes.WARNING,
-			},
-		],
-		nextActions: [
-			"Review failing checks",
-			"Re-run diagnostics",
-		],
-		skippedChecks: [
-			{
-				name: "e2e",
-				reason: "Browser unavailable",
-			},
-		],
-		title: "Project diagnostics",
-	}, options);
+
+	const confirmation = confirmationResult(
+		{
+			action: "Delete project",
+			detail: "Project and 12 files removed.",
+			item: "Website refresh",
+			state: "confirmed",
+		},
+		options,
+	);
+
+	const command = commandResult(
+		{
+			command: "bun run test:unit",
+			details: ["121 tests passed", "Log saved to .agent/diagnostics/test-unit.log"],
+			duration: "158 ms",
+			exitCode: 0,
+			result: resultTypes.SUCCESS,
+			summary: "Unit tests passed",
+			title: "Unit test command",
+		},
+		options,
+	);
+
+	const report = diagnosticReport(
+		{
+			checks: [
+				{
+					detail: "184 tests",
+					name: "unit",
+					result: resultTypes.SUCCESS,
+				},
+				{
+					detail: "2 failures",
+					name: "type-check",
+					result: resultTypes.FAILED,
+				},
+			],
+			findings: [
+				{
+					message: "Coverage below target",
+					result: resultTypes.WARNING,
+				},
+			],
+			nextActions: ["Review failing checks", "Re-run diagnostics"],
+			skippedChecks: [
+				{
+					name: "e2e",
+					reason: "Browser unavailable",
+				},
+			],
+			title: "Project diagnostics",
+		},
+		options,
+	);
+
 	const reporter = createReporter(options);
 
 	reporter.divider("Project setup", "Claude + Codex");
-	reporter.group("Project files", [
+	reporter.group(
+		"Project files",
+		[
+			{
+				detail: "already exists",
+				label: "AGENTS.md",
+				result: resultTypes.UNCHANGED,
+			},
+			{
+				detail: "already exists",
+				label: "WORKSPACE.md",
+				result: resultTypes.UNCHANGED,
+			},
+		],
 		{
-			detail: "already exists",
-			label: "AGENTS.md",
-			result: resultTypes.UNCHANGED,
+			summary: "2 already present",
 		},
+	);
+	reporter.group(
+		"Agent scripts",
+		[
+			{
+				detail: "already linked",
+				label: "project-diagnostics.py",
+				result: resultTypes.UNCHANGED,
+			},
+			{
+				detail: "already linked",
+				label: "generated-file-guard.py",
+				result: resultTypes.UNCHANGED,
+			},
+			{
+				detail: "already linked",
+				label: "repo-context.py",
+				result: resultTypes.UNCHANGED,
+			},
+			{
+				detail: "already linked",
+				label: "change-impact.py",
+				result: resultTypes.UNCHANGED,
+			},
+		],
 		{
-			detail: "already exists",
-			label: "WORKSPACE.md",
-			result: resultTypes.UNCHANGED,
+			summary: "4 already linked",
 		},
-	], {
-		summary: "2 already present",
-	});
-	reporter.group("Agent scripts", [
+	);
+	reporter.group(
+		"Claude files",
+		[
+			{
+				detail: "already exists",
+				label: ".claude/",
+				result: resultTypes.UNCHANGED,
+			},
+			{
+				detail: "already up to date",
+				label: ".claude/.claudeignore",
+				result: resultTypes.UNCHANGED,
+			},
+		],
 		{
-			detail: "already linked",
-			label: "project-diagnostics.py",
-			result: resultTypes.UNCHANGED,
+			summary: "2 already current",
 		},
-		{
-			detail: "already linked",
-			label: "generated-file-guard.py",
-			result: resultTypes.UNCHANGED,
-		},
-		{
-			detail: "already linked",
-			label: "repo-context.py",
-			result: resultTypes.UNCHANGED,
-		},
-		{
-			detail: "already linked",
-			label: "change-impact.py",
-			result: resultTypes.UNCHANGED,
-		},
-	], {
-		summary: "4 already linked",
-	});
-	reporter.group("Claude files", [
-		{
-			detail: "already exists",
-			label: ".claude/",
-			result: resultTypes.UNCHANGED,
-		},
-		{
-			detail: "already up to date",
-			label: ".claude/.claudeignore",
-			result: resultTypes.UNCHANGED,
-		},
-	], {
-		summary: "2 already current",
-	});
+	);
 	reporter.status(resultTypes.SUCCESS, "Done.");
 
 	const reporterOutput = reporter.render();
-	const nextStep = nextStepBlock({
-		alternatives: [
-			"Review the focused gallery fixture",
-		],
-		commands: [
-			"git status --short",
-			"bun run test:unit",
-		],
-		next: "Commit the completed pattern chunk",
-		reason: "Implementation and verification are complete.",
-	}, options);
-	const summary = taskSummary({
-		completed: [
-			"Added command result renderer",
-			"Added task summary renderer",
-		],
-		remaining: [
-			"Review gallery output",
-		],
-		result: resultTypes.PARTIAL,
-		summary: "Implementation complete",
-		task: "Add command and task patterns",
-		title: "Pattern implementation",
-	}, options);
-	const transcript = agentTranscript({
-		entries: [
-			{
-				content: "Run the focused unit tests.",
-				role: "user",
-			},
-			{
-				content: "Running project diagnostics.",
-				role: "agent",
-			},
-			{
-				content: [
-					"128 tests passed",
-					"0 tests failed",
-				],
-				name: "project-diagnostics",
-				role: "tool",
-			},
-			{
-				content: "Tests pass. Nothing remains.",
-				role: "agent",
-			},
-		],
-		title: "Focused verification",
-	}, options);
+
+	const nextStep = nextStepBlock(
+		{
+			alternatives: ["Review the focused gallery fixture"],
+			commands: ["git status --short", "bun run test:unit"],
+			next: "Commit the completed pattern chunk",
+			reason: "Implementation and verification are complete.",
+		},
+		options,
+	);
+
+	const summary = taskSummary(
+		{
+			completed: ["Added command result renderer", "Added task summary renderer"],
+			remaining: ["Review gallery output"],
+			result: resultTypes.PARTIAL,
+			summary: "Implementation complete",
+			task: "Add command and task patterns",
+			title: "Pattern implementation",
+		},
+		options,
+	);
+
+	const transcript = agentTranscript(
+		{
+			entries: [
+				{
+					content: "Run the focused unit tests.",
+					role: "user",
+				},
+				{
+					content: "Running project diagnostics.",
+					role: "agent",
+				},
+				{
+					content: ["128 tests passed", "0 tests failed"],
+					name: "project-diagnostics",
+					role: "tool",
+				},
+				{
+					content: "Tests pass. Nothing remains.",
+					role: "agent",
+				},
+			],
+			title: "Focused verification",
+		},
+		options,
+	);
+
 	const fixtures = {
 		"agent-transcript": ["Agent transcript", transcript],
 		"audit-finding": ["Audit finding", audit],
@@ -553,7 +560,7 @@ function renderPatterns(options, fixture) {
 		"confirmation-result": ["Confirmation result", confirmation],
 		"diagnostic-report": ["Diagnostic report", report],
 		"next-step-block": ["Next-step block", nextStep],
-		"reporter": ["Reporter", reporterOutput],
+		reporter: ["Reporter", reporterOutput],
 		"task-summary": ["Task summary", summary],
 	};
 
@@ -610,10 +617,7 @@ function renderPatterns(options, fixture) {
  *     Framed fixture output.
  */
 function renderPatternFixture(fixture, options) {
-	return [
-		fixture[0],
-		frameExample(fixture[1], options),
-	].join("\n");
+	return [fixture[0], frameExample(fixture[1], options)].join("\n");
 }
 
 /**
@@ -631,7 +635,7 @@ function frameExample(output, options) {
 
 	return output
 		.split("\n")
-		.map((line) => line === "" ? rail : `${rail} ${line}`)
+		.map((line) => (line === "" ? rail : `${rail} ${line}`))
 		.join("\n");
 }
 
@@ -780,12 +784,14 @@ function renderBarChartExample(options) {
  *     Progress examples.
  */
 function renderProgressExamples(options) {
-	return progressExamples.map((example) => progressBar({
-		...options,
-		max: 100,
-		tone: example.tone,
-		value: example.value,
-	}));
+	return progressExamples.map((example) =>
+		progressBar({
+			...options,
+			max: 100,
+			tone: example.tone,
+			value: example.value,
+		}),
+	);
 }
 
 /**
@@ -797,12 +803,14 @@ function renderProgressExamples(options) {
  *     Panel examples.
  */
 function renderPanelExamples(options) {
-	return panelToneExamples.map((tone) => panel({
-		...options,
-		lines: [`tone: ${tone}`],
-		title: tone,
-		tone,
-	}));
+	return panelToneExamples.map((tone) =>
+		panel({
+			...options,
+			lines: [`tone: ${tone}`],
+			title: tone,
+			tone,
+		}),
+	);
 }
 
 /**

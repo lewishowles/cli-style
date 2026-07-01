@@ -9,7 +9,9 @@ import { profiles } from "../../src/profiles/profiles.js";
 
 describe("parseRenderRequest", () => {
 	test("Parses renderer and render options", () => {
-		expect(parseRenderRequest(["status", "--plain", "--profile", "agent", "--width", "48"])).toEqual({
+		expect(
+			parseRenderRequest(["status", "--plain", "--profile", "agent", "--width", "48"]),
+		).toEqual({
 			renderer: "status",
 			width: 48,
 		});
@@ -20,11 +22,21 @@ describe("parseRenderRequest", () => {
 	test("Rejects unsupported render requests", () => {
 		expect(() => parseRenderRequest([])).toThrow("Missing renderer");
 		expect(() => parseRenderRequest(["missing"])).toThrow("Unknown renderer: missing");
-		expect(() => parseRenderRequest(["status", "extra"])).toThrow("Unexpected render argument: extra");
-		expect(() => parseRenderRequest(["status", "--profile", "missing"])).toThrow("Unknown profile: missing");
-		expect(() => parseRenderRequest(["status", "--profile=json"])).toThrow("Render does not support json output");
-		expect(() => parseRenderRequest(["status", "--json"])).toThrow("Render does not support json output");
-		expect(() => parseRenderRequest(["status", "--width", "0"])).toThrow("Render width must be a positive integer");
+		expect(() => parseRenderRequest(["status", "extra"])).toThrow(
+			"Unexpected render argument: extra",
+		);
+		expect(() => parseRenderRequest(["status", "--profile", "missing"])).toThrow(
+			"Unknown profile: missing",
+		);
+		expect(() => parseRenderRequest(["status", "--profile=json"])).toThrow(
+			"Render does not support json output",
+		);
+		expect(() => parseRenderRequest(["status", "--json"])).toThrow(
+			"Render does not support json output",
+		);
+		expect(() => parseRenderRequest(["status", "--width", "0"])).toThrow(
+			"Render width must be a positive integer",
+		);
 	});
 });
 
@@ -70,11 +82,17 @@ describe("renderJsonInput", () => {
 	});
 
 	test("Rejects invalid input and json profile", () => {
-		expect(() => renderJsonInput("{", parseRenderRequest(["status"]))).toThrow("Render input must be valid JSON");
-		expect(() => renderJsonInput("[]", parseRenderRequest(["status"]))).toThrow("Render input must be a JSON object");
-		expect(() => renderJsonInput("{}", parseRenderRequest(["status"]), {
-			profile: profiles.JSON,
-		})).toThrow("Render does not support json output");
+		expect(() => renderJsonInput("{", parseRenderRequest(["status"]))).toThrow(
+			"Render input must be valid JSON",
+		);
+		expect(() => renderJsonInput("[]", parseRenderRequest(["status"]))).toThrow(
+			"Render input must be a JSON object",
+		);
+		expect(() =>
+			renderJsonInput("{}", parseRenderRequest(["status"]), {
+				profile: profiles.JSON,
+			}),
+		).toThrow("Render does not support json output");
 	});
 
 	test("Exposes stable renderer names", () => {

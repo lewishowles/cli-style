@@ -31,7 +31,9 @@ describe("parseGalleryRequest", () => {
 			variants: false,
 			width: undefined,
 		});
-		expect(parseGalleryRequest(["--fixture", "confirmation-result"]).fixture).toBe("confirmation-result");
+		expect(parseGalleryRequest(["--fixture", "confirmation-result"]).fixture).toBe(
+			"confirmation-result",
+		);
 		expect(parseGalleryRequest(["--fixture", "next-step-block"]).fixture).toBe("next-step-block");
 		expect(parseGalleryRequest(["--fixture", "reporter"]).fixture).toBe("reporter");
 		expect(parseGalleryRequest(["--variants"])).toEqual({
@@ -78,12 +80,20 @@ describe("parseGalleryRequest", () => {
 
 	test("Rejects unsupported arguments", () => {
 		expect(() => parseGalleryRequest(["missing"])).toThrow("Unknown gallery variant: missing");
-		expect(() => parseGalleryRequest(["current", "plain"])).toThrow("Unexpected gallery argument: plain");
+		expect(() => parseGalleryRequest(["current", "plain"])).toThrow(
+			"Unexpected gallery argument: plain",
+		);
 		expect(() => parseGalleryRequest(["--section"])).toThrow("Missing value for --section");
-		expect(() => parseGalleryRequest(["--fixture", "missing"])).toThrow("Unknown gallery fixture: missing");
+		expect(() => parseGalleryRequest(["--fixture", "missing"])).toThrow(
+			"Unknown gallery fixture: missing",
+		);
 		expect(() => parseGalleryRequest(["--profile", "missing"])).toThrow("Unknown profile: missing");
-		expect(() => parseGalleryRequest(["--profile=json"])).toThrow("Gallery does not support json output");
+		expect(() => parseGalleryRequest(["--profile=json"])).toThrow(
+			"Gallery does not support json output",
+		);
 		expect(() => parseGalleryRequest(["--json"])).toThrow("Gallery does not support json output");
-		expect(() => parseGalleryRequest(["--width", "0"])).toThrow("Gallery width must be a positive integer");
+		expect(() => parseGalleryRequest(["--width", "0"])).toThrow(
+			"Gallery width must be a positive integer",
+		);
 	});
 });

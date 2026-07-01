@@ -16,8 +16,8 @@ export const severityOrder = [
 	resultTypes.WARNING,
 	resultTypes.PARTIAL,
 	resultTypes.UNKNOWN,
-	resultTypes.SUCCESS,
 	resultTypes.SKIPPED,
+	resultTypes.SUCCESS,
 	resultTypes.INFO,
 	resultTypes.UNCHANGED,
 ];

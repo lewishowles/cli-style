@@ -7,9 +7,11 @@ describe("step", () => {
 		const completed = step("Install dependencies", "complete", {
 			colour: false,
 		});
+
 		const current = step("Build package", "current", {
 			colour: false,
 		});
+
 		const pending = step("Publish release", "pending", {
 			colour: false,
 		});
@@ -32,6 +34,7 @@ describe("step", () => {
 		const failed = step("Unit tests", "failed", {
 			colour: false,
 		});
+
 		const warning = step("Accessibility audit", "warning", {
 			colour: false,
 		});
@@ -46,18 +49,12 @@ describe("stepProgress", () => {
 		const output = stepProgress({
 			colour: false,
 			current: 1,
-			steps: [
-				"Install dependencies",
-				"Build package",
-				"Publish release",
-			],
+			steps: ["Install dependencies", "Build package", "Publish release"],
 		});
 
-		expect(output).toBe([
-			"1/3 ✓ Install dependencies",
-			"2/3 … Build package",
-			"3/3 – Publish release",
-		].join("\n"));
+		expect(output).toBe(
+			["1/3 ✓ Install dependencies", "2/3 … Build package", "3/3 – Publish release"].join("\n"),
+		);
 	});
 
 	test("Clamps the current step to the available range", () => {
@@ -67,10 +64,7 @@ describe("stepProgress", () => {
 			steps: ["Install", "Build"],
 		});
 
-		expect(output).toBe([
-			"1/2 ✓ Install",
-			"2/2 … Build",
-		].join("\n"));
+		expect(output).toBe(["1/2 ✓ Install", "2/2 … Build"].join("\n"));
 	});
 
 	test("Returns an empty string when no valid steps are provided", () => {
@@ -91,10 +85,6 @@ describe("stepProgress", () => {
 		expect(output).toContain("\u001b[38;2;143;223;114m✓\u001b[0m");
 		expect(output).toContain("\u001b[38;2;139;189;255m…\u001b[0m");
 		expect(output).toContain("\u001b[38;2;111;127;135m–\u001b[0m");
-		expect(stripAnsi(output)).toBe([
-			"1/3 ✓ Install",
-			"2/3 … Build",
-			"3/3 – Publish",
-		].join("\n"));
+		expect(stripAnsi(output)).toBe(["1/3 ✓ Install", "2/3 … Build", "3/3 – Publish"].join("\n"));
 	});
 });

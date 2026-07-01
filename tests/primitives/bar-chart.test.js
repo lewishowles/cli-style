@@ -19,10 +19,7 @@ describe("barChart", () => {
 			],
 		});
 
-		expect(output).toBe([
-			"Passed    ██████████ 10",
-			"Warnings  ████       4",
-		].join("\n"));
+		expect(output).toBe(["Passed    ██████████ 10", "Warnings  ████       4"].join("\n"));
 	});
 
 	test("Renders ASCII bars when Unicode is disabled", () => {
@@ -57,10 +54,7 @@ describe("barChart", () => {
 			],
 		});
 
-		expect(output).toBe([
-			"Added    ██████████ 10",
-			"Removed  █████      -5",
-		].join("\n"));
+		expect(output).toBe(["Added    ██████████ 10", "Removed  █████      -5"].join("\n"));
 	});
 
 	test("Returns an empty string when no valid rows are provided", () => {
@@ -95,9 +89,6 @@ describe("barChart", () => {
 
 		expect(output).toContain("\u001b[38;2;244;189;95m████\u001b[0m");
 		expect(output).toContain("\u001b[38;2;196;135;69m██\u001b[0m");
-		expect(stripAnsi(output)).toBe([
-			"Warnings  ████ 2",
-			"Removed   ██   -1",
-		].join("\n"));
+		expect(stripAnsi(output)).toBe(["Warnings  ████ 2", "Removed   ██   -1"].join("\n"));
 	});
 });

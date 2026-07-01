@@ -22,73 +22,81 @@ import { isProfile, profiles } from "../profiles/profiles.js";
 const renderers = {
 	"agent-transcript": (input, options) => agentTranscript(input, options),
 	"audit-finding": (input, options) => auditFinding(input, options),
-	"bar-chart": (input, options) => barChart({
-		...input,
-		...options,
-	}),
-	chip: (input, options) => chip(input.label, input.tone, {
-		...input,
-		...options,
-	}),
+	"bar-chart": (input, options) =>
+		barChart({
+			...input,
+			...options,
+		}),
+	chip: (input, options) =>
+		chip(input.label, input.tone, {
+			...input,
+			...options,
+		}),
 	"command-result": (input, options) => commandResult(input, options),
 	"compact-data-table": (input, options) => compactDataTable(input, options),
 	"confirmation-result": (input, options) => confirmationResult(input, options),
 	"diagnostic-report": (input, options) => diagnosticReport(input, options),
-	divider: (input, options) => divider({
-		...input,
-		...options,
-	}),
-	"empty-state": (input, options) => emptyState(input.title, input.detail, {
-		...input,
-		...options,
-	}),
-	"error-block": (input, options) => errorBlock(input.title, input.lines, {
-		...input,
-		...options,
-	}),
-	hint: (input, options) => hint(input.message, {
-		...input,
-		...options,
-	}),
+	divider: (input, options) =>
+		divider({
+			...input,
+			...options,
+		}),
+	"empty-state": (input, options) =>
+		emptyState(input.title, input.detail, {
+			...input,
+			...options,
+		}),
+	"error-block": (input, options) =>
+		errorBlock(input.title, input.lines, {
+			...input,
+			...options,
+		}),
+	hint: (input, options) =>
+		hint(input.message, {
+			...input,
+			...options,
+		}),
 	"next-step-block": (input, options) => nextStepBlock(input, options),
-	panel: (input, options) => panel({
-		...input,
-		...options,
-	}),
-	"progress-bar": (input, options) => progressBar({
-		...input,
-		...options,
-	}),
-	row: (input, options) => row(input.label, input.value, {
-		...input,
-		...options,
-	}),
-	status: (input, options) => status(input.type, input.detail, {
-		...input,
-		...options,
-	}),
-	step: (input, options) => step(input.label, input.state, {
-		...input,
-		...options,
-	}),
-	"step-progress": (input, options) => stepProgress({
-		...input,
-		...options,
-	}),
-	table: (input, options) => table({
-		...input,
-		...options,
-	}),
+	panel: (input, options) =>
+		panel({
+			...input,
+			...options,
+		}),
+	"progress-bar": (input, options) =>
+		progressBar({
+			...input,
+			...options,
+		}),
+	row: (input, options) =>
+		row(input.label, input.value, {
+			...input,
+			...options,
+		}),
+	status: (input, options) =>
+		status(input.type, input.detail, {
+			...input,
+			...options,
+		}),
+	step: (input, options) =>
+		step(input.label, input.state, {
+			...input,
+			...options,
+		}),
+	"step-progress": (input, options) =>
+		stepProgress({
+			...input,
+			...options,
+		}),
+	table: (input, options) =>
+		table({
+			...input,
+			...options,
+		}),
 	"task-summary": (input, options) => taskSummary(input, options),
 };
 
 // Global rendering flags accepted after `render <renderer>`.
-const globalRenderingFlags = new Set([
-	"--no-color",
-	"--no-colour",
-	"--no-unicode",
-	"--plain",
-]);
+const globalRenderingFlags = new Set(["--no-color", "--no-colour", "--no-unicode", "--plain"]);
 
 // Renderer names exposed for help text and tests.
 export const rendererNames = Object.keys(renderers);

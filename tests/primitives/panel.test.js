@@ -6,21 +6,20 @@ describe("panel", () => {
 	test("Renders a fixed-width panel with a title and padded content", () => {
 		const output = panel({
 			colour: false,
-			lines: [
-				"Short",
-				"Longer detail",
-			],
+			lines: ["Short", "Longer detail"],
 			panelWidth: 20,
 			title: "Info",
 		});
 
-		expect(output).toBe([
-			"▌                   ",
-			"▌  Info             ",
-			"▌  Short            ",
-			"▌  Longer detail    ",
-			"▌                   ",
-		].join("\n"));
+		expect(output).toBe(
+			[
+				"▌                   ",
+				"▌  Info             ",
+				"▌  Short            ",
+				"▌  Longer detail    ",
+				"▌                   ",
+			].join("\n"),
+		);
 	});
 
 	test("Renders an ASCII accent when Unicode is disabled", () => {
@@ -32,12 +31,14 @@ describe("panel", () => {
 			unicode: false,
 		});
 
-		expect(output).toBe([
-			"|                               ",
-			"|  Error                        ",
-			"|  Configuration file missing   ",
-			"|                               ",
-		].join("\n"));
+		expect(output).toBe(
+			[
+				"|                               ",
+				"|  Error                        ",
+				"|  Configuration file missing   ",
+				"|                               ",
+			].join("\n"),
+		);
 	});
 
 	test("Omits decoration for the CI profile", () => {
@@ -58,12 +59,7 @@ describe("panel", () => {
 			panelWidth: 10,
 		});
 
-		expect(output).toBe([
-			"▌         ",
-			"▌  One    ",
-			"▌  Two    ",
-			"▌         ",
-		].join("\n"));
+		expect(output).toBe(["▌         ", "▌  One    ", "▌  Two    ", "▌         "].join("\n"));
 	});
 
 	test("Colours the surface and semantic accent", () => {
@@ -77,11 +73,13 @@ describe("panel", () => {
 
 		expect(output).toContain("\u001b[38;2;255;114;114m");
 		expect(output).toContain("\u001b[48;2;15;24;27m");
-		expect(stripAnsi(output)).toBe([
-			"▌                               ",
-			"▌  Error                        ",
-			"▌  Configuration file missing   ",
-			"▌                               ",
-		].join("\n"));
+		expect(stripAnsi(output)).toBe(
+			[
+				"▌                               ",
+				"▌  Error                        ",
+				"▌  Configuration file missing   ",
+				"▌                               ",
+			].join("\n"),
+		);
 	});
 });

@@ -10,11 +10,7 @@ export {
 	parseAdapterPathRequest,
 	renderAdapterPath,
 } from "./cli/adapter-path-command.js";
-export {
-	parseRenderRequest,
-	rendererNames,
-	renderJsonInput,
-} from "./cli/render-command.js";
+export { parseRenderRequest, rendererNames, renderJsonInput } from "./cli/render-command.js";
 export {
 	galleryFixtures,
 	gallerySections,

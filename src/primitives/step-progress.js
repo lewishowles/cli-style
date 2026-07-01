@@ -67,12 +67,14 @@ export function stepProgress(options = {}) {
 
 	const current = normaliseCurrent(options.current, steps.length);
 
-	return steps.map((label, index) => {
-		const state = stateForIndex(index, current);
-		const count = `${index + 1}/${steps.length}`;
+	return steps
+		.map((label, index) => {
+			const state = stateForIndex(index, current);
+			const count = `${index + 1}/${steps.length}`;
 
-		return `${count} ${step(label, state, options)}`;
-	}).join("\n");
+			return `${count} ${step(label, state, options)}`;
+		})
+		.join("\n");
 }
 
 /**

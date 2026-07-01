@@ -22,9 +22,10 @@ import { getResultSymbol, getResultToken, resultTypes } from "../theme/results.j
 export function status(resultType = resultTypes.UNKNOWN, detail = "", options = {}) {
 	const token = getResultToken(resultType);
 	const symbol = getResultSymbol(resultType, options);
-	const label = typeof options.label === "string" && options.label !== ""
-		? options.label
-		: token.label;
+
+	const label =
+		typeof options.label === "string" && options.label !== "" ? options.label : token.label;
+
 	const prefix = `${symbol} ${label}`;
 	const detailText = detail === "" ? "" : ` ${detail}`;
 

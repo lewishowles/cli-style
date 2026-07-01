@@ -34,22 +34,16 @@ export function panel(options = {}) {
 	const lines = options.lines ?? [];
 
 	if (options.profile === profiles.CI) {
-		return [
-			...(options.title === undefined ? [] : [options.title]),
-			...lines,
-		].join("\n");
+		return [...(options.title === undefined ? [] : [options.title]), ...lines].join("\n");
 	}
 
 	const width = Math.max(options.panelWidth ?? defaultWidth, 4);
-	const panelLines = [
-		"",
-		...(options.title === undefined ? [] : [options.title]),
-		...lines,
-		"",
-	];
+	const panelLines = ["", ...(options.title === undefined ? [] : [options.title]), ...lines, ""];
 
 	return panelLines
-		.map((line, index) => renderLine(line, width, index === 1 && options.title !== undefined, options))
+		.map((line, index) =>
+			renderLine(line, width, index === 1 && options.title !== undefined, options),
+		)
 		.join("\n");
 }
 

@@ -28,10 +28,11 @@ export function createCliStyle(options = {}) {
 		print: (value) => {
 			console.log(value);
 		},
-		reporter: (reporterOptions = {}) => createReporter({
-			...resolvedOptions,
-			...reporterOptions,
-		}),
+		reporter: (reporterOptions = {}) =>
+			createReporter({
+				...resolvedOptions,
+				...reporterOptions,
+			}),
 		write: (value) => {
 			process.stdout.write(value);
 		},

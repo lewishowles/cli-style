@@ -29,12 +29,14 @@ describe("table", () => {
 			width: 80,
 		});
 
-		expect(output).toBe([
-			"Name        Status",
-			"──────────  ───────",
-			"Type check  Passed",
-			"Unit        Warning",
-		].join("\n"));
+		expect(output).toBe(
+			[
+				"Name        Status",
+				"──────────  ───────",
+				"Type check  Passed",
+				"Unit        Warning",
+			].join("\n"),
+		);
 	});
 
 	test("Falls back to key/value blocks at narrow widths", () => {
@@ -63,13 +65,9 @@ describe("table", () => {
 			width: 15,
 		});
 
-		expect(output).toBe([
-			"Name    Type check",
-			"Status  Passed",
-			"",
-			"Name    Unit",
-			"Status  Warning",
-		].join("\n"));
+		expect(output).toBe(
+			["Name    Type check", "Status  Passed", "", "Name    Unit", "Status  Warning"].join("\n"),
+		);
 	});
 
 	test("Uses an ASCII header rule when Unicode is disabled", () => {
@@ -127,10 +125,6 @@ describe("table", () => {
 		expect(output).toContain("\u001b[38;2;111;127;135mName ");
 		expect(output).toContain("\u001b[38;2;42;58;66m");
 		expect(output).toContain("\u001b[38;2;232;238;240mBuild");
-		expect(stripAnsi(output)).toBe([
-			"Name   Status",
-			"─────  ──────",
-			"Build  Passed",
-		].join("\n"));
+		expect(stripAnsi(output)).toBe(["Name   Status", "─────  ──────", "Build  Passed"].join("\n"));
 	});
 });

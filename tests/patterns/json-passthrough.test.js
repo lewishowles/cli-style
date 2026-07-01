@@ -26,9 +26,11 @@ describe("Pattern JSON passthrough", () => {
 		];
 
 		for (const [renderer, input] of cases) {
-			expect(renderer(input, {
-				profile: profiles.JSON,
-			})).toBe(input);
+			expect(
+				renderer(input, {
+					profile: profiles.JSON,
+				}),
+			).toBe(input);
 		}
 	});
 });

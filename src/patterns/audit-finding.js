@@ -50,6 +50,7 @@ export function auditFinding(finding, options = {}) {
 	const summary = isNonEmptyString(finding.finding) ? finding.finding : "";
 	const evidence = normaliseStringList(finding.evidence).map((item) => `- ${item}`);
 	const references = normaliseStringList(finding.references).map((item) => `- ${item}`);
+
 	const sections = [
 		status(finding.result ?? resultTypes.UNKNOWN, summary, options),
 		renderLocation(finding.location, options),

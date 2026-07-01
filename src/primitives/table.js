@@ -34,8 +34,11 @@ export function table(options = {}) {
 	}
 
 	const widths = columnWidths(columns, rows);
-	const naturalWidth = widths.reduce((total, width) => total + width, 0)
-		+ (columnSeparator.length * (columns.length - 1));
+
+	const naturalWidth =
+		widths.reduce((total, width) => total + width, 0) +
+		columnSeparator.length * (columns.length - 1);
+
 	const availableWidth = Number.isFinite(options.width) ? options.width : defaultWidth;
 
 	if (naturalWidth > availableWidth) {
@@ -58,14 +61,15 @@ function normaliseColumns(columns) {
 		return [];
 	}
 
-	return columns.filter((column) => (
-		column !== null
-		&& typeof column === "object"
-		&& typeof column.key === "string"
-		&& column.key !== ""
-		&& typeof column.label === "string"
-		&& column.label !== ""
-	));
+	return columns.filter(
+		(column) =>
+			column !== null &&
+			typeof column === "object" &&
+			typeof column.key === "string" &&
+			column.key !== "" &&
+			typeof column.label === "string" &&
+			column.label !== "",
+	);
 }
 
 /**
@@ -95,10 +99,9 @@ function normaliseRows(rows) {
  *     Column widths.
  */
 function columnWidths(columns, rows) {
-	return columns.map((column) => Math.max(
-		column.label.length,
-		...rows.map((row) => cellValue(row[column.key]).length),
-	));
+	return columns.map((column) =>
+		Math.max(column.label.length, ...rows.map((row) => cellValue(row[column.key]).length)),
+	);
 }
 
 /**
@@ -117,25 +120,28 @@ function columnWidths(columns, rows) {
  */
 function renderTable(columns, rows, widths, options) {
 	const header = columns
-		.map((column, index) => renderHeader(
-			padColumn(column.label, widths[index], index, columns.length),
-			options,
-		))
+		.map((column, index) =>
+			renderHeader(padColumn(column.label, widths[index], index, columns.length), options),
+		)
 		.join(columnSeparator);
+
 	const ruleCharacter = options.unicode === false ? "-" : "─";
-	const rule = widths
-		.map((width) => ruleCharacter.repeat(width))
-		.join(columnSeparator);
-	const renderedRule = options.colour === true
-		? foreground(rule, tableColours.border, options)
-		: rule;
-	const body = rows.map((row) => columns
-		.map((column, index) => renderCell(
-			padColumn(cellValue(row[column.key]), widths[index], index, columns.length),
-			index,
-			options,
-		))
-		.join(columnSeparator));
+	const rule = widths.map((width) => ruleCharacter.repeat(width)).join(columnSeparator);
+
+	const renderedRule =
+		options.colour === true ? foreground(rule, tableColours.border, options) : rule;
+
+	const body = rows.map((row) =>
+		columns
+			.map((column, index) =>
+				renderCell(
+					padColumn(cellValue(row[column.key]), widths[index], index, columns.length),
+					index,
+					options,
+				),
+			)
+			.join(columnSeparator),
+	);
 
 	return [header, renderedRule, ...body].join("\n");
 }
@@ -173,14 +179,17 @@ function padColumn(value, width, index, columnCount) {
 function renderBlocks(columns, rows, options) {
 	const labelWidth = Math.max(...columns.map((column) => column.label.length));
 
-	return rows.map((row) => columns
-		.map((column) => {
-			const label = renderHeader(column.label.padEnd(labelWidth, " "), options);
-			const value = renderCell(cellValue(row[column.key]), 0, options);
+	return rows
+		.map((row) =>
+			columns
+				.map((column) => {
+					const label = renderHeader(column.label.padEnd(labelWidth, " "), options);
+					const value = renderCell(cellValue(row[column.key]), 0, options);
 
-			return `${label}${columnSeparator}${value}`;
-		})
-		.join("\n"))
+					return `${label}${columnSeparator}${value}`;
+				})
+				.join("\n"),
+		)
 		.join("\n\n");
 }
 
@@ -231,9 +240,7 @@ function renderCell(value, columnIndex, options) {
 		return value;
 	}
 
-	const colour = columnIndex === 0
-		? tableColours.primaryText
-		: tableColours.secondaryText;
+	const colour = columnIndex === 0 ? tableColours.primaryText : tableColours.secondaryText;
 
 	return foreground(value, colour, options);
 }

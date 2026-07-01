@@ -21,7 +21,9 @@ describe("parseAdapterPathRequest", () => {
 	test("Rejects unsupported adapter requests", () => {
 		expect(() => parseAdapterPathRequest([])).toThrow("Missing adapter");
 		expect(() => parseAdapterPathRequest(["ruby"])).toThrow("Unknown adapter: ruby");
-		expect(() => parseAdapterPathRequest(["bash", "extra"])).toThrow("Unexpected adapter-path argument: extra");
+		expect(() => parseAdapterPathRequest(["bash", "extra"])).toThrow(
+			"Unexpected adapter-path argument: extra",
+		);
 	});
 });
 

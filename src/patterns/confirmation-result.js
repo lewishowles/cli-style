@@ -1,13 +1,7 @@
 import { profiles } from "../profiles/profiles.js";
 import { status } from "../primitives/status.js";
 import { resultTypes } from "../theme/results.js";
-import {
-	formatLabel,
-	isNonEmptyString,
-	isRecord,
-	renderSection,
-	renderTitle,
-} from "./helpers.js";
+import { formatLabel, isNonEmptyString, isRecord, renderSection, renderTitle } from "./helpers.js";
 
 // Confirmation states map workflow outcomes onto shared result semantics.
 const confirmationStates = {
@@ -67,15 +61,15 @@ export function confirmationResult(confirmation, options = {}) {
 		return "";
 	}
 
-	const title = isNonEmptyString(confirmation.title)
-		? confirmation.title
-		: defaultTitle;
+	const title = isNonEmptyString(confirmation.title) ? confirmation.title : defaultTitle;
 	const action = isNonEmptyString(confirmation.action) ? confirmation.action : "";
 	const summary = formatLabel(action, confirmation.item, options);
 	const state = confirmationStates[confirmation.state] ?? fallbackState;
+
 	const detail = isNonEmptyString(confirmation.detail)
 		? renderSection("Detail", [confirmation.detail], options, false)
 		: "";
+
 	const sections = [
 		status(state.result, summary, {
 			...options,

@@ -81,6 +81,7 @@ describe("Initialisation", () => {
 			colour: false,
 			unicode: false,
 		});
+
 		const reporter = ui.reporter();
 
 		expect(reporter.status("info", "Checking")).toBe("> Checking");
@@ -97,189 +98,259 @@ describe("Render contracts", () => {
 	});
 
 	test("Exports divider primitive", () => {
-		expect(divider({
-			colour: false,
-			dividerWidth: 4,
-		})).toBe("----");
+		expect(
+			divider({
+				colour: false,
+				dividerWidth: 4,
+			}),
+		).toBe("----");
 	});
 
 	test("Exports panel primitive", () => {
-		expect(panel({
-			colour: false,
-			lines: ["Ready"],
-			panelWidth: 12,
-			title: "Status",
-		})).toBe("▌           \n▌  Status   \n▌  Ready    \n▌           ");
+		expect(
+			panel({
+				colour: false,
+				lines: ["Ready"],
+				panelWidth: 12,
+				title: "Status",
+			}),
+		).toBe("▌           \n▌  Status   \n▌  Ready    \n▌           ");
 	});
 
 	test("Exports progress bar primitive", () => {
-		expect(progressBar({
-			barWidth: 4,
-			colour: false,
-			max: 4,
-			value: 2,
-		})).toBe("[██░░] 50% (2/4)");
+		expect(
+			progressBar({
+				barWidth: 4,
+				colour: false,
+				max: 4,
+				value: 2,
+			}),
+		).toBe("[██░░] 50% (2/4)");
 	});
 
 	test("Exports bar chart primitive", () => {
-		expect(barChart({
-			barWidth: 4,
-			colour: false,
-			rows: [
-				{
-					label: "Items",
-					value: 2,
-				},
-			],
-		})).toBe("Items  ████ 2");
+		expect(
+			barChart({
+				barWidth: 4,
+				colour: false,
+				rows: [
+					{
+						label: "Items",
+						value: 2,
+					},
+				],
+			}),
+		).toBe("Items  ████ 2");
 	});
 
 	test("Exports table primitive", () => {
-		expect(table({
-			colour: false,
-			columns: [
-				{
-					key: "name",
-					label: "Name",
-				},
-			],
-			rows: [
-				{
-					name: "Build",
-				},
-			],
-		})).toBe("Name\n─────\nBuild");
+		expect(
+			table({
+				colour: false,
+				columns: [
+					{
+						key: "name",
+						label: "Name",
+					},
+				],
+				rows: [
+					{
+						name: "Build",
+					},
+				],
+			}),
+		).toBe("Name\n─────\nBuild");
 	});
 
 	test("Exports feedback primitives", () => {
-		expect(hint("Review output.", {
-			colour: false,
-		})).toBe("i Hint: Review output.");
-		expect(emptyState("No results", "", {
-			colour: false,
-		})).toBe("– No results");
-		expect(errorBlock("Failed", ["Stopped"], {
-			colour: false,
-			profile: "ci",
-			unicode: false,
-		})).toBe("x Error: Failed\nStopped");
+		expect(
+			hint("Review output.", {
+				colour: false,
+			}),
+		).toBe("i Hint: Review output.");
+		expect(
+			emptyState("No results", "", {
+				colour: false,
+			}),
+		).toBe("– No results");
+		expect(
+			errorBlock("Failed", ["Stopped"], {
+				colour: false,
+				profile: "ci",
+				unicode: false,
+			}),
+		).toBe("x Error: Failed\nStopped");
 	});
 
 	test("Exports reporter helpers", () => {
-		expect(createReporter({
-			colour: false,
-		}).status("success", "Done.")).toBe("✓ Done.");
-		expect(renderGroup("Checks", [
-			{
-				result: "success",
-				label: "unit",
-			},
-		], {
-			colour: false,
-		})).toBe("✓ Checks 1 success");
-		expect(renderReporterDivider("Checks", "Unit tests", {
-			colour: false,
-			dividerWidth: 32,
-		})).toBe("Checks · Unit tests ------------");
+		expect(
+			createReporter({
+				colour: false,
+			}).status("success", "Done."),
+		).toBe("✓ Done.");
+		expect(
+			renderGroup(
+				"Checks",
+				[
+					{
+						result: "success",
+						label: "unit",
+					},
+				],
+				{
+					colour: false,
+				},
+			),
+		).toBe("✓ Checks 1 success");
+		expect(
+			renderReporterDivider("Checks", "Unit tests", {
+				colour: false,
+				dividerWidth: 32,
+			}),
+		).toBe("Checks · Unit tests ------------");
 	});
 
 	test("Exports diagnostic report pattern", () => {
-		expect(diagnosticReport({
-			checks: [
+		expect(
+			diagnosticReport(
 				{
-					name: "unit",
-					result: "success",
+					checks: [
+						{
+							name: "unit",
+							result: "success",
+						},
+					],
 				},
-			],
-		}, {
-			colour: false,
-		})).toContain("✓ Success unit");
+				{
+					colour: false,
+				},
+			),
+		).toContain("✓ Success unit");
 	});
 
 	test("Exports command and task result patterns", () => {
-		expect(commandResult({
-			result: "success",
-			summary: "Tests passed",
-		}, {
-			colour: false,
-		})).toContain("✓ Success Tests passed");
-		expect(taskSummary({
-			result: "partial",
-			task: "Add patterns",
-		}, {
-			colour: false,
-		})).toContain("◐ Partial Add patterns");
+		expect(
+			commandResult(
+				{
+					result: "success",
+					summary: "Tests passed",
+				},
+				{
+					colour: false,
+				},
+			),
+		).toContain("✓ Success Tests passed");
+		expect(
+			taskSummary(
+				{
+					result: "partial",
+					task: "Add patterns",
+				},
+				{
+					colour: false,
+				},
+			),
+		).toContain("◐ Partial Add patterns");
 	});
 
 	test("Exports agent transcript pattern", () => {
-		expect(agentTranscript({
-			entries: [
+		expect(
+			agentTranscript(
 				{
-					content: "Tests pass.",
-					role: "agent",
+					entries: [
+						{
+							content: "Tests pass.",
+							role: "agent",
+						},
+					],
 				},
-			],
-		}, {
-			colour: false,
-		})).toContain("[Agent] Tests pass.");
+				{
+					colour: false,
+				},
+			),
+		).toContain("[Agent] Tests pass.");
 	});
 
 	test("Exports audit finding pattern", () => {
-		expect(auditFinding({
-			finding: "Icon button is unnamed",
-			result: "failed",
-		}, {
-			colour: false,
-		})).toContain("× Failed Icon button is unnamed");
+		expect(
+			auditFinding(
+				{
+					finding: "Icon button is unnamed",
+					result: "failed",
+				},
+				{
+					colour: false,
+				},
+			),
+		).toContain("× Failed Icon button is unnamed");
 	});
 
 	test("Exports compact data table pattern", () => {
-		expect(compactDataTable({
-			columns: [
+		expect(
+			compactDataTable(
 				{
-					key: "check",
-					label: "Check",
+					columns: [
+						{
+							key: "check",
+							label: "Check",
+						},
+					],
+					rows: [
+						{
+							check: "unit",
+						},
+					],
 				},
-			],
-			rows: [
 				{
-					check: "unit",
+					colour: false,
 				},
-			],
-		}, {
-			colour: false,
-		})).toContain("unit");
+			),
+		).toContain("unit");
 	});
 
 	test("Exports confirmation result pattern", () => {
-		expect(confirmationResult({
-			action: "Delete project",
-			item: "Website refresh",
-			state: "confirmed",
-		}, {
-			colour: false,
-		})).toContain("✓ Confirmed Delete project — Website refresh");
+		expect(
+			confirmationResult(
+				{
+					action: "Delete project",
+					item: "Website refresh",
+					state: "confirmed",
+				},
+				{
+					colour: false,
+				},
+			),
+		).toContain("✓ Confirmed Delete project — Website refresh");
 	});
 
 	test("Exports next-step block pattern", () => {
-		expect(nextStepBlock({
-			next: "Run verification",
-		}, {
-			colour: false,
-		})).toContain("Next  Run verification");
+		expect(
+			nextStepBlock(
+				{
+					next: "Run verification",
+				},
+				{
+					colour: false,
+				},
+			),
+		).toContain("Next  Run verification");
 	});
 
 	test("Exports step primitives", () => {
-		expect(step("Build", "current", {
-			colour: false,
-			unicode: false,
-		})).toBe("... Build");
-		expect(stepProgress({
-			colour: false,
-			current: 1,
-			steps: ["Install", "Build"],
-			unicode: false,
-		})).toBe("1/2 OK Install\n2/2 ... Build");
+		expect(
+			step("Build", "current", {
+				colour: false,
+				unicode: false,
+			}),
+		).toBe("... Build");
+		expect(
+			stepProgress({
+				colour: false,
+				current: 1,
+				steps: ["Install", "Build"],
+				unicode: false,
+			}),
+		).toBe("1/2 OK Install\n2/2 ... Build");
 	});
 
 	test("Renders the current-terminal gallery by default", () => {
@@ -293,9 +364,12 @@ describe("Render contracts", () => {
 	});
 
 	test("Renders all gallery variants on request", () => {
-		const output = renderGallery({}, {
-			variants: true,
-		});
+		const output = renderGallery(
+			{},
+			{
+				variants: true,
+			},
+		);
 
 		expect(output).toContain("No colour ------------------------------");
 		expect(output).toContain("No Unicode -----------------------------");
@@ -358,26 +432,49 @@ describe("Render contracts", () => {
 	});
 
 	test("Filters gallery variants, sections, and fixtures", () => {
-		const noColour = renderGallery({
-			colour: true,
-		}, {
-			variant: "no-colour",
-		});
-		const patterns = renderGallery({}, {
-			section: "patterns",
-		});
-		const audit = renderGallery({}, {
-			fixture: "audit-finding",
-		});
-		const confirmation = renderGallery({}, {
-			fixture: "confirmation-result",
-		});
-		const nextStep = renderGallery({}, {
-			fixture: "next-step-block",
-		});
-		const reporter = renderGallery({}, {
-			fixture: "reporter",
-		});
+		const noColour = renderGallery(
+			{
+				colour: true,
+			},
+			{
+				variant: "no-colour",
+			},
+		);
+
+		const patterns = renderGallery(
+			{},
+			{
+				section: "patterns",
+			},
+		);
+
+		const audit = renderGallery(
+			{},
+			{
+				fixture: "audit-finding",
+			},
+		);
+
+		const confirmation = renderGallery(
+			{},
+			{
+				fixture: "confirmation-result",
+			},
+		);
+
+		const nextStep = renderGallery(
+			{},
+			{
+				fixture: "next-step-block",
+			},
+		);
+
+		const reporter = renderGallery(
+			{},
+			{
+				fixture: "reporter",
+			},
+		);
 
 		expect(noColour).toContain("No colour ------------------------------");
 		expect(noColour).not.toContain("\u001b[");
@@ -396,21 +493,32 @@ describe("Render contracts", () => {
 	});
 
 	test("Renders gallery with a width override", () => {
-		const output = renderGallery({}, {
-			section: "primitives",
-			width: 18,
-		});
+		const output = renderGallery(
+			{},
+			{
+				section: "primitives",
+				width: 18,
+			},
+		);
 
 		expect(output).toContain("Check   type-check");
 		expect(output).toContain("Result  warning");
 	});
 
 	test("Constrains gallery output to a requested width", () => {
-		const output = renderGallery({}, {
-			variants: true,
-			width: 16,
-		});
-		const widestLine = Math.max(...stripAnsi(output).split("\n").map((line) => line.length));
+		const output = renderGallery(
+			{},
+			{
+				variants: true,
+				width: 16,
+			},
+		);
+
+		const widestLine = Math.max(
+			...stripAnsi(output)
+				.split("\n")
+				.map((line) => line.length),
+		);
 
 		expect(widestLine).toBeLessThanOrEqual(16);
 	});

@@ -53,18 +53,22 @@ const reporter = createReporter({
 });
 
 reporter.divider("Project setup", "Claude + Codex");
-reporter.group("Agent scripts", [
+reporter.group(
+	"Agent scripts",
+	[
+		{
+			label: "project-diagnostics.py",
+			result: "unchanged",
+		},
+		{
+			label: "repo-context.py",
+			result: "unchanged",
+		},
+	],
 	{
-		label: "project-diagnostics.py",
-		result: "unchanged",
+		summary: "2 already linked",
 	},
-	{
-		label: "repo-context.py",
-		result: "unchanged",
-	},
-], {
-	summary: "2 already linked",
-});
+);
 reporter.status("success", "Done.");
 
 console.log(reporter.render());

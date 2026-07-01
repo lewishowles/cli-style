@@ -1,11 +1,6 @@
 import { profiles } from "../profiles/profiles.js";
 import { chip } from "../primitives/chip.js";
-import {
-	isNonEmptyString,
-	isRecord,
-	normaliseStringList,
-	renderTitle,
-} from "./helpers.js";
+import { isNonEmptyString, isRecord, normaliseStringList, renderTitle } from "./helpers.js";
 
 // Transcript roles map machine-facing values to stable textual labels and tones.
 const transcriptRoles = {
@@ -66,10 +61,9 @@ export function agentTranscript(transcript, options = {}) {
 		return renderTitle(title, options);
 	}
 
-	return [
-		renderTitle(title, options),
-		...entries.map((entry) => renderEntry(entry, options)),
-	].join("\n\n");
+	return [renderTitle(title, options), ...entries.map((entry) => renderEntry(entry, options))].join(
+		"\n\n",
+	);
 }
 
 /**
@@ -134,10 +128,7 @@ function renderEntry(entry, options) {
 		return `${renderedLabel} ${entry.content[0]}`;
 	}
 
-	return [
-		renderedLabel,
-		...entry.content.map((line) => `  ${line}`),
-	].join("\n");
+	return [renderedLabel, ...entry.content.map((line) => `  ${line}`)].join("\n");
 }
 
 /**
@@ -154,12 +145,7 @@ function renderEntry(entry, options) {
  */
 function renderAgentEntry(label, content, role) {
 	if (role === "tool") {
-		return [
-			`## ${label}`,
-			"```text",
-			...content,
-			"```",
-		].join("\n");
+		return [`## ${label}`, "```text", ...content, "```"].join("\n");
 	}
 
 	return [`## ${label}`, ...content].join("\n");

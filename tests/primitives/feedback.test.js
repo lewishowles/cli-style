@@ -29,38 +29,36 @@ describe("Feedback primitives", () => {
 	});
 
 	test("Renders errors as danger panels", () => {
-		const output = errorBlock("Configuration invalid", [
-			"Missing required field: package",
-		], {
+		const output = errorBlock("Configuration invalid", ["Missing required field: package"], {
 			colour: false,
 			panelWidth: 40,
 		});
 
-		expect(output).toBe([
-			"▌                                       ",
-			"▌  × Error: Configuration invalid       ",
-			"▌  Missing required field: package      ",
-			"▌                                       ",
-		].join("\n"));
+		expect(output).toBe(
+			[
+				"▌                                       ",
+				"▌  × Error: Configuration invalid       ",
+				"▌  Missing required field: package      ",
+				"▌                                       ",
+			].join("\n"),
+		);
 	});
 
 	test("Keeps CI errors undecorated and grep-friendly", () => {
-		const output = errorBlock("Configuration invalid", [
-			"Missing required field: package",
-		], {
+		const output = errorBlock("Configuration invalid", ["Missing required field: package"], {
 			colour: false,
 			profile: "ci",
 			unicode: false,
 		});
 
-		expect(output).toBe([
-			"x Error: Configuration invalid",
-			"Missing required field: package",
-		].join("\n"));
+		expect(output).toBe(
+			["x Error: Configuration invalid", "Missing required field: package"].join("\n"),
+		);
 	});
 
 	test("Uses safe defaults for omitted feedback content", () => {
 		const hintOutput = hint();
+
 		const errorOutput = errorBlock(undefined, "Invalid details", {
 			colour: false,
 			profile: "ci",
@@ -75,9 +73,11 @@ describe("Feedback primitives", () => {
 		const hintOutput = hint("Review the warning.", {
 			colour: true,
 		});
+
 		const emptyOutput = emptyState("No results", "", {
 			colour: true,
 		});
+
 		const errorOutput = errorBlock("Build failed", ["Compilation stopped."], {
 			colour: true,
 		});

@@ -30,27 +30,44 @@ export function createReporter(options = {}) {
 		...reporterDefaults,
 		...options,
 	};
+
 	const lines = [];
 
 	return {
-		divider: (label, detail = "", dividerOptions = {}) => append(lines, renderReporterDivider(label, detail, {
-			...reporterOptions,
-			...dividerOptions,
-		})),
-		group: (label, items = [], groupOptions = {}) => append(lines, renderGroup(label, items, {
-			...reporterOptions,
-			...groupOptions,
-		})),
+		divider: (label, detail = "", dividerOptions = {}) =>
+			append(
+				lines,
+				renderReporterDivider(label, detail, {
+					...reporterOptions,
+					...dividerOptions,
+				}),
+			),
+		group: (label, items = [], groupOptions = {}) =>
+			append(
+				lines,
+				renderGroup(label, items, {
+					...reporterOptions,
+					...groupOptions,
+				}),
+			),
 		lines,
 		render: () => lines.join("\n"),
-		section: (label, detail = "", sectionOptions = {}) => append(lines, renderSection(label, detail, {
-			...reporterOptions,
-			...sectionOptions,
-		})),
-		status: (resultType, label, detail = "", statusOptions = {}) => append(lines, renderReporterStatus(resultType, label, detail, {
-			...reporterOptions,
-			...statusOptions,
-		})),
+		section: (label, detail = "", sectionOptions = {}) =>
+			append(
+				lines,
+				renderSection(label, detail, {
+					...reporterOptions,
+					...sectionOptions,
+				}),
+			),
+		status: (resultType, label, detail = "", statusOptions = {}) =>
+			append(
+				lines,
+				renderReporterStatus(resultType, label, detail, {
+					...reporterOptions,
+					...statusOptions,
+				}),
+			),
 	};
 }
 
@@ -87,7 +104,10 @@ export function renderReporterDivider(label, detail = "", options = {}) {
  */
 export function renderGroup(label, items = [], options = {}) {
 	const normalisedItems = normaliseItems(items);
-	const resultType = options.result ?? getHighestSeverityResult(normalisedItems.map((item) => item.result));
+
+	const resultType =
+		options.result ?? getHighestSeverityResult(normalisedItems.map((item) => item.result));
+
 	const summary = options.summary ?? summariseItems(normalisedItems);
 	const groupLine = renderReporterStatus(resultType, label, summary, options);
 
@@ -193,9 +213,10 @@ function normaliseItems(items) {
 		.map((item) => ({
 			detail: isNonEmptyString(item.detail) ? item.detail : "",
 			label: isNonEmptyString(item.label) ? item.label : getResultToken(item.result).label,
-			result: getResultToken(item.result) === getResultToken(resultTypes.UNKNOWN)
-				? resultTypes.UNKNOWN
-				: item.result,
+			result:
+				getResultToken(item.result) === getResultToken(resultTypes.UNKNOWN)
+					? resultTypes.UNKNOWN
+					: item.result,
 		}));
 }
 

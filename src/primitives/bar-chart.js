@@ -31,9 +31,7 @@ export function barChart(options = {}) {
 	const maximum = Math.max(...rows.map((row) => Math.abs(row.value)), 1);
 	const width = normaliseWidth(options.barWidth);
 
-	return rows
-		.map((row) => renderRow(row, labelWidth, maximum, width, options))
-		.join("\n");
+	return rows.map((row) => renderRow(row, labelWidth, maximum, width, options)).join("\n");
 }
 
 /**
@@ -49,13 +47,14 @@ function normaliseRows(rows) {
 		return [];
 	}
 
-	return rows.filter((row) => (
-		row !== null
-		&& typeof row === "object"
-		&& typeof row.label === "string"
-		&& row.label !== ""
-		&& Number.isFinite(row.value)
-	));
+	return rows.filter(
+		(row) =>
+			row !== null &&
+			typeof row === "object" &&
+			typeof row.label === "string" &&
+			row.label !== "" &&
+			Number.isFinite(row.value),
+	);
 }
 
 /**
@@ -101,9 +100,10 @@ function renderRow(row, labelWidth, maximum, width, options) {
 	}
 
 	const renderedLabel = foreground(label, chartColours.label, options);
-	const renderedBar = barWidth === 0
-		? ""
-		: foreground(bar.slice(0, barWidth), barColour(row), options);
+
+	const renderedBar =
+		barWidth === 0 ? "" : foreground(bar.slice(0, barWidth), barColour(row), options);
+
 	const barPadding = bar.slice(barWidth);
 	const renderedValue = foreground(String(row.value), chartColours.value, options);
 

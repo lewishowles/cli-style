@@ -1,10 +1,6 @@
 import { profiles } from "../profiles/profiles.js";
 import { table } from "../primitives/table.js";
-import {
-	isNonEmptyString,
-	isRecord,
-	renderTitle,
-} from "./helpers.js";
+import { isNonEmptyString, isRecord, renderTitle } from "./helpers.js";
 
 // Compact data tables use a stable title when the caller does not provide one.
 const defaultTitle = "Data";
@@ -38,14 +34,17 @@ export function compactDataTable(data, options = {}) {
 
 	const title = isNonEmptyString(data.title) ? data.title : defaultTitle;
 	const summary = isNonEmptyString(data.summary) ? data.summary : "";
+
 	const renderedTable = table({
 		...options,
 		columns: data.columns,
 		rows: data.rows,
 	});
-	const heading = summary === ""
-		? renderTitle(title, options)
-		: [renderTitle(title, options), summary].join("\n");
+
+	const heading =
+		summary === ""
+			? renderTitle(title, options)
+			: [renderTitle(title, options), summary].join("\n");
 
 	if (renderedTable === "") {
 		return "";

@@ -49,6 +49,7 @@ export function taskSummary(summary, options = {}) {
 	const detail = formatLabel(task, summary.summary, options);
 	const completed = normaliseStringList(summary.completed).map((item) => `- ${item}`);
 	const remaining = normaliseStringList(summary.remaining).map((item) => `- ${item}`);
+
 	const sections = [
 		status(summary.result ?? resultTypes.UNKNOWN, detail, options),
 		renderSection("Completed", completed, options, false),

@@ -33,6 +33,7 @@ describe("progressBar", () => {
 			max: 10,
 			value: 12,
 		});
+
 		const belowMinimum = progressBar({
 			barWidth: 5,
 			colour: false,

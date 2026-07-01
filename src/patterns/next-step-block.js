@@ -42,12 +42,17 @@ export function nextStepBlock(nextStep, options = {}) {
 
 	const title = isNonEmptyString(nextStep.title) ? nextStep.title : defaultTitle;
 	const next = renderNext(nextStep.next, options);
+
 	const reason = isNonEmptyString(nextStep.reason)
 		? renderSection("Why", [nextStep.reason], options, false)
 		: "";
+
 	const commands = renderCommands(nextStep.commands, options);
-	const alternatives = normaliseStringList(nextStep.alternatives)
-		.map((alternative) => `- ${alternative}`);
+
+	const alternatives = normaliseStringList(nextStep.alternatives).map(
+		(alternative) => `- ${alternative}`,
+	);
+
 	const sections = [
 		next,
 		reason,
@@ -101,12 +106,7 @@ function renderCommands(commands, options) {
 	}
 
 	if (options.profile === profiles.AGENT) {
-		return [
-			"## Commands",
-			"```sh",
-			...validCommands,
-			"```",
-		].join("\n");
+		return ["## Commands", "```sh", ...validCommands, "```"].join("\n");
 	}
 
 	return renderSection(

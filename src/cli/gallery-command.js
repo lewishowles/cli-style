@@ -1,19 +1,10 @@
 import { spawnSync } from "node:child_process";
 
-import {
-	galleryFixtures,
-	gallerySections,
-	galleryVariants,
-} from "../gallery/render-gallery.js";
+import { galleryFixtures, gallerySections, galleryVariants } from "../gallery/render-gallery.js";
 import { isProfile, profiles } from "../profiles/profiles.js";
 
 // Global rendering flags accepted after `gallery` for focused review commands.
-const globalRenderingFlags = new Set([
-	"--no-color",
-	"--no-colour",
-	"--no-unicode",
-	"--plain",
-]);
+const globalRenderingFlags = new Set(["--no-color", "--no-colour", "--no-unicode", "--plain"]);
 
 /**
  * Parse gallery command arguments.
@@ -25,6 +16,7 @@ const globalRenderingFlags = new Set([
  */
 export function parseGalleryRequest(args = []) {
 	let hasVariant = false;
+
 	const request = {
 		fixture: undefined,
 		interactive: false,
@@ -96,15 +88,13 @@ export function selectInteractiveGalleryRequest(request) {
 		...gallerySections.map((section) => `section:${section}`),
 		...galleryFixtures.map((fixture) => `fixture:${fixture}`),
 	];
-	const selection = spawnSync("fzf", [
-		"--height=60%",
-		"--layout=reverse",
-		"--prompt=Gallery > ",
-	], {
+
+	const selection = spawnSync("fzf", ["--height=60%", "--layout=reverse", "--prompt=Gallery > "], {
 		encoding: "utf8",
 		input: choices.join("\n"),
 		stdio: ["pipe", "pipe", "inherit"],
 	});
+
 	const value = selection.status === 0 ? selection.stdout.trim() : "";
 
 	if (value === "") {

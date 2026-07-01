@@ -50,6 +50,7 @@ export function commandResult(result, options = {}) {
 	const metadata = renderMetadata(result, options);
 	const details = normaliseStringList(result.details).map((detail) => `- ${detail}`);
 	const summary = isNonEmptyString(result.summary) ? result.summary : "";
+
 	const sections = [
 		status(result.result ?? resultTypes.UNKNOWN, summary, options),
 		metadata,
@@ -83,9 +84,11 @@ function renderMetadata(result, options) {
 	}
 
 	return entries
-		.map(([label, value]) => row(label, value, {
-			...options,
-			labelWidth: 9,
-		}))
+		.map(([label, value]) =>
+			row(label, value, {
+				...options,
+				labelWidth: 9,
+			}),
+		)
 		.join("\n");
 }

@@ -81,12 +81,10 @@ export function renderSection(title, lines, options, listItems = true) {
 		return "";
 	}
 
-	const heading = options.profile === profiles.AGENT
-		? `## ${title}`
-		: title;
-	const content = options.profile === profiles.AGENT && listItems
-		? lines.map((line) => `- ${line}`)
-		: lines;
+	const heading = options.profile === profiles.AGENT ? `## ${title}` : title;
+
+	const content =
+		options.profile === profiles.AGENT && listItems ? lines.map((line) => `- ${line}`) : lines;
 
 	return [heading, ...content].join("\n");
 }

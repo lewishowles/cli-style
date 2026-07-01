@@ -37,19 +37,22 @@ describe("Result tokens", () => {
 			resultTypes.WARNING,
 			resultTypes.PARTIAL,
 			resultTypes.UNKNOWN,
-			resultTypes.SUCCESS,
 			resultTypes.SKIPPED,
+			resultTypes.SUCCESS,
 			resultTypes.INFO,
 			resultTypes.UNCHANGED,
 		]);
 	});
 
 	test("Resolves the highest-priority result", () => {
-		expect(getHighestSeverityResult([
-			resultTypes.UNCHANGED,
-			resultTypes.SUCCESS,
-			resultTypes.WARNING,
-		])).toBe(resultTypes.WARNING);
+		expect(
+			getHighestSeverityResult([resultTypes.UNCHANGED, resultTypes.SUCCESS, resultTypes.WARNING]),
+		).toBe(resultTypes.WARNING);
+
+		expect(
+			getHighestSeverityResult([resultTypes.UNCHANGED, resultTypes.SUCCESS, resultTypes.SKIPPED]),
+		).toBe(resultTypes.SKIPPED);
+
 		expect(getHighestSeverityResult([])).toBe(resultTypes.UNKNOWN);
 	});
 });

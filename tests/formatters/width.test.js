@@ -15,18 +15,24 @@ describe("Width normalisation", () => {
 
 	test("Clamps to minimum and maximum bounds", () => {
 		expect(normaliseWidth(8)).toBe(minimumWidth);
-		expect(normaliseWidth(120, {
-			maxWidth: 90,
-		})).toBe(90);
+		expect(
+			normaliseWidth(120, {
+				maxWidth: 90,
+			}),
+		).toBe(90);
 	});
 
 	test("Supports custom fallback and minimum width", () => {
-		expect(normaliseWidth(null, {
-			defaultWidth: 48,
-			minWidth: 32,
-		})).toBe(48);
-		expect(normaliseWidth(24, {
-			minWidth: 32,
-		})).toBe(32);
+		expect(
+			normaliseWidth(null, {
+				defaultWidth: 48,
+				minWidth: 32,
+			}),
+		).toBe(48);
+		expect(
+			normaliseWidth(24, {
+				minWidth: 32,
+			}),
+		).toBe(32);
 	});
 });
