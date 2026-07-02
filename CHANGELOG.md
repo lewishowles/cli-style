@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 0.6.0 - 2026-07-03
+
+### Added
+
+- Added result-state support to `row()` and `cli_style_row`, so label/value rows can render failed, warning, success, or other status cues while keeping column alignment.
+- Added the `span()` inline emphasis primitive and `cli_style_span` Bash helper for highlighting commands, files, or values inside existing line renderers such as `hint()`.
+- Added `span` support to `cli-style render` and the public JavaScript export.
+
+### Changed
+
+- Reworked the README around integration paths, available renderers, primitive data shapes, patterns, options, profiles, result types, and gallery commands.
+
 ## 0.5.0 - 2026-07-02
 
 ### Added
