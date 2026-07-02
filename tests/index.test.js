@@ -22,6 +22,7 @@ import {
 	renderHelp,
 	renderGroup,
 	renderReporterDivider,
+	span,
 	step,
 	stepProgress,
 	stripAnsi,
@@ -163,11 +164,15 @@ describe("Render contracts", () => {
 	});
 
 	test("Exports feedback primitives", () => {
+		const command = span("npm run docs:readme", "info", {
+			colour: false,
+		});
+
 		expect(
-			hint("Review output.", {
+			hint(`Review output with ${command}.`, {
 				colour: false,
 			}),
-		).toBe("i Hint: Review output.");
+		).toBe("i Hint: Review output with npm run docs:readme.");
 		expect(
 			emptyState("No results", "", {
 				colour: false,
@@ -394,7 +399,7 @@ describe("Render contracts", () => {
 		expect(output).toContain("type-check  passed");
 		expect(output).toContain("Check   type-check");
 		expect(output).toContain("Result  warning");
-		expect(output).toContain("i Hint: tone: info");
+		expect(output).toContain("i Hint: Run npm run docs:readme");
 		expect(output).toContain("- No results tone: muted");
 		expect(output).toContain("|  x Error: Failed");
 		expect(output).toContain("OK complete");

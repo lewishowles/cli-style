@@ -140,6 +140,33 @@ cli_style_row() {
 	cli_style_render_json row "$json" "$@"
 }
 
+# Render an inline span from Bash string values.
+#
+# @param  {string}  value
+#     Span text.
+# @param  {string}  tone
+#     Optional colour tone.
+# @param  {string}  ...
+#     Render flags passed through to `cli-style render`.
+cli_style_span() {
+	local value="${1:-}"
+	local tone="info"
+	local json
+
+	if (($# >= 2)) && [[ "${2:-}" != --* ]]; then
+		tone="${2:-}"
+		shift 2
+	elif (($# >= 1)); then
+		shift
+	else
+		set --
+	fi
+
+	json="{\"value\":$(cli_style_json_string "$value"),\"tone\":$(cli_style_json_string "$tone")}"
+
+	cli_style_render_json span "$json" "$@"
+}
+
 # Render a divider from a Bash string value.
 #
 # @param  {string}  label

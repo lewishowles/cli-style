@@ -14,6 +14,7 @@ import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
 import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
+import { span } from "../primitives/span.js";
 import { status } from "../primitives/status.js";
 import { step, stepProgress, stepStates } from "../primitives/step-progress.js";
 import { table } from "../primitives/table.js";
@@ -676,7 +677,7 @@ function renderPrimitives(options) {
 		}),
 		"",
 		"Feedback",
-		hint("tone: info", options),
+		hint(`Run ${span("npm run docs:readme", "info", options)}`, options),
 		emptyState("No results", "tone: muted", options),
 		errorBlock("Failed", ["tone: danger"], {
 			...options,

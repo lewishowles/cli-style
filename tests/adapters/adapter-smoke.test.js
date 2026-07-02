@@ -60,6 +60,8 @@ describe("Adapter smoke tests", () => {
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_status success "$label" "$value" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Config" "$value" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Bundle" "over budget" failed --plain',
+					'command="$(CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_span "npm run docs:readme" info --plain)"',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_hint "Run $command before release" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_hint "$message" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_divider "$label" --plain',
 				].join("\n"),
@@ -75,8 +77,9 @@ describe("Adapter smoke tests", () => {
 		expect(lines[0]).toBe('OK Saved "config" C:\\repo\\setup.json');
 		expect(lines[1]).toBe("Config  C:\\repo\\setup.json");
 		expect(lines[2]).toBe("x Bundle  over budget");
-		expect(lines[3]).toBe('i Hint: Run "dry-run" before C:\\repo\\setup.json');
-		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
+		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
+		expect(lines[4]).toBe('i Hint: Run "dry-run" before C:\\repo\\setup.json');
+		expect(lines[5].startsWith('Saved "config" ')).toBe(true);
 		expect(result.stderr).toBe("");
 	});
 

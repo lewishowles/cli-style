@@ -97,6 +97,7 @@ describe("renderJsonInput", () => {
 
 	test("Exposes stable renderer names", () => {
 		expect(rendererNames).toContain("status");
+		expect(rendererNames).toContain("span");
 		expect(rendererNames).toContain("task-summary");
 		expect(rendererNames).toContain("diagnostic-report");
 	});

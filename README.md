@@ -140,7 +140,8 @@ detail="/path/to/project"
 cli_style_status success "$label" "$detail" --profile diagnostic
 cli_style_row "Workspace" "$detail" --plain
 cli_style_row "Bundle" "is 22.3 KB, above the 12.0 KB budget" failed --plain
-cli_style_hint "Run \"check\" before release" --plain
+command="$(cli_style_span "npm run docs:readme" info --plain)"
+cli_style_hint "Run $command before release" --plain
 cli_style_divider "Project setup" --plain
 ```
 
@@ -156,6 +157,13 @@ cli_style_status success "Done" "" --plain
 
 ```bash
 cli_style_row "dist/object-BmsQavd_.js" "is 22.3 KB, above the 12.0 KB budget" failed --plain
+```
+
+`cli_style_span` accepts `value`, an optional tone, then render flags. Use it inside another message when only one word, command, file, or value needs emphasis:
+
+```bash
+command="$(cli_style_span "npm run docs:readme" info --profile diagnostic)"
+cli_style_hint "Run $command before release" --profile diagnostic
 ```
 
 Set `CLI_STYLE_BIN` when `cli-style` is not on `PATH`:

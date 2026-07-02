@@ -35,6 +35,7 @@ export { emptyState, errorBlock, hint } from "./primitives/feedback.js";
 export { panel } from "./primitives/panel.js";
 export { progressBar } from "./primitives/progress-bar.js";
 export { row } from "./primitives/row.js";
+export { span } from "./primitives/span.js";
 export { status } from "./primitives/status.js";
 export { step, stepProgress, stepStates } from "./primitives/step-progress.js";
 export { table } from "./primitives/table.js";
