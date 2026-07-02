@@ -47,6 +47,37 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Bash adapter convenience functions escape dynamic strings", () => {
+		const result = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"source adapters/bash/cli-style.sh",
+					"label='Saved \"config\"'",
+					"value='C:\\repo\\setup.json'",
+					"message='Run \"dry-run\" before C:\\repo\\setup.json'",
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_status success "$label" "$value" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Config" "$value" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_hint "$message" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_divider "$label" --plain',
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		const lines = result.stdout.trim().split("\n");
+
+		expect(result.status).toBe(0);
+		expect(lines[0]).toBe('OK Saved "config" C:\\repo\\setup.json');
+		expect(lines[1]).toBe("Config  C:\\repo\\setup.json");
+		expect(lines[2]).toBe('i Hint: Run "dry-run" before C:\\repo\\setup.json');
+		expect(lines[3].startsWith('Saved "config" ')).toBe(true);
+		expect(result.stderr).toBe("");
+	});
+
 	test("Bash adapter fails clearly when cli-style is unavailable", () => {
 		const result = spawnSync(
 			"bash",

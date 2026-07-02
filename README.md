@@ -27,8 +27,9 @@ export PATH="/path/to/cli-style/bin:$PATH"
 import { createCliStyle, status } from "@lewishowles/cli-style";
 
 const ui = createCliStyle({
-	profile: "human",
-	width: 80,
+	argv: process.argv.slice(2),
+	env: process.env,
+	stdout: process.stdout,
 });
 
 const output = status("success", "184 tests", {
@@ -40,6 +41,8 @@ ui.print(output);
 ```
 
 Renderer methods return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
+
+Create the `ui` instance at the CLI entrypoint, then pass it to command handlers. That keeps flag, environment, stream, colour, Unicode, and width detection in one place.
 
 ## Reporter
 
@@ -131,19 +134,33 @@ The package contains `bin/cli-style` and `adapters/`. Install it into a repo-loc
 ```bash
 source "$(cli-style adapter-path bash)"
 
-cli_style_render status --profile diagnostic <<'JSON'
-{
-  "type": "success",
-  "label": "Build passed",
-  "detail": "184 tests"
-}
-JSON
+label='Build "passed"'
+detail="/path/to/project"
+
+cli_style_status success "$label" "$detail" --profile diagnostic
+cli_style_row "Workspace" "$detail" --plain
+cli_style_hint "Run \"check\" before release" --plain
+cli_style_divider "Project setup" --plain
+```
+
+Use the convenience functions for dynamic Bash values. They build JSON internally, so callers do not need to escape quotes, backslashes, or paths by hand.
+
+`cli_style_status` accepts `type`, `label`, `detail`, then render flags. Pass an empty detail when you only need a label:
+
+```bash
+cli_style_status success "Done" "" --plain
 ```
 
 Set `CLI_STYLE_BIN` when `cli-style` is not on `PATH`:
 
 ```bash
-CLI_STYLE_BIN="/path/to/cli-style" cli_style_render status --plain <<'JSON'
+CLI_STYLE_BIN="/path/to/cli-style" cli_style_status success "Build passed" "" --plain
+```
+
+Keep `cli_style_render` for literal or prebuilt JSON:
+
+```bash
+cli_style_render status --plain <<'JSON'
 {
   "type": "success",
   "label": "Build passed"
