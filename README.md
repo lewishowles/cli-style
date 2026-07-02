@@ -139,6 +139,7 @@ detail="/path/to/project"
 
 cli_style_status success "$label" "$detail" --profile diagnostic
 cli_style_row "Workspace" "$detail" --plain
+cli_style_row "Bundle" "is 22.3 KB, above the 12.0 KB budget" failed --plain
 cli_style_hint "Run \"check\" before release" --plain
 cli_style_divider "Project setup" --plain
 ```
@@ -149,6 +150,12 @@ Use the convenience functions for dynamic Bash values. They build JSON internall
 
 ```bash
 cli_style_status success "Done" "" --plain
+```
+
+`cli_style_row` accepts `label`, `value`, an optional result type, then render flags. Use the result when a row should keep its label/value alignment but render as a status:
+
+```bash
+cli_style_row "dist/object-BmsQavd_.js" "is 22.3 KB, above the 12.0 KB budget" failed --plain
 ```
 
 Set `CLI_STYLE_BIN` when `cli-style` is not on `PATH`:

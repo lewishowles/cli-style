@@ -116,20 +116,26 @@ cli_style_status() {
 #     Row label.
 # @param  {string}  value
 #     Row value.
+# @param  {string}  result
+#     Optional result type before render flags.
 # @param  {string}  ...
 #     Render flags passed through to `cli-style render`.
 cli_style_row() {
 	local label="${1:-}"
 	local value="${2:-}"
+	local result=""
 	local json
 
-	if (($# >= 2)); then
+	if (($# >= 3)) && [[ "${3:-}" != --* ]]; then
+		result="${3:-}"
+		shift 3
+	elif (($# >= 2)); then
 		shift 2
 	else
 		set --
 	fi
 
-	json="{\"label\":$(cli_style_json_string "$label"),\"value\":$(cli_style_json_string "$value")}"
+	json="{\"label\":$(cli_style_json_string "$label"),\"value\":$(cli_style_json_string "$value"),\"result\":$(cli_style_json_string "$result")}"
 
 	cli_style_render_json row "$json" "$@"
 }

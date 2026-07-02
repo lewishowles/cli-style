@@ -59,6 +59,7 @@ describe("Adapter smoke tests", () => {
 					"message='Run \"dry-run\" before C:\\repo\\setup.json'",
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_status success "$label" "$value" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Config" "$value" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Bundle" "over budget" failed --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_hint "$message" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_divider "$label" --plain',
 				].join("\n"),
@@ -73,8 +74,9 @@ describe("Adapter smoke tests", () => {
 		expect(result.status).toBe(0);
 		expect(lines[0]).toBe('OK Saved "config" C:\\repo\\setup.json');
 		expect(lines[1]).toBe("Config  C:\\repo\\setup.json");
-		expect(lines[2]).toBe('i Hint: Run "dry-run" before C:\\repo\\setup.json');
-		expect(lines[3].startsWith('Saved "config" ')).toBe(true);
+		expect(lines[2]).toBe("x Bundle  over budget");
+		expect(lines[3]).toBe('i Hint: Run "dry-run" before C:\\repo\\setup.json');
+		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
 		expect(result.stderr).toBe("");
 	});
 

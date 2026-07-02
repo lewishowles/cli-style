@@ -48,4 +48,27 @@ describe("row", () => {
 		);
 		expect(stripAnsi(output)).toBe("Status  passed");
 	});
+
+	test("Renders a result row with a symbol prefix", () => {
+		const output = row("dist/object-BmsQavd_.js", "is 22.3 KB, above the 12.0 KB budget", {
+			colour: false,
+			result: "failed",
+			unicode: true,
+		});
+
+		expect(output).toBe("× dist/object-BmsQavd_.js  is 22.3 KB, above the 12.0 KB budget");
+	});
+
+	test("Colours result row labels and values with the result tone", () => {
+		const output = row("Package size", "over budget", {
+			colour: true,
+			result: "failed",
+			unicode: false,
+		});
+
+		expect(output).toBe(
+			"\u001b[38;2;255;114;114mx Package size\u001b[0m  \u001b[38;2;255;114;114mover budget\u001b[0m",
+		);
+		expect(stripAnsi(output)).toBe("x Package size  over budget");
+	});
 });

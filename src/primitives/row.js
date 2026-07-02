@@ -1,4 +1,5 @@
 import { foreground } from "../formatters/ansi.js";
+import { getResultSymbol, getResultToken } from "../theme/results.js";
 
 // Row labels use the same subdued tone as table headers by default.
 const defaultLabelColour = "muted";
@@ -21,6 +22,8 @@ const defaultSeparator = "  ";
  *     Colour token for the label.
  * @param  {number}  options.labelWidth
  *     Minimum label width before the separator.
+ * @param  {string}  options.result
+ *     Optional semantic result state for the row.
  * @param  {string}  options.separator
  *     Text between label and value.
  * @param  {string}  options.valueColour
@@ -29,8 +32,10 @@ const defaultSeparator = "  ";
  *     Rendered row.
  */
 export function row(label, value = "", options = {}) {
-	const labelWidth = Math.max(label.length, options.labelWidth ?? 0);
-	const labelText = label.padEnd(labelWidth, " ");
+	const resultToken = resolveResultToken(options);
+	const displayLabel = renderDisplayLabel(label, resultToken, options);
+	const labelWidth = Math.max(displayLabel.length, options.labelWidth ?? 0);
+	const labelText = displayLabel.padEnd(labelWidth, " ");
 	const renderedLabel = renderLabel(labelText, options);
 
 	if (value === "") {
@@ -41,6 +46,44 @@ export function row(label, value = "", options = {}) {
 	const separator = options.separator ?? defaultSeparator;
 
 	return `${renderedLabel}${separator}${renderedValue}`;
+}
+
+/**
+ * Resolve the row's optional result token.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {object|null}
+ *     Result token when a row result is provided.
+ */
+function resolveResultToken(options) {
+	if (typeof options.result !== "string" || options.result === "") {
+		return null;
+	}
+
+	return getResultToken(options.result);
+}
+
+/**
+ * Render the visible row label, including any result symbol.
+ *
+ * @param  {string}  label
+ *     Label text to render.
+ * @param  {object|null}  resultToken
+ *     Optional result token.
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Label text with any result prefix.
+ */
+function renderDisplayLabel(label, resultToken, options) {
+	if (resultToken === null) {
+		return label;
+	}
+
+	const symbol = getResultSymbol(options.result, options);
+
+	return `${symbol} ${label}`;
 }
 
 /**
@@ -58,7 +101,7 @@ function renderLabel(label, options) {
 		return label;
 	}
 
-	return foreground(label, options.labelColour ?? defaultLabelColour, options);
+	return foreground(label, getLabelColour(options), options);
 }
 
 /**
@@ -72,9 +115,55 @@ function renderLabel(label, options) {
  *     Rendered value.
  */
 function renderValue(value, options) {
-	if (options.colour !== true || options.valueColour === undefined) {
+	if (options.colour !== true) {
 		return value;
 	}
 
-	return foreground(value, options.valueColour, options);
+	const colour = getValueColour(options);
+
+	if (colour === undefined) {
+		return value;
+	}
+
+	return foreground(value, colour, options);
+}
+
+/**
+ * Resolve the colour token for the row label.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Colour token for the label.
+ */
+function getLabelColour(options) {
+	if (options.labelColour !== undefined) {
+		return options.labelColour;
+	}
+
+	if (typeof options.result === "string" && options.result !== "") {
+		return getResultToken(options.result).tone;
+	}
+
+	return defaultLabelColour;
+}
+
+/**
+ * Resolve the colour token for the row value.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string|undefined}
+ *     Colour token for the value.
+ */
+function getValueColour(options) {
+	if (options.valueColour !== undefined) {
+		return options.valueColour;
+	}
+
+	if (typeof options.result === "string" && options.result !== "") {
+		return getResultToken(options.result).tone;
+	}
+
+	return undefined;
 }

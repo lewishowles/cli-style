@@ -709,6 +709,11 @@ function renderPrimitives(options) {
 			...options,
 			labelWidth: 8,
 		}),
+		row("Bundle", "is 22.3 KB, above the 12.0 KB budget", {
+			...options,
+			labelWidth: 8,
+			result: resultTypes.FAILED,
+		}),
 	].join("\n");
 }
 
