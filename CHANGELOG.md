@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.5.0 - 2026-07-02
+
+### Added
+
+- Added Bash adapter convenience functions for common renderers: `cli_style_status`, `cli_style_row`, `cli_style_divider`, and `cli_style_hint`.
+- Added Bash adapter escaping for dynamic string values, so scripts can pass quotes, backslashes, paths, and messages without hand-building JSON.
+- Added README examples for JS CLI entrypoint wiring with `createCliStyle({ argv, env, stdout })` and helper-first Bash adapter usage.
+
 ### Changed
 
 - Lightened the muted colour token so secondary text stays readable on dark surfaces.
