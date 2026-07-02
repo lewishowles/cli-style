@@ -83,6 +83,44 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Bash adapter pattern convenience functions escape dynamic strings", () => {
+		const result = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"source adapters/bash/cli-style.sh",
+					"command='bun run \"test:unit\"'",
+					"detail='See C:\\repo\\logs\\unit.txt'",
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_command_result success "Unit tests passed" "$command" 0 "1.2s" "$detail" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_audit_finding warning "Button label is vague" "src/App.vue:42" "Use a specific action label" "Found \\"Continue\\"" "WCAG 2.4.6" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_task_summary partial "Adopt cli-style" "Bash wrappers added" "Updated adapter" "Update downstream scripts" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_confirmation_result confirmed "Publish release" "v0.6.0" "Tag push starts npm publish" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_next_step_block "Update helpers scripts" "Wrappers are now available" "scripts/setup.sh --check" "Keep literal JSON for aggregate reports" --plain',
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		const output = result.stdout;
+
+		expect(result.status).toBe(0);
+		expect(output).toContain("Command result");
+		expect(output).toContain('Command    bun run "test:unit"');
+		expect(output).toContain("See C:\\repo\\logs\\unit.txt");
+		expect(output).toContain("Audit finding");
+		expect(output).toContain('Found "Continue"');
+		expect(output).toContain("Task summary");
+		expect(output).toContain("- Updated adapter");
+		expect(output).toContain("Confirmation result");
+		expect(output).toContain("Tag push starts npm publish");
+		expect(output).toContain("Next step");
+		expect(output).toContain("$ scripts/setup.sh --check");
+		expect(result.stderr).toBe("");
+	});
+
 	test("Bash adapter fails clearly when cli-style is unavailable", () => {
 		const result = spawnSync(
 			"bash",

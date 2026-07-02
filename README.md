@@ -84,7 +84,7 @@ Use renderer names from the tables below, for example `status`, `row`, `diagnost
 
 ### Bash
 
-Source the Bash adapter, then use convenience helpers for common primitive renderers:
+Source the Bash adapter, then use convenience helpers for common primitive and per-script pattern renderers:
 
 ```bash
 source "$(cli-style adapter-path bash)"
@@ -98,6 +98,11 @@ cli_style_row "Bundle" "is 22.3 KB, above the 12.0 KB budget" failed --plain
 command="$(cli_style_span "npm run docs:readme" info --plain)"
 cli_style_hint "Run $command before release" --plain
 cli_style_divider "Project setup" --plain
+
+cli_style_command_result success "Build passed" "bun run test:unit" 0 "1.2s" "184 tests" --plain
+cli_style_task_summary partial "Adopt cli-style" "Bash wrappers added" "Updated adapter" "Update scripts" --plain
+cli_style_confirmation_result confirmed "Publish release" "v0.6.0" "Tag push starts npm publish" --plain
+cli_style_next_step_block "Update helpers scripts" "Wrappers are now available" "scripts/setup.sh --check" "" --plain
 ```
 
 The convenience functions build JSON internally, so callers do not need to escape quotes, backslashes, or paths by hand.
@@ -108,7 +113,7 @@ Set `CLI_STYLE_BIN` when `cli-style` is not on `PATH`:
 CLI_STYLE_BIN="/path/to/cli-style" cli_style_status success "Build passed" "" --plain
 ```
 
-Use `cli_style_render` for literal or prebuilt JSON, especially for structured patterns:
+Use `cli_style_render` for literal or prebuilt JSON, especially for aggregate patterns or multi-item pattern fields:
 
 ```bash
 cli_style_render diagnostic-report --profile diagnostic <<'JSON'
@@ -276,6 +281,18 @@ Patterns are built-in composite renderers for common report shapes. They use the
 | `compact-data-table`  | `compactDataTable(data, options)`           | Titled compact data table.            | `title`, `summary`, `columns`, `rows`                                                |
 
 For visual examples, run `cli-style gallery --section patterns`.
+
+The Bash adapter also exposes scalar convenience wrappers for per-script usage:
+
+| Bash helper                     | Renderer              | Arguments before render flags                                              |
+| ------------------------------- | --------------------- | -------------------------------------------------------------------------- |
+| `cli_style_command_result`      | `command-result`      | `result`, `summary`, `command`, `exit_code`, `duration`, `detail`          |
+| `cli_style_audit_finding`       | `audit-finding`       | `result`, `finding`, `location`, `recommendation`, `evidence`, `reference` |
+| `cli_style_task_summary`        | `task-summary`        | `result`, `task`, `summary`, `completed`, `remaining`                      |
+| `cli_style_confirmation_result` | `confirmation-result` | `state`, `action`, `item`, `detail`                                        |
+| `cli_style_next_step_block`     | `next-step-block`     | `next`, `reason`, `command`, `alternative`                                 |
+
+Pass an empty string for optional positional fields you want to skip. Use `cli_style_render` or `cli_style_render_json` for aggregate reports, tables, transcripts, and multi-item arrays.
 
 ### Pattern example
 

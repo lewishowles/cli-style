@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+
+- Added Bash adapter convenience functions for scalar pattern usage: `cli_style_command_result`, `cli_style_audit_finding`, `cli_style_task_summary`, `cli_style_confirmation_result`, and `cli_style_next_step_block`.
+- Added Bash adapter helpers for JSON string arrays and integer/null fields, so pattern wrappers can safely pass single-item list fields and exit codes.
+
 ## 0.6.0 - 2026-07-03
 
 ### Added

@@ -41,6 +41,41 @@ cli_style_json_string() {
 	printf '"%s"' "$value"
 }
 
+# Escape Bash strings for a JSON string array.
+#
+# @param  {string}  ...
+#     String values to encode. Empty values are skipped.
+cli_style_json_string_array() {
+	local item
+	local separator=""
+
+	printf '['
+
+	for item in "$@"; do
+		if [[ "$item" != "" ]]; then
+			printf '%s' "$separator"
+			cli_style_json_string "$item"
+			separator=","
+		fi
+	done
+
+	printf ']'
+}
+
+# Render a Bash value as a JSON integer or null.
+#
+# @param  {string}  value
+#     Integer value to encode.
+cli_style_json_integer_or_null() {
+	local value="${1:-}"
+
+	if [[ "$value" =~ ^-?[0-9]+$ ]]; then
+		printf '%s' "$value"
+	else
+		printf 'null'
+	fi
+}
+
 # Render a JSON object through the shared cli-style command.
 #
 # @param  {string}  renderer
@@ -207,4 +242,169 @@ cli_style_hint() {
 	json="{\"message\":$(cli_style_json_string "$message")}"
 
 	cli_style_render_json hint "$json" "$@"
+}
+
+# Render a command result pattern from Bash string values.
+#
+# @param  {string}  result
+#     Result type such as success, failed, warning, or skipped.
+# @param  {string}  summary
+#     Summary line.
+# @param  {string}  command
+#     Optional command text.
+# @param  {string}  exit_code
+#     Optional integer exit code.
+# @param  {string}  duration
+#     Optional duration text.
+# @param  {string}  detail
+#     Optional detail line.
+# @param  {string}  ...
+#     Render flags passed through to `cli-style render`.
+cli_style_command_result() {
+	local result="${1:-}"
+	local summary="${2:-}"
+	local command="${3:-}"
+	local exit_code="${4:-}"
+	local duration="${5:-}"
+	local detail="${6:-}"
+	local json
+
+	if (($# >= 6)); then
+		shift 6
+	else
+		set --
+	fi
+
+	json="{\"result\":$(cli_style_json_string "$result"),\"summary\":$(cli_style_json_string "$summary"),\"command\":$(cli_style_json_string "$command"),\"exitCode\":$(cli_style_json_integer_or_null "$exit_code"),\"duration\":$(cli_style_json_string "$duration"),\"details\":$(cli_style_json_string_array "$detail")}"
+
+	cli_style_render_json command-result "$json" "$@"
+}
+
+# Render an audit finding pattern from Bash string values.
+#
+# @param  {string}  result
+#     Result type such as success, failed, warning, or skipped.
+# @param  {string}  finding
+#     Finding summary.
+# @param  {string}  location
+#     Optional source location.
+# @param  {string}  recommendation
+#     Optional recommendation text.
+# @param  {string}  evidence
+#     Optional evidence line.
+# @param  {string}  reference
+#     Optional reference line.
+# @param  {string}  ...
+#     Render flags passed through to `cli-style render`.
+cli_style_audit_finding() {
+	local result="${1:-}"
+	local finding="${2:-}"
+	local location="${3:-}"
+	local recommendation="${4:-}"
+	local evidence="${5:-}"
+	local reference="${6:-}"
+	local json
+
+	if (($# >= 6)); then
+		shift 6
+	else
+		set --
+	fi
+
+	json="{\"result\":$(cli_style_json_string "$result"),\"finding\":$(cli_style_json_string "$finding"),\"location\":$(cli_style_json_string "$location"),\"recommendation\":$(cli_style_json_string "$recommendation"),\"evidence\":$(cli_style_json_string_array "$evidence"),\"references\":$(cli_style_json_string_array "$reference")}"
+
+	cli_style_render_json audit-finding "$json" "$@"
+}
+
+# Render a task summary pattern from Bash string values.
+#
+# @param  {string}  result
+#     Result type such as success, failed, warning, or skipped.
+# @param  {string}  task
+#     Task label.
+# @param  {string}  summary
+#     Optional summary detail.
+# @param  {string}  completed
+#     Optional completed item.
+# @param  {string}  remaining
+#     Optional remaining item.
+# @param  {string}  ...
+#     Render flags passed through to `cli-style render`.
+cli_style_task_summary() {
+	local result="${1:-}"
+	local task="${2:-}"
+	local summary="${3:-}"
+	local completed="${4:-}"
+	local remaining="${5:-}"
+	local json
+
+	if (($# >= 5)); then
+		shift 5
+	else
+		set --
+	fi
+
+	json="{\"result\":$(cli_style_json_string "$result"),\"task\":$(cli_style_json_string "$task"),\"summary\":$(cli_style_json_string "$summary"),\"completed\":$(cli_style_json_string_array "$completed"),\"remaining\":$(cli_style_json_string_array "$remaining")}"
+
+	cli_style_render_json task-summary "$json" "$@"
+}
+
+# Render a confirmation result pattern from Bash string values.
+#
+# @param  {string}  state
+#     Confirmation state such as confirmed, cancelled, or skipped.
+# @param  {string}  action
+#     Action label.
+# @param  {string}  item
+#     Optional item label.
+# @param  {string}  detail
+#     Optional detail text.
+# @param  {string}  ...
+#     Render flags passed through to `cli-style render`.
+cli_style_confirmation_result() {
+	local state="${1:-}"
+	local action="${2:-}"
+	local item="${3:-}"
+	local detail="${4:-}"
+	local json
+
+	if (($# >= 4)); then
+		shift 4
+	else
+		set --
+	fi
+
+	json="{\"state\":$(cli_style_json_string "$state"),\"action\":$(cli_style_json_string "$action"),\"item\":$(cli_style_json_string "$item"),\"detail\":$(cli_style_json_string "$detail")}"
+
+	cli_style_render_json confirmation-result "$json" "$@"
+}
+
+# Render a next-step block pattern from Bash string values.
+#
+# @param  {string}  next
+#     Next step text.
+# @param  {string}  reason
+#     Optional reason text.
+# @param  {string}  command
+#     Optional command line.
+# @param  {string}  alternative
+#     Optional alternative line.
+# @param  {string}  ...
+#     Render flags passed through to `cli-style render`.
+cli_style_next_step_block() {
+	local next="${1:-}"
+	local reason="${2:-}"
+	local command="${3:-}"
+	local alternative="${4:-}"
+	local json
+
+	if (($# >= 4)); then
+		shift 4
+	else
+		set --
+	fi
+
+	json="{\"next\":$(cli_style_json_string "$next"),\"reason\":$(cli_style_json_string "$reason"),\"commands\":$(cli_style_json_string_array "$command"),\"alternatives\":$(cli_style_json_string_array "$alternative")}"
+
+	cli_style_render_json next-step-block "$json" "$@"
 }
