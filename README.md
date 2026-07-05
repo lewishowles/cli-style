@@ -173,24 +173,29 @@ print(output)
 
 Renderer names are stable for `cli-style render`, `cli_style_render`, and Python `render()`. JavaScript uses camel-case function names.
 
-| Renderer        | JavaScript                            | Bash helper                          | Purpose                                                         |
-| --------------- | ------------------------------------- | ------------------------------------ | --------------------------------------------------------------- |
-| `status`        | `status(resultType, detail, options)` | `cli_style_status type label detail` | Result line with symbol, label, and detail.                     |
-| `row`           | `row(label, value, options)`          | `cli_style_row label value [result]` | Aligned label/value row, optionally marked with a result state. |
-| `span`          | `span(value, tone, options)`          | `cli_style_span value [tone]`        | Inline colour or weight for a word, command, file, or value.    |
-| `hint`          | `hint(message, options)`              | `cli_style_hint message`             | Informational hint line.                                        |
-| `divider`       | `divider(options)`                    | `cli_style_divider label`            | Section divider with an optional label.                         |
-| `chip`          | `chip(label, tone, options)`          | Use `cli_style_render`               | Compact labelled state.                                         |
-| `panel`         | `panel(options)`                      | Use `cli_style_render`               | Framed content block for grouped output.                        |
-| `table`         | `table(options)`                      | Use `cli_style_render`               | Tabular records with narrow-width fallback.                     |
-| `progress-bar`  | `progressBar(options)`                | Use `cli_style_render`               | Single progress value with numeric text.                        |
-| `bar-chart`     | `barChart(options)`                   | Use `cli_style_render`               | Multi-row bar chart.                                            |
-| `step`          | `step(label, state, options)`         | Use `cli_style_render`               | One workflow step.                                              |
-| `step-progress` | `stepProgress(options)`               | Use `cli_style_render`               | Numbered workflow steps.                                        |
-| `empty-state`   | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Empty result message.                                           |
-| `error-block`   | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Structured error block.                                         |
+| Renderer              | JavaScript                            | Bash helper                          | Python helper                      | Purpose                                                         |
+| --------------------- | ------------------------------------- | ------------------------------------ | ---------------------------------- | --------------------------------------------------------------- |
+| `status`              | `status(resultType, detail, options)` | `cli_style_status type label detail` | `status(type, label, detail)`      | Result line with symbol, label, and detail.                     |
+| `row`                 | `row(label, value, options)`          | `cli_style_row label value [result]` | `row(label, value, result)`        | Aligned label/value row, optionally marked with a result state. |
+| `span`                | `span(value, tone, options)`          | `cli_style_span value [tone]`        | `span(value, tone)`                | Inline colour or weight for a word, command, file, or value.    |
+| `hint`                | `hint(message, options)`              | `cli_style_hint message`             | `hint(message)`                    | Informational hint line.                                        |
+| `divider`             | `divider(options)`                    | `cli_style_divider label`            | `divider(label)`                   | Section divider with an optional label.                         |
+| `command-result`      | `commandResult(options)`              | `cli_style_command_result ...`       | `command_result(...)`              | Command execution outcome with exit code and duration.          |
+| `audit-finding`       | `auditFinding(options)`               | `cli_style_audit_finding ...`        | `audit_finding(...)`               | Structured audit finding with evidence and recommendation.      |
+| `task-summary`        | `taskSummary(options)`                | `cli_style_task_summary ...`         | `task_summary(...)`                | Task progress with completed and remaining items.               |
+| `confirmation-result` | `confirmationResult(options)`         | `cli_style_confirmation_result ...`  | `confirmation_result(...)`         | Confirmation outcome with action and item.                      |
+| `next-step-block`     | `nextStepBlock(options)`              | `cli_style_next_step_block ...`      | `next_step_block(...)`             | Next-step guidance with command and alternative.                |
+| `chip`                | `chip(label, tone, options)`          | Use `cli_style_render`               | Use `render("chip", ...)`          | Compact labelled state.                                         |
+| `panel`               | `panel(options)`                      | Use `cli_style_render`               | Use `render("panel", ...)`         | Framed content block for grouped output.                        |
+| `table`               | `table(options)`                      | Use `cli_style_render`               | Use `render("table", ...)`         | Tabular records with narrow-width fallback.                     |
+| `progress-bar`        | `progressBar(options)`                | Use `cli_style_render`               | Use `render("progress-bar", ...)`  | Single progress value with numeric text.                        |
+| `bar-chart`           | `barChart(options)`                   | Use `cli_style_render`               | Use `render("bar-chart", ...)`     | Multi-row bar chart.                                            |
+| `step`                | `step(label, state, options)`         | Use `cli_style_render`               | Use `render("step", ...)`          | One workflow step.                                              |
+| `step-progress`       | `stepProgress(options)`               | Use `cli_style_render`               | Use `render("step-progress", ...)` | Numbered workflow steps.                                        |
+| `empty-state`         | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Use `render("empty-state", ...)`   | Empty result message.                                           |
+| `error-block`         | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Use `render("error-block", ...)`   | Structured error block.                                         |
 
-Python convenience functions cover the same scalar renderers as Bash: `status`, `row`, `span`, `hint`, `divider`, `command_result`, `audit_finding`, `task_summary`, `confirmation_result`, and `next_step_block`. Use `render("<renderer>", data, ...)` for aggregate patterns or multi-item fields.
+Use `render("<renderer>", data, ...)` for aggregate patterns (`diagnostic-report`, `agent-transcript`, `compact-data-table`) or any renderer with multi-item fields.
 
 ## Primitive data shapes
 
