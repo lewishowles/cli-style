@@ -2,10 +2,16 @@
 
 ## Unreleased
 
+## 0.8.0 - 2026-07-05
+
 ### Added
 
 - Added Swift adapter with convenience functions for scalar primitives and per-script patterns: `CliStyle.status`, `CliStyle.row`, `CliStyle.span`, `CliStyle.hint`, `CliStyle.divider`, `CliStyle.commandResult`, `CliStyle.auditFinding`, `CliStyle.taskSummary`, `CliStyle.confirmationResult`, and `CliStyle.nextStepBlock`.
 - Added `cli-style adapter-path swift` support for discovering the Swift adapter file path.
+
+### Changed
+
+- Extended the README renderer table with a Swift helper column covering all 20 renderers.
 
 ## 0.7.0 - 2026-07-05
 
