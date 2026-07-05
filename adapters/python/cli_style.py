@@ -83,6 +83,221 @@ def render(
 	return result.stdout.rstrip("\n")
 
 
+# Render a result status line from Python values.
+#
+# @param  {str}  type
+#     Result type such as success, failed, warning, or skipped.
+# @param  {str}  label
+#     Status label.
+# @param  {str}  detail
+#     Optional detail text.
+def status(
+	type: str,
+	label: str = "",
+	detail: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("status", {"type": type, "label": label, "detail": detail}, **kwargs)
+
+
+# Render a labelled value row from Python values.
+#
+# @param  {str}  label
+#     Row label.
+# @param  {str}  value
+#     Row value.
+# @param  {str}  result
+#     Optional result type for a symbol and tone.
+def row(
+	label: str,
+	value: str,
+	result: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("row", {"label": label, "value": value, "result": result}, **kwargs)
+
+
+# Render an inline span from Python values.
+#
+# @param  {str}  value
+#     Span text.
+# @param  {str}  tone
+#     Optional colour tone, defaulting to info.
+def span(
+	value: str,
+	tone: str = "info",
+	**kwargs: Any,
+) -> str:
+	return render("span", {"value": value, "tone": tone}, **kwargs)
+
+
+# Render a divider from a Python value.
+#
+# @param  {str}  label
+#     Optional divider label.
+def divider(
+	label: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("divider", {"label": label}, **kwargs)
+
+
+# Render a hint from a Python value.
+#
+# @param  {str}  message
+#     Hint message.
+def hint(
+	message: str,
+	**kwargs: Any,
+) -> str:
+	return render("hint", {"message": message}, **kwargs)
+
+
+# Render a command result pattern from Python values.
+#
+# @param  {str}  result
+#     Result type such as success, failed, warning, or skipped.
+# @param  {str}  summary
+#     Summary line.
+# @param  {str}  command
+#     Optional command text.
+# @param  {int|None}  exit_code
+#     Optional integer exit code.
+# @param  {str}  duration
+#     Optional duration text.
+# @param  {str}  detail
+#     Optional detail line.
+def command_result(
+	result: str,
+	summary: str,
+	command: str = "",
+	exit_code: int | None = None,
+	duration: str = "",
+	detail: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("command-result", {
+		"result": result,
+		"summary": summary,
+		"command": command,
+		"exitCode": exit_code,
+		"duration": duration,
+		"details": [detail] if detail else [],
+	}, **kwargs)
+
+
+# Render an audit finding pattern from Python values.
+#
+# @param  {str}  result
+#     Result type such as success, failed, warning, or skipped.
+# @param  {str}  finding
+#     Finding summary.
+# @param  {str}  location
+#     Optional source location.
+# @param  {str}  recommendation
+#     Optional recommendation text.
+# @param  {str}  evidence
+#     Optional evidence line.
+# @param  {str}  reference
+#     Optional reference line.
+def audit_finding(
+	result: str,
+	finding: str,
+	location: str = "",
+	recommendation: str = "",
+	evidence: str = "",
+	reference: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("audit-finding", {
+		"result": result,
+		"finding": finding,
+		"location": location,
+		"recommendation": recommendation,
+		"evidence": [evidence] if evidence else [],
+		"references": [reference] if reference else [],
+	}, **kwargs)
+
+
+# Render a task summary pattern from Python values.
+#
+# @param  {str}  result
+#     Result type such as success, failed, warning, or skipped.
+# @param  {str}  task
+#     Task label.
+# @param  {str}  summary
+#     Optional summary detail.
+# @param  {str}  completed
+#     Optional completed item.
+# @param  {str}  remaining
+#     Optional remaining item.
+def task_summary(
+	result: str,
+	task: str,
+	summary: str = "",
+	completed: str = "",
+	remaining: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("task-summary", {
+		"result": result,
+		"task": task,
+		"summary": summary,
+		"completed": [completed] if completed else [],
+		"remaining": [remaining] if remaining else [],
+	}, **kwargs)
+
+
+# Render a confirmation result pattern from Python values.
+#
+# @param  {str}  state
+#     Confirmation state such as confirmed, cancelled, or skipped.
+# @param  {str}  action
+#     Action label.
+# @param  {str}  item
+#     Optional item label.
+# @param  {str}  detail
+#     Optional detail text.
+def confirmation_result(
+	state: str,
+	action: str,
+	item: str = "",
+	detail: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("confirmation-result", {
+		"state": state,
+		"action": action,
+		"item": item,
+		"detail": detail,
+	}, **kwargs)
+
+
+# Render a next-step block pattern from Python values.
+#
+# @param  {str}  next_step
+#     Next step text.
+# @param  {str}  reason
+#     Optional reason text.
+# @param  {str}  command
+#     Optional command line.
+# @param  {str}  alternative
+#     Optional alternative line.
+def next_step_block(
+	next_step: str,
+	reason: str = "",
+	command: str = "",
+	alternative: str = "",
+	**kwargs: Any,
+) -> str:
+	return render("next-step-block", {
+		"next": next_step,
+		"reason": reason,
+		"commands": [command] if command else [],
+		"alternatives": [alternative] if alternative else [],
+	}, **kwargs)
+
+
 # Resolve a command name or executable path for subprocess use.
 #
 # @param  {str}  binary

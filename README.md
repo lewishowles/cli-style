@@ -131,40 +131,42 @@ JSON
 
 ### Python
 
-Add the adapter directory to `PYTHONPATH`, then import the generic `render()` helper:
+Add the adapter directory to `PYTHONPATH`, then import the generic `render()` helper or convenience functions:
 
 ```bash
 export PYTHONPATH="$(cli-style adapter-path python):$PYTHONPATH"
 ```
 
 ```python
+from cli_style import status, row, span, hint, divider
+
+kwargs = {"binary": "./bin/cli-style.js", "plain": True}
+
+print(status("success", "Build passed", "184 tests", **kwargs))
+print(row("Workspace", "/path/to/project", **kwargs))
+print(row("Bundle", "over budget", "failed", **kwargs))
+command = span("npm run docs:readme", "info", **kwargs)
+print(hint(f"Run {command} before release", **kwargs))
+print(divider("Project setup", **kwargs))
+```
+
+Convenience functions build the renderer payload internally, so callers pass plain Python strings without hand-building JSON.
+
+Pass `binary=` when `cli-style` is not on `PATH`. The generic `render()` helper remains for aggregate patterns or multi-item fields:
+
+```python
 from cli_style import render
 
 output = render(
-	"status",
+	"diagnostic-report",
 	{
-		"type": "success",
-		"label": "Build passed",
-		"detail": "184 tests",
+		"title": "Release checks",
+		"checks": [{"name": "README", "result": "success"}],
 	},
 	profile="diagnostic",
 )
 
 print(output)
-```
-
-Pass `binary=` when `cli-style` is not on `PATH`:
-
-```python
-output = render(
-	"status",
-	{
-		"type": "success",
-		"label": "Build passed",
-	},
-	binary="/path/to/cli-style",
-	plain=True,
-)
 ```
 
 ## Available renderers
@@ -188,7 +190,7 @@ Renderer names are stable for `cli-style render`, `cli_style_render`, and Python
 | `empty-state`   | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Empty result message.                                           |
 | `error-block`   | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Structured error block.                                         |
 
-Python uses `render("<renderer>", data, ...)` for every renderer.
+Python convenience functions cover the same scalar renderers as Bash: `status`, `row`, `span`, `hint`, `divider`, `command_result`, `audit_finding`, `task_summary`, `confirmation_result`, and `next_step_block`. Use `render("<renderer>", data, ...)` for aggregate patterns or multi-item fields.
 
 ## Primitive data shapes
 
