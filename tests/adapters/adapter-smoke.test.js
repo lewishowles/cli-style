@@ -279,4 +279,157 @@ describe("Adapter smoke tests", () => {
 		expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
 		expect(result.stderr).toBe("");
 	});
+
+	test("Swift adapter renders through cli-style render", () => {
+		const result = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
+					"@main",
+					"struct Runner {",
+					"  static func main() throws {",
+					'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true))',
+					"    print(output)",
+					"  }",
+					"}",
+					"SWIFT",
+					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
+		expect(result.stderr).toBe("");
+	});
+
+	test("Swift adapter path is returned by cli-style adapter-path", () => {
+		const result = spawnSync("bash", ["-c", "bin/cli-style.js adapter-path swift"], {
+			encoding: "utf8",
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toContain("adapters/swift/CliStyle.swift");
+		expect(result.stderr).toBe("");
+	});
+
+	test("Swift adapter convenience functions handle dynamic strings", () => {
+		const result = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
+					"@main",
+					"struct Runner {",
+					"  static func main() throws {",
+					'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
+					'    print(try CliStyle.status(type: "success", label: #"Saved "config""#, detail: #"C:\\repo\\setup.json"#, options: options))',
+					'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, options: options))',
+					'    print(try CliStyle.row(label: "Bundle", value: "over budget", result: "failed", options: options))',
+					'    let command = try CliStyle.span(value: "npm run docs:readme", tone: "info", options: options)',
+					'    print(try CliStyle.hint(message: "Run " + command + " before release", options: options))',
+					'    print(try CliStyle.divider(label: #"Saved "config""#, options: options))',
+					"  }",
+					"}",
+					"SWIFT",
+					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		const lines = result.stdout.trim().split("\n");
+
+		expect(result.status).toBe(0);
+		expect(lines[0]).toBe('OK Saved "config" C:\\repo\\setup.json');
+		expect(lines[1]).toBe("Config  C:\\repo\\setup.json");
+		expect(lines[2]).toBe("x Bundle  over budget");
+		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
+		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
+		expect(result.stderr).toBe("");
+	});
+
+	test("Swift adapter pattern convenience functions handle dynamic strings", () => {
+		const result = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
+					"@main",
+					"struct Runner {",
+					"  static func main() throws {",
+					'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
+					'    print(try CliStyle.commandResult(result: "success", summary: "Unit tests passed", command: #"bun run "test:unit""#, exitCode: 0, duration: "1.2s", detail: #"See C:\\repo\\logs\\unit.txt"#, options: options))',
+					'    print(try CliStyle.auditFinding(result: "warning", finding: "Button label is vague", location: "src/App.vue:42", recommendation: "Use a specific action label", evidence: #"Found "Continue""#, reference: "WCAG 2.4.6", options: options))',
+					'    print(try CliStyle.taskSummary(result: "partial", task: "Adopt cli-style", summary: "Bash wrappers added", completed: "Updated adapter", remaining: "Update downstream scripts", options: options))',
+					'    print(try CliStyle.confirmationResult(state: "confirmed", action: "Publish release", item: "v0.6.0", detail: "Tag push starts npm publish", options: options))',
+					'    print(try CliStyle.nextStepBlock(nextStep: "Update helpers scripts", reason: "Wrappers are now available", command: "scripts/setup.sh --check", alternative: "Keep literal JSON for aggregate reports", options: options))',
+					"  }",
+					"}",
+					"SWIFT",
+					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		const output = result.stdout;
+
+		expect(result.status).toBe(0);
+		expect(output).toContain("Command result");
+		expect(output).toContain('Command    bun run "test:unit"');
+		expect(output).toContain("See C:\\repo\\logs\\unit.txt");
+		expect(output).toContain("Audit finding");
+		expect(output).toContain('Found "Continue"');
+		expect(output).toContain("Task summary");
+		expect(output).toContain("- Updated adapter");
+		expect(output).toContain("Confirmation result");
+		expect(output).toContain("Tag push starts npm publish");
+		expect(output).toContain("Next step");
+		expect(output).toContain("$ scripts/setup.sh --check");
+		expect(result.stderr).toBe("");
+	});
+
+	test("Swift adapter fails clearly when cli-style is unavailable", () => {
+		const result = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
+					"@main",
+					"struct Runner {",
+					"  static func main() throws {",
+					"    do {",
+					'      _ = try CliStyle.render("status", data: [:], options: CliStyleOptions(binary: "/missing/cli-style"))',
+					'      throw CliStyleError.invalidInput("expected notFound but render succeeded")',
+					"    } catch CliStyleError.notFound(let message) {",
+					"      print(message)",
+					"    }",
+					"  }",
+					"}",
+					"SWIFT",
+					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
+		expect(result.stderr).toBe("");
+	});
 });

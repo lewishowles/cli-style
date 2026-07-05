@@ -12,6 +12,10 @@ const adapterPaths = {
 		releasePath: "adapters/python",
 		sourceUrl: new URL("../../adapters/python", import.meta.url),
 	},
+	swift: {
+		releasePath: "adapters/swift/CliStyle.swift",
+		sourceUrl: new URL("../../adapters/swift/CliStyle.swift", import.meta.url),
+	},
 };
 
 // Adapter names accepted by the adapter-path command.

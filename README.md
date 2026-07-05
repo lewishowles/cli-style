@@ -2,12 +2,12 @@
 
 Shared terminal output styles for local tools, diagnostics, agent-facing reports, and package CLIs.
 
-Use it directly from JavaScript, or call the same renderers from Bash and Python through the `cli-style` binary.
+Use it directly from JavaScript, or call the same renderers from Bash, Python, and Swift through the `cli-style` binary.
 
 ## Requirements
 
 - Bun and Node.js 20 or newer for JavaScript projects and local binary builds
-- The standalone `cli-style` binary for Bash or Python projects that should not install Bun
+- The standalone `cli-style` binary for Bash, Python, or Swift projects that should not install Bun
 
 ## Install
 
@@ -17,7 +17,7 @@ JavaScript projects can install the package directly:
 bun add @lewishowles/cli-style
 ```
 
-Bash and Python projects call the `cli-style` binary through thin adapters. If the project already has Node or Bun tooling, add this package as a dev dependency and use the package binary. Otherwise, install or vendor the standalone binary and put it on `PATH`:
+Bash, Python, and Swift projects call the `cli-style` binary through thin adapters. If the project already has Node or Bun tooling, add this package as a dev dependency and use the package binary. Otherwise, install or vendor the standalone binary and put it on `PATH`:
 
 ```bash
 export PATH="/path/to/cli-style/bin:$PATH"
@@ -41,7 +41,7 @@ The package contains `bin/cli-style` and `adapters/`.
 
 ## Choose an integration
 
-All renderers return text. JavaScript imports functions directly. CLI, Bash, and Python integrations pass JSON-compatible data to a named renderer.
+All renderers return text. JavaScript imports functions directly. CLI, Bash, Python, and Swift integrations pass JSON-compatible data to a named renderer.
 
 ### JavaScript
 
@@ -169,33 +169,75 @@ output = render(
 print(output)
 ```
 
+### Swift
+
+Add the adapter file to your Swift project, then use the `CliStyle` enum for convenience functions or the generic `render` method:
+
+```bash
+cli-style adapter-path swift
+# Returns the path to CliStyle.swift for inclusion in your project
+```
+
+```swift
+let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)
+
+print(try CliStyle.status(type: "success", label: "Build passed", detail: "184 tests", options: options))
+print(try CliStyle.row(label: "Workspace", value: "/path/to/project", options: options))
+print(try CliStyle.row(label: "Bundle", value: "over budget", result: "failed", options: options))
+let command = try CliStyle.span(value: "npm run docs:readme", tone: "info", options: options)
+print(try CliStyle.hint(message: "Run " + command + " before release", options: options))
+print(try CliStyle.divider(label: "Project setup", options: options))
+
+print(try CliStyle.commandResult(result: "success", summary: "Build passed", command: "bun run test:unit", exitCode: 0, duration: "1.2s", detail: "184 tests", options: options))
+print(try CliStyle.taskSummary(result: "partial", task: "Adopt cli-style", summary: "Wrappers added", completed: "Updated adapter", remaining: "Update scripts", options: options))
+print(try CliStyle.confirmationResult(state: "confirmed", action: "Publish release", item: "v0.6.0", detail: "Tag push starts npm publish", options: options))
+print(try CliStyle.nextStepBlock(nextStep: "Update helpers scripts", reason: "Wrappers are now available", command: "scripts/setup.sh --check", alternative: "", options: options))
+```
+
+Convenience functions build the renderer payload internally, so callers pass plain Swift strings without hand-building JSON.
+
+Pass `binary:` in `CliStyleOptions` when `cli-style` is not on `PATH`. The generic `CliStyle.render(_:data:options:)` method remains for aggregate patterns or multi-item fields:
+
+```swift
+let output = try CliStyle.render(
+    "diagnostic-report",
+    data: [
+        "title": "Release checks",
+        "checks": [["name": "README", "result": "success"]],
+    ],
+    options: CliStyleOptions(profile: "diagnostic")
+)
+
+print(output)
+```
+
 ## Available renderers
 
 Renderer names are stable for `cli-style render`, `cli_style_render`, and Python `render()`. JavaScript uses camel-case function names.
 
-| Renderer              | JavaScript                            | Bash helper                          | Python helper                      | Purpose                                                         |
-| --------------------- | ------------------------------------- | ------------------------------------ | ---------------------------------- | --------------------------------------------------------------- |
-| `status`              | `status(resultType, detail, options)` | `cli_style_status type label detail` | `status(type, label, detail)`      | Result line with symbol, label, and detail.                     |
-| `row`                 | `row(label, value, options)`          | `cli_style_row label value [result]` | `row(label, value, result)`        | Aligned label/value row, optionally marked with a result state. |
-| `span`                | `span(value, tone, options)`          | `cli_style_span value [tone]`        | `span(value, tone)`                | Inline colour or weight for a word, command, file, or value.    |
-| `hint`                | `hint(message, options)`              | `cli_style_hint message`             | `hint(message)`                    | Informational hint line.                                        |
-| `divider`             | `divider(options)`                    | `cli_style_divider label`            | `divider(label)`                   | Section divider with an optional label.                         |
-| `command-result`      | `commandResult(options)`              | `cli_style_command_result ...`       | `command_result(...)`              | Command execution outcome with exit code and duration.          |
-| `audit-finding`       | `auditFinding(options)`               | `cli_style_audit_finding ...`        | `audit_finding(...)`               | Structured audit finding with evidence and recommendation.      |
-| `task-summary`        | `taskSummary(options)`                | `cli_style_task_summary ...`         | `task_summary(...)`                | Task progress with completed and remaining items.               |
-| `confirmation-result` | `confirmationResult(options)`         | `cli_style_confirmation_result ...`  | `confirmation_result(...)`         | Confirmation outcome with action and item.                      |
-| `next-step-block`     | `nextStepBlock(options)`              | `cli_style_next_step_block ...`      | `next_step_block(...)`             | Next-step guidance with command and alternative.                |
-| `chip`                | `chip(label, tone, options)`          | Use `cli_style_render`               | Use `render("chip", ...)`          | Compact labelled state.                                         |
-| `panel`               | `panel(options)`                      | Use `cli_style_render`               | Use `render("panel", ...)`         | Framed content block for grouped output.                        |
-| `table`               | `table(options)`                      | Use `cli_style_render`               | Use `render("table", ...)`         | Tabular records with narrow-width fallback.                     |
-| `progress-bar`        | `progressBar(options)`                | Use `cli_style_render`               | Use `render("progress-bar", ...)`  | Single progress value with numeric text.                        |
-| `bar-chart`           | `barChart(options)`                   | Use `cli_style_render`               | Use `render("bar-chart", ...)`     | Multi-row bar chart.                                            |
-| `step`                | `step(label, state, options)`         | Use `cli_style_render`               | Use `render("step", ...)`          | One workflow step.                                              |
-| `step-progress`       | `stepProgress(options)`               | Use `cli_style_render`               | Use `render("step-progress", ...)` | Numbered workflow steps.                                        |
-| `empty-state`         | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Use `render("empty-state", ...)`   | Empty result message.                                           |
-| `error-block`         | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Use `render("error-block", ...)`   | Structured error block.                                         |
+| Renderer              | JavaScript                            | Bash helper                          | Python helper                      | Swift helper                           | Purpose                                                         |
+| --------------------- | ------------------------------------- | ------------------------------------ | ---------------------------------- | -------------------------------------- | --------------------------------------------------------------- |
+| `status`              | `status(resultType, detail, options)` | `cli_style_status type label detail` | `status(type, label, detail)`      | `CliStyle.status(type, label, detail)` | Result line with symbol, label, and detail.                     |
+| `row`                 | `row(label, value, options)`          | `cli_style_row label value [result]` | `row(label, value, result)`        | `CliStyle.row(label, value, result)`   | Aligned label/value row, optionally marked with a result state. |
+| `span`                | `span(value, tone, options)`          | `cli_style_span value [tone]`        | `span(value, tone)`                | `CliStyle.span(value, tone)`           | Inline colour or weight for a word, command, file, or value.    |
+| `hint`                | `hint(message, options)`              | `cli_style_hint message`             | `hint(message)`                    | `CliStyle.hint(message)`               | Informational hint line.                                        |
+| `divider`             | `divider(options)`                    | `cli_style_divider label`            | `divider(label)`                   | `CliStyle.divider(label)`              | Section divider with an optional label.                         |
+| `command-result`      | `commandResult(options)`              | `cli_style_command_result ...`       | `command_result(...)`              | `CliStyle.commandResult(...)`          | Command execution outcome with exit code and duration.          |
+| `audit-finding`       | `auditFinding(options)`               | `cli_style_audit_finding ...`        | `audit_finding(...)`               | `CliStyle.auditFinding(...)`           | Structured audit finding with evidence and recommendation.      |
+| `task-summary`        | `taskSummary(options)`                | `cli_style_task_summary ...`         | `task_summary(...)`                | `CliStyle.taskSummary(...)`            | Task progress with completed and remaining items.               |
+| `confirmation-result` | `confirmationResult(options)`         | `cli_style_confirmation_result ...`  | `confirmation_result(...)`         | `CliStyle.confirmationResult(...)`     | Confirmation outcome with action and item.                      |
+| `next-step-block`     | `nextStepBlock(options)`              | `cli_style_next_step_block ...`      | `next_step_block(...)`             | `CliStyle.nextStepBlock(...)`          | Next-step guidance with command and alternative.                |
+| `chip`                | `chip(label, tone, options)`          | Use `cli_style_render`               | Use `render("chip", ...)`          | Use `CliStyle.render`                  | Compact labelled state.                                         |
+| `panel`               | `panel(options)`                      | Use `cli_style_render`               | Use `render("panel", ...)`         | Use `CliStyle.render`                  | Framed content block for grouped output.                        |
+| `table`               | `table(options)`                      | Use `cli_style_render`               | Use `render("table", ...)`         | Use `CliStyle.render`                  | Tabular records with narrow-width fallback.                     |
+| `progress-bar`        | `progressBar(options)`                | Use `cli_style_render`               | Use `render("progress-bar", ...)`  | Use `CliStyle.render`                  | Single progress value with numeric text.                        |
+| `bar-chart`           | `barChart(options)`                   | Use `cli_style_render`               | Use `render("bar-chart", ...)`     | Use `CliStyle.render`                  | Multi-row bar chart.                                            |
+| `step`                | `step(label, state, options)`         | Use `cli_style_render`               | Use `render("step", ...)`          | Use `CliStyle.render`                  | One workflow step.                                              |
+| `step-progress`       | `stepProgress(options)`               | Use `cli_style_render`               | Use `render("step-progress", ...)` | Use `CliStyle.render`                  | Numbered workflow steps.                                        |
+| `empty-state`         | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Use `render("empty-state", ...)`   | Use `CliStyle.render`                  | Empty result message.                                           |
+| `error-block`         | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Use `render("error-block", ...)`   | Use `CliStyle.render`                  | Structured error block.                                         |
 
-Use `render("<renderer>", data, ...)` for aggregate patterns (`diagnostic-report`, `agent-transcript`, `compact-data-table`) or any renderer with multi-item fields.
+Use `render("<renderer>", data, ...)` (Python) or `CliStyle.render(_:data:options:)` (Swift) for aggregate patterns (`diagnostic-report`, `agent-transcript`, `compact-data-table`) or any renderer with multi-item fields.
 
 ## Primitive data shapes
 
@@ -300,6 +342,8 @@ The Bash adapter also exposes scalar convenience wrappers for per-script usage:
 | `cli_style_next_step_block`     | `next-step-block`     | `next`, `reason`, `command`, `alternative`                                 |
 
 Pass an empty string for optional positional fields you want to skip. Use `cli_style_render` or `cli_style_render_json` for aggregate reports, tables, transcripts, and multi-item arrays.
+
+Swift equivalents are available as `CliStyle.commandResult(...)`, `CliStyle.auditFinding(...)`, `CliStyle.taskSummary(...)`, `CliStyle.confirmationResult(...)`, and `CliStyle.nextStepBlock(...)`. Use `CliStyle.render` for aggregate reports, tables, transcripts, and multi-item arrays.
 
 ### Pattern example
 
@@ -487,6 +531,20 @@ Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI
 | `no_unicode` | Use ASCII symbols.                               |
 | `binary`     | Path or command name for the `cli-style` binary. |
 | `extra_args` | Extra CLI arguments to pass through.             |
+
+### Swift options
+
+Swift options are passed via the `CliStyleOptions` struct:
+
+| Property      | Purpose                                          |
+| ------------- | ------------------------------------------------ |
+| `binary`      | Path or command name for the `cli-style` binary. |
+| `profile`     | Render with a named profile.                     |
+| `width`       | Override detected output width.                  |
+| `isPlain`     | Disable colour and Unicode decoration.           |
+| `isNoColour`  | Disable ANSI colour.                             |
+| `isNoUnicode` | Use ASCII symbols.                               |
+| `extraArgs`   | Extra CLI arguments to pass through.             |
 
 ## Profiles
 
