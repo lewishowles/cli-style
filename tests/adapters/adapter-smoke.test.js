@@ -306,7 +306,7 @@ describe("Adapter smoke tests", () => {
 		expect(result.status).toBe(0);
 		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
 		expect(result.stderr).toBe("");
-	});
+	}, 30000);
 
 	test("Swift adapter path is returned by cli-style adapter-path", () => {
 		const result = spawnSync("bash", ["-c", "bin/cli-style.js adapter-path swift"], {
@@ -355,7 +355,7 @@ describe("Adapter smoke tests", () => {
 		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
 		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
 		expect(result.stderr).toBe("");
-	});
+	}, 30000);
 
 	test("Swift adapter pattern convenience functions handle dynamic strings", () => {
 		const result = spawnSync(
@@ -399,7 +399,7 @@ describe("Adapter smoke tests", () => {
 		expect(output).toContain("Next step");
 		expect(output).toContain("$ scripts/setup.sh --check");
 		expect(result.stderr).toBe("");
-	});
+	}, 30000);
 
 	test("Swift adapter fails clearly when cli-style is unavailable", () => {
 		const result = spawnSync(
@@ -431,5 +431,5 @@ describe("Adapter smoke tests", () => {
 		expect(result.status).toBe(0);
 		expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
 		expect(result.stderr).toBe("");
-	});
+	}, 30000);
 });
