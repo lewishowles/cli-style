@@ -107,6 +107,14 @@ cli_style_next_step_block "Update helpers scripts" "Wrappers are now available" 
 
 The convenience functions build JSON internally, so callers do not need to escape quotes, backslashes, or paths by hand.
 
+Direct Bash calls use `cli-style`'s native stdout detection. When a helper's output is captured, the adapter cannot know where the captured text will be written, so set `FORCE_COLOR=1` explicitly when the destination is an interactive terminal:
+
+```bash
+command="$(FORCE_COLOR=1 cli_style_span "npm run docs:readme" info)"
+```
+
+Python and Swift automatically set `FORCE_COLOR=1` for the child render process when their caller's stdout is an interactive terminal. An existing `FORCE_COLOR` or `NO_COLOR` value is preserved. `FORCE_COLOR=0` does not enable colour, while `NO_COLOR`, `TERM=dumb`, and explicit no-colour flags remain authoritative.
+
 Set `CLI_STYLE_BIN` when `cli-style` is not on `PATH`:
 
 ```bash
@@ -506,7 +514,7 @@ Most renderers accept the same output options:
 | `unicode` | Whether Unicode symbols should be used.                                   |
 | `width`   | Available output width for renderers that adapt layout.                   |
 
-Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI, TTY, `NO_COLOR`, and terminal capability.
+Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI, TTY, `NO_COLOR`, `FORCE_COLOR`, and terminal capability.
 
 ### CLI and Bash flags
 

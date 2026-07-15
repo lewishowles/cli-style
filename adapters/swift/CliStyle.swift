@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 // Error types for cli-style adapter failures.
@@ -89,6 +90,7 @@ enum CliStyle {
 		let process = Process()
 		process.executableURL = URL(fileURLWithPath: resolvedBinary)
 		process.arguments = arguments
+		process.environment = resolveProcessEnvironment()
 
 		let stdinPipe = Pipe()
 		let stdoutPipe = Pipe()
@@ -123,6 +125,21 @@ enum CliStyle {
 
 		let stdoutText = String(data: stdoutData, encoding: .utf8) ?? ""
 		return stdoutText.trimmingCharacters(in: .newlines)
+	}
+
+	/**
+	 * Resolve the child environment for a captured render.
+	 */
+	private static func resolveProcessEnvironment() -> [String: String] {
+		var environment = ProcessInfo.processInfo.environment
+
+		if isatty(STDOUT_FILENO) == 1 &&
+			environment["FORCE_COLOR"] == nil &&
+			environment["NO_COLOR"] == nil {
+			environment["FORCE_COLOR"] = "1"
+		}
+
+		return environment
 	}
 
 	/**

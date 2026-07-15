@@ -29,6 +29,42 @@ describe("Terminal capability detection", () => {
 		expect(capabilities.width).toBe(100);
 	});
 
+	test("Forces colour when FORCE_COLOR is present and not zero", () => {
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					FORCE_COLOR: "1",
+				},
+				stdout: {
+					isTTY: false,
+				},
+			}).colour,
+		).toBe(true);
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					FORCE_COLOR: "",
+				},
+				stdout: {
+					isTTY: false,
+				},
+			}).colour,
+		).toBe(true);
+	});
+
+	test("Does not force colour when FORCE_COLOR is zero", () => {
+		const capabilities = resolveTerminalCapabilities({
+			env: {
+				FORCE_COLOR: "0",
+			},
+			stdout: {
+				isTTY: false,
+			},
+		});
+
+		expect(capabilities.colour).toBe(false);
+	});
+
 	test("Detects CI from environment", () => {
 		const capabilities = resolveTerminalCapabilities({
 			env: {
@@ -42,6 +78,7 @@ describe("Terminal capability detection", () => {
 	test("Disables colour when NO_COLOR is present", () => {
 		const capabilities = resolveTerminalCapabilities({
 			env: {
+				FORCE_COLOR: "1",
 				NO_COLOR: "1",
 			},
 			stdout: {
@@ -55,6 +92,7 @@ describe("Terminal capability detection", () => {
 	test("Disables colour and Unicode for dumb terminals", () => {
 		const capabilities = resolveTerminalCapabilities({
 			env: {
+				FORCE_COLOR: "1",
 				TERM: "dumb",
 			},
 			stdout: {
@@ -70,6 +108,9 @@ describe("Terminal capability detection", () => {
 	test("Plain flag disables colour and Unicode", () => {
 		const capabilities = resolveTerminalCapabilities({
 			argv: ["--plain"],
+			env: {
+				FORCE_COLOR: "1",
+			},
 			stdout: {
 				isTTY: true,
 			},
@@ -83,6 +124,9 @@ describe("Terminal capability detection", () => {
 		expect(
 			resolveTerminalCapabilities({
 				argv: ["--no-colour"],
+				env: {
+					FORCE_COLOR: "1",
+				},
 				stdout: {
 					isTTY: true,
 				},
@@ -91,6 +135,9 @@ describe("Terminal capability detection", () => {
 		expect(
 			resolveTerminalCapabilities({
 				argv: ["--no-color"],
+				env: {
+					FORCE_COLOR: "1",
+				},
 				stdout: {
 					isTTY: true,
 				},

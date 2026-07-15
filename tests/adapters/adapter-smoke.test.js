@@ -1,6 +1,77 @@
 import { spawnSync } from "node:child_process";
 
 import { describe, expect, test } from "bun:test";
+import { stripAnsi } from "../../src/index.js";
+
+// Prefix emitted by the macOS `script` command before pseudo-terminal output.
+const pseudoTerminalPrefix = `^D${String.fromCharCode(8)}${String.fromCharCode(8)}`;
+
+/**
+ * Run a Python status render with optional terminal and environment inputs.
+ *
+ * @param  {object}  options
+ *     Test inputs for the adapter process.
+ * @returns  {object}
+ *     Spawned process result.
+ */
+function runPythonStatus(options = {}) {
+	const environment = {
+		...process.env,
+		TERM: "xterm-256color",
+	};
+
+	delete environment.FORCE_COLOR;
+	delete environment.NO_COLOR;
+	Object.assign(environment, options.environment ?? {});
+
+	const ttySetup = options.isTty
+		? [
+				"class TtyStdout:",
+				"    def __init__(self, stream):",
+				"        self.stream = stream",
+				"    def isatty(self):",
+				"        return True",
+				"    def write(self, value):",
+				"        return self.stream.write(value)",
+				"    def flush(self):",
+				"        return self.stream.flush()",
+				"sys.stdout = TtyStdout(sys.stdout)",
+			]
+		: [];
+
+	const renderArguments = ["binary='./bin/cli-style.js'", options.renderOptions]
+		.filter(Boolean)
+		.join(", ");
+
+	const script = [
+		"import sys",
+		"from adapters.python.cli_style import render",
+		...ttySetup,
+		`output = render('status', {'type': 'success', 'label': 'Build passed', 'detail': '184 tests'}, ${renderArguments})`,
+		"print(output)",
+	].join("\n");
+
+	return spawnSync("python3", ["-c", script], {
+		encoding: "utf8",
+		env: environment,
+	});
+}
+
+/**
+ * Remove terminal-driver control bytes from output captured by `script`.
+ *
+ * @param  {string}  value
+ *     Captured pseudo-terminal output.
+ * @returns  {string}
+ *     Output without terminal-driver framing.
+ */
+function normalisePseudoTerminalOutput(value) {
+	const output = value.startsWith(pseudoTerminalPrefix)
+		? value.slice(pseudoTerminalPrefix.length)
+		: value;
+
+	return output.replaceAll("\r", "");
+}
 
 describe("Adapter smoke tests", () => {
 	test("Bash adapter renders through cli-style render", () => {
@@ -163,6 +234,81 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Python adapter preserves colour for a TTY caller", () => {
+		const result = runPythonStatus({
+			isTty: true,
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stdout).toContain("\u001b[");
+		expect(stripAnsi(result.stdout).trim()).toContain("Build passed 184 tests");
+		expect(result.stderr).toBe("");
+	});
+
+	test("Python adapter keeps explicit colour controls authoritative", () => {
+		const cases = [
+			{
+				environment: {
+					FORCE_COLOR: "1",
+					NO_COLOR: "1",
+				},
+				isTty: true,
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+				},
+				isTty: true,
+				renderOptions: "plain=True",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+				},
+				isTty: true,
+				renderOptions: "no_colour=True",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+				},
+				isTty: true,
+				renderOptions: "extra_args=['--no-color']",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+					TERM: "dumb",
+				},
+				isTty: true,
+			},
+		];
+
+		for (const testCase of cases) {
+			const result = runPythonStatus(testCase);
+
+			expect(result.status).toBe(0);
+			expect(result.stdout).not.toContain("\u001b[");
+			expect(stripAnsi(result.stdout).trim()).toContain("Build passed 184 tests");
+			expect(result.stderr).toBe("");
+		}
+	});
+
+	test("Python adapter keeps non-TTY output plain unless explicitly forced", () => {
+		const plainResult = runPythonStatus();
+
+		const forcedResult = runPythonStatus({
+			environment: {
+				FORCE_COLOR: "1",
+			},
+		});
+
+		expect(plainResult.status).toBe(0);
+		expect(plainResult.stdout).not.toContain("\u001b[");
+		expect(forcedResult.status).toBe(0);
+		expect(forcedResult.stdout).toContain("\u001b[");
+	});
+
 	test("Python adapter can be imported from cli-style adapter-path", () => {
 		const result = spawnSync(
 			"bash",
@@ -307,6 +453,177 @@ describe("Adapter smoke tests", () => {
 		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
 		expect(result.stderr).toBe("");
 	}, 30000);
+
+	test("Swift adapter preserves TTY colour and explicit controls", () => {
+		const compileResult = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"cat > /tmp/cli-style-swift-colour-runner.swift <<'SWIFT'",
+					"import Foundation",
+					"@main",
+					"struct Runner {",
+					"  static func main() throws {",
+					'    var options = CliStyleOptions(binary: "./bin/cli-style.js")',
+					'    switch ProcessInfo.processInfo.environment["CLI_STYLE_TEST_MODE"] {',
+					'    case "plain":',
+					"      options.isPlain = true",
+					'    case "no-colour":',
+					"      options.isNoColour = true",
+					'    case "no-color":',
+					'      options.extraArgs = ["--no-color"]',
+					"    default:",
+					"      break",
+					"    }",
+					'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: options)',
+					"    print(output)",
+					"  }",
+					"}",
+					"SWIFT",
+					"swiftc -o /tmp/cli-style-swift-colour-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-colour-runner.swift",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(compileResult.status).toBe(0);
+
+		const cases = [
+			{
+				expectColour: true,
+				mode: "default",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+					NO_COLOR: "1",
+				},
+				expectColour: false,
+				mode: "default",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+				},
+				expectColour: false,
+				mode: "plain",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+				},
+				expectColour: false,
+				mode: "no-colour",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+				},
+				expectColour: false,
+				mode: "no-color",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "1",
+					TERM: "dumb",
+				},
+				expectColour: false,
+				mode: "default",
+			},
+			{
+				environment: {
+					FORCE_COLOR: "0",
+				},
+				expectColour: false,
+				mode: "default",
+			},
+		];
+
+		for (const testCase of cases) {
+			const environmentArguments = [
+				"env",
+				"-u",
+				"FORCE_COLOR",
+				"-u",
+				"NO_COLOR",
+				`TERM=${testCase.environment?.TERM ?? "xterm-256color"}`,
+				...(testCase.environment?.FORCE_COLOR === undefined
+					? []
+					: [`FORCE_COLOR=${testCase.environment.FORCE_COLOR}`]),
+				...(testCase.environment?.NO_COLOR === undefined
+					? []
+					: [`NO_COLOR=${testCase.environment.NO_COLOR}`]),
+				`CLI_STYLE_TEST_MODE=${testCase.mode}`,
+				"script",
+				"-q",
+				"/dev/null",
+				"/tmp/cli-style-swift-colour-bin",
+			];
+
+			const result = spawnSync("bash", ["-c", environmentArguments.join(" ")], {
+				encoding: "utf8",
+			});
+
+			const output = normalisePseudoTerminalOutput(result.stdout);
+
+			expect(result.status).toBe(0);
+			expect(output.includes("\u001b[")).toBe(testCase.expectColour);
+			expect(stripAnsi(output).trim()).toContain("Build passed 184 tests");
+			expect(result.stderr).toBe("");
+		}
+	}, 60000);
+
+	test("Swift adapter keeps non-TTY output plain unless explicitly forced", () => {
+		const compileResult = spawnSync(
+			"bash",
+			[
+				"-c",
+				[
+					"cat > /tmp/cli-style-swift-non-tty-runner.swift <<'SWIFT'",
+					"import Foundation",
+					"@main",
+					"struct Runner {",
+					"  static func main() throws {",
+					'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: CliStyleOptions(binary: "./bin/cli-style.js"))',
+					"    print(output)",
+					"  }",
+					"}",
+					"SWIFT",
+					"swiftc -o /tmp/cli-style-swift-non-tty-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-non-tty-runner.swift",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		const plainResult = spawnSync(
+			"bash",
+			["-c", "env -u FORCE_COLOR -u NO_COLOR TERM=xterm-256color /tmp/cli-style-swift-non-tty-bin"],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		const forcedResult = spawnSync(
+			"bash",
+			["-c", "env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 /tmp/cli-style-swift-non-tty-bin"],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(compileResult.status).toBe(0);
+		expect(plainResult.status).toBe(0);
+		expect(plainResult.stdout).not.toContain("\u001b[");
+		expect(stripAnsi(plainResult.stdout).trim()).toContain("Build passed 184 tests");
+		expect(forcedResult.status).toBe(0);
+		expect(forcedResult.stdout).toContain("\u001b[");
+		expect(stripAnsi(forcedResult.stdout).trim()).toContain("Build passed 184 tests");
+	}, 60000);
 
 	test("Swift adapter path is returned by cli-style adapter-path", () => {
 		const result = spawnSync("bash", ["-c", "bin/cli-style.js adapter-path swift"], {

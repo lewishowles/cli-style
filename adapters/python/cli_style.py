@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -21,6 +22,20 @@ class CliStyleNotFoundError(CliStyleError):
 
 class CliStyleRenderError(CliStyleError):
 	"""Raised when cli-style rejects a render request."""
+
+
+# Resolve the child environment while preserving explicit caller controls.
+def resolve_subprocess_environment() -> dict[str, str]:
+	environment = os.environ.copy()
+
+	if (
+		sys.stdout.isatty()
+		and "FORCE_COLOR" not in environment
+		and "NO_COLOR" not in environment
+	):
+		environment["FORCE_COLOR"] = "1"
+
+	return environment
 
 
 # Render caller data through `cli-style render`.
@@ -72,6 +87,7 @@ def render(
 		command,
 		capture_output=True,
 		check=False,
+		env=resolve_subprocess_environment(),
 		input=json.dumps(data),
 		text=True,
 	)

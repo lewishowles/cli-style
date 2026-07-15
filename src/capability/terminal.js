@@ -23,12 +23,14 @@ export function resolveTerminalCapabilities(options = {}) {
 	const isTty = stdout.isTTY === true;
 	const isCi = env.CI === "true" || env.CI === "1";
 	const isDumb = env.TERM === "dumb";
+	const forceColour = env.FORCE_COLOR !== undefined && env.FORCE_COLOR !== "0";
 	const width = resolveWidth(stdout.columns);
 	const usesPlain = argv.includes("--plain");
 
 	const colour = resolveColour({
 		argv,
 		env,
+		forceColour,
 		isDumb,
 		isTty,
 		usesPlain,
@@ -69,7 +71,7 @@ function resolveColour(options) {
 		return false;
 	}
 
-	return options.isTty;
+	return options.forceColour || options.isTty;
 }
 
 /**
