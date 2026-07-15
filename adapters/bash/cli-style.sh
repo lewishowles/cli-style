@@ -159,6 +159,11 @@ cli_style_row() {
 	local label="${1:-}"
 	local value="${2:-}"
 	local result=""
+	local label_width=""
+	local label_colour_json="null"
+	local value_colour_json="null"
+	local separator_json="null"
+	local -a render_args=()
 	local json
 
 	if (($# >= 3)) && [[ "${3:-}" != --* ]]; then
@@ -170,9 +175,60 @@ cli_style_row() {
 		set --
 	fi
 
-	json="{\"label\":$(cli_style_json_string "$label"),\"value\":$(cli_style_json_string "$value"),\"result\":$(cli_style_json_string "$result")}"
+	while (($# > 0)); do
+		case "$1" in
+			--label-width)
+				label_width="${2:-}"
+				shift 2
+				;;
+			--label-width=*)
+				label_width="${1#*=}"
+				shift
+				;;
+			--label-colour)
+				label_colour_json="$(cli_style_json_string "${2:-}")"
+				shift 2
+				;;
+			--label-colour=*)
+				label_colour_json="$(cli_style_json_string "${1#*=}")"
+				shift
+				;;
+			--value-colour)
+				value_colour_json="$(cli_style_json_string "${2:-}")"
+				shift 2
+				;;
+			--value-colour=*)
+				value_colour_json="$(cli_style_json_string "${1#*=}")"
+				shift
+				;;
+			--separator)
+				separator_json="$(cli_style_json_string "${2:-}")"
+				shift 2
+				;;
+			--separator=*)
+				separator_json="$(cli_style_json_string "${1#*=}")"
+				shift
+				;;
+			*)
+				render_args+=("$1")
+				shift
+				;;
+		esac
+	done
 
-	cli_style_render_json row "$json" "$@"
+	json="{\"label\":$(cli_style_json_string "$label"),\"value\":$(cli_style_json_string "$value"),\"result\":$(cli_style_json_string "$result"),\"labelWidth\":$(cli_style_json_integer_or_null "$label_width"),\"separator\":$separator_json"
+
+	if [[ "$label_colour_json" != "null" ]]; then
+		json="${json},\"labelColour\":$label_colour_json"
+	fi
+
+	if [[ "$value_colour_json" != "null" ]]; then
+		json="${json},\"valueColour\":$value_colour_json"
+	fi
+
+	json="${json}}"
+
+	cli_style_render_json row "$json" "${render_args[@]}"
 }
 
 # Render an inline span from Bash string values.
@@ -186,6 +242,8 @@ cli_style_row() {
 cli_style_span() {
 	local value="${1:-}"
 	local tone="info"
+	local weight_json="null"
+	local -a render_args=()
 	local json
 
 	if (($# >= 2)) && [[ "${2:-}" != --* ]]; then
@@ -197,9 +255,26 @@ cli_style_span() {
 		set --
 	fi
 
-	json="{\"value\":$(cli_style_json_string "$value"),\"tone\":$(cli_style_json_string "$tone")}"
+	while (($# > 0)); do
+		case "$1" in
+			--weight)
+				weight_json="$(cli_style_json_string "${2:-}")"
+				shift 2
+				;;
+			--weight=*)
+				weight_json="$(cli_style_json_string "${1#*=}")"
+				shift
+				;;
+			*)
+				render_args+=("$1")
+				shift
+				;;
+		esac
+	done
 
-	cli_style_render_json span "$json" "$@"
+	json="{\"value\":$(cli_style_json_string "$value"),\"tone\":$(cli_style_json_string "$tone"),\"weight\":$weight_json}"
+
+	cli_style_render_json span "$json" "${render_args[@]}"
 }
 
 # Render a divider from a Bash string value.
@@ -210,6 +285,10 @@ cli_style_span() {
 #     Render flags passed through to `cli-style render`.
 cli_style_divider() {
 	local label="${1:-}"
+	local divider_width=""
+	local divider_colour_json="null"
+	local label_colour_json="null"
+	local -a render_args=()
 	local json
 
 	if (($# >= 1)); then
@@ -218,9 +297,52 @@ cli_style_divider() {
 		set --
 	fi
 
-	json="{\"label\":$(cli_style_json_string "$label")}"
+	while (($# > 0)); do
+		case "$1" in
+			--divider-width)
+				divider_width="${2:-}"
+				shift 2
+				;;
+			--divider-width=*)
+				divider_width="${1#*=}"
+				shift
+				;;
+			--divider-colour)
+				divider_colour_json="$(cli_style_json_string "${2:-}")"
+				shift 2
+				;;
+			--divider-colour=*)
+				divider_colour_json="$(cli_style_json_string "${1#*=}")"
+				shift
+				;;
+			--label-colour)
+				label_colour_json="$(cli_style_json_string "${2:-}")"
+				shift 2
+				;;
+			--label-colour=*)
+				label_colour_json="$(cli_style_json_string "${1#*=}")"
+				shift
+				;;
+			*)
+				render_args+=("$1")
+				shift
+				;;
+		esac
+	done
 
-	cli_style_render_json divider "$json" "$@"
+	json="{\"label\":$(cli_style_json_string "$label"),\"dividerWidth\":$(cli_style_json_integer_or_null "$divider_width")"
+
+	if [[ "$divider_colour_json" != "null" ]]; then
+		json="${json},\"dividerColour\":$divider_colour_json"
+	fi
+
+	if [[ "$label_colour_json" != "null" ]]; then
+		json="${json},\"labelColour\":$label_colour_json"
+	fi
+
+	json="${json}}"
+
+	cli_style_render_json divider "$json" "${render_args[@]}"
 }
 
 # Render a hint from a Bash string value.

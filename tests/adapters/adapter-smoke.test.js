@@ -135,6 +135,10 @@ describe("Adapter smoke tests", () => {
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_hint "Run $command before release" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_hint "$message" --plain',
 					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_divider "$label" --plain',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Config" "$value" --label-width 10 --separator " => " --plain',
+					'unset NO_COLOR; FORCE_COLOR=1 CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_span "Weighted" info --weight dim',
+					'unset NO_COLOR; FORCE_COLOR=1 CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_row "Source" "value"',
+					'CLI_STYLE_BIN="$PWD/bin/cli-style.js" cli_style_divider "Saved" --divider-width 8 --plain',
 				].join("\n"),
 			],
 			{
@@ -151,6 +155,11 @@ describe("Adapter smoke tests", () => {
 		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
 		expect(lines[4]).toBe('i Hint: Run "dry-run" before C:\\repo\\setup.json');
 		expect(lines[5].startsWith('Saved "config" ')).toBe(true);
+		expect(lines[6]).toBe("Config     => C:\\repo\\setup.json");
+		expect(lines[7]).toContain("\u001b[2m");
+		expect(stripAnsi(lines[7])).toBe("Weighted");
+		expect(lines[8]).toBe("\u001b[38;2;122;138;146mSource\u001b[0m  value");
+		expect(lines[9]).toBe("Saved --");
 		expect(result.stderr).toBe("");
 	});
 
@@ -333,6 +342,13 @@ describe("Adapter smoke tests", () => {
 	});
 
 	test("Python adapter convenience functions handle dynamic strings", () => {
+		const environment = {
+			...process.env,
+			FORCE_COLOR: "1",
+		};
+
+		delete environment.NO_COLOR;
+
 		const result = spawnSync(
 			"python3",
 			[
@@ -346,10 +362,15 @@ describe("Adapter smoke tests", () => {
 					"command = span('npm run docs:readme', 'info', **kwargs)",
 					"print(hint('Run ' + command + ' before release', **kwargs))",
 					"print(divider('Saved \"config\"', **kwargs))",
+					"print(row('Config', 'C:\\\\repo\\\\setup.json', label_width=10, separator=' => ', **kwargs))",
+					"print(span('Weighted', 'info', 'dim', binary='./bin/cli-style.js'))",
+					"print(row('Source', 'value', binary='./bin/cli-style.js'))",
+					"print(divider('Saved', divider_width=8, **kwargs))",
 				].join("\n"),
 			],
 			{
 				encoding: "utf8",
+				env: environment,
 			},
 		);
 
@@ -361,6 +382,11 @@ describe("Adapter smoke tests", () => {
 		expect(lines[2]).toBe("x Bundle  over budget");
 		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
 		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
+		expect(lines[5]).toBe("Config     => C:\\repo\\setup.json");
+		expect(lines[6]).toContain("\u001b[2m");
+		expect(stripAnsi(lines[6])).toBe("Weighted");
+		expect(lines[7]).toBe("\u001b[38;2;122;138;146mSource\u001b[0m  value");
+		expect(lines[8]).toBe("Saved --");
 		expect(result.stderr).toBe("");
 	});
 
@@ -648,16 +674,20 @@ describe("Adapter smoke tests", () => {
 					"struct Runner {",
 					"  static func main() throws {",
 					'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
+					'    let colourOptions = CliStyleOptions(binary: "./bin/cli-style.js")',
 					'    print(try CliStyle.status(type: "success", label: #"Saved "config""#, detail: #"C:\\repo\\setup.json"#, options: options))',
 					'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, options: options))',
 					'    print(try CliStyle.row(label: "Bundle", value: "over budget", result: "failed", options: options))',
 					'    let command = try CliStyle.span(value: "npm run docs:readme", tone: "info", options: options)',
 					'    print(try CliStyle.hint(message: "Run " + command + " before release", options: options))',
 					'    print(try CliStyle.divider(label: #"Saved "config""#, options: options))',
+					'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, labelWidth: 10, separator: " => ", options: options))',
+					'    print(try CliStyle.span(value: "Weighted", tone: "info", weight: "dim", options: colourOptions))',
+					'    print(try CliStyle.divider(label: "Saved", dividerWidth: 8, options: options))',
 					"  }",
 					"}",
 					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
+					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && env -u NO_COLOR FORCE_COLOR=1 /tmp/cli-style-swift-bin",
 				].join("\n"),
 			],
 			{
@@ -673,6 +703,10 @@ describe("Adapter smoke tests", () => {
 		expect(lines[2]).toBe("x Bundle  over budget");
 		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
 		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
+		expect(lines[5]).toBe("Config     => C:\\repo\\setup.json");
+		expect(lines[6]).toContain("\u001b[2m");
+		expect(stripAnsi(lines[6])).toBe("Weighted");
+		expect(lines[7]).toBe("Saved --");
 		expect(result.stderr).toBe("");
 	}, 30000);
 

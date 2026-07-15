@@ -175,6 +175,10 @@ enum CliStyle {
 	 - parameter label: Row label.
 	 - parameter value: Row value.
 	 - parameter result: Optional result type for a symbol and tone.
+	 - parameter labelWidth: Optional minimum label width.
+	 - parameter labelColour: Optional label colour token.
+	 - parameter valueColour: Optional value colour token.
+	 - parameter separator: Optional text between the label and value.
 	 - parameter options: Render options.
 	 - returns: Rendered row line.
 	 - throws: `CliStyleError` on failure.
@@ -183,13 +187,35 @@ enum CliStyle {
 		label: String,
 		value: String,
 		result: String = "",
+		labelWidth: Int? = nil,
+		labelColour: String? = nil,
+		valueColour: String? = nil,
+		separator: String? = nil,
 		options: CliStyleOptions = .init()
 	) throws -> String {
-		try render("row", data: [
+		var data: [String: Any] = [
 			"label": label,
 			"value": value,
 			"result": result,
-		], options: options)
+		]
+
+		if let labelWidth = labelWidth {
+			data["labelWidth"] = labelWidth
+		}
+
+		if let labelColour = labelColour {
+			data["labelColour"] = labelColour
+		}
+
+		if let valueColour = valueColour {
+			data["valueColour"] = valueColour
+		}
+
+		if let separator = separator {
+			data["separator"] = separator
+		}
+
+		return try render("row", data: data, options: options)
 	}
 
 	/**
@@ -197,6 +223,7 @@ enum CliStyle {
 
 	 - parameter value: Span text.
 	 - parameter tone: Optional colour tone, defaulting to info.
+	 - parameter weight: Optional ANSI text weight.
 	 - parameter options: Render options.
 	 - returns: Rendered span string.
 	 - throws: `CliStyleError` on failure.
@@ -204,29 +231,56 @@ enum CliStyle {
 	static func span(
 		value: String,
 		tone: String = "info",
+		weight: String? = nil,
 		options: CliStyleOptions = .init()
 	) throws -> String {
-		try render("span", data: [
+		var data: [String: Any] = [
 			"value": value,
 			"tone": tone,
-		], options: options)
+		]
+
+		if let weight = weight {
+			data["weight"] = weight
+		}
+
+		return try render("span", data: data, options: options)
 	}
 
 	/**
 	 Render a divider.
 
 	 - parameter label: Optional divider label.
+	 - parameter dividerWidth: Optional divider width.
+	 - parameter dividerColour: Optional divider colour token.
+	 - parameter labelColour: Optional label colour token.
 	 - parameter options: Render options.
 	 - returns: Rendered divider line.
 	 - throws: `CliStyleError` on failure.
 	 */
 	static func divider(
 		label: String = "",
+		dividerWidth: Int? = nil,
+		dividerColour: String? = nil,
+		labelColour: String? = nil,
 		options: CliStyleOptions = .init()
 	) throws -> String {
-		try render("divider", data: [
+		var data: [String: Any] = [
 			"label": label,
-		], options: options)
+		]
+
+		if let dividerWidth = dividerWidth {
+			data["dividerWidth"] = dividerWidth
+		}
+
+		if let dividerColour = dividerColour {
+			data["dividerColour"] = dividerColour
+		}
+
+		if let labelColour = labelColour {
+			data["labelColour"] = labelColour
+		}
+
+		return try render("divider", data: data, options: options)
 	}
 
 	/**
