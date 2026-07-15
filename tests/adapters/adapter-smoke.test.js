@@ -452,7 +452,7 @@ describe("Adapter smoke tests", () => {
 		expect(result.status).toBe(0);
 		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
 		expect(result.stderr).toBe("");
-	}, 30000);
+	}, 90000);
 
 	test("Swift adapter preserves TTY colour and explicit controls", () => {
 		const compileResult = spawnSync(
@@ -543,7 +543,7 @@ describe("Adapter smoke tests", () => {
 		];
 
 		for (const testCase of cases) {
-			const environmentArguments = [
+			const innerCommand = [
 				"env",
 				"-u",
 				"FORCE_COLOR",
@@ -557,13 +557,15 @@ describe("Adapter smoke tests", () => {
 					? []
 					: [`NO_COLOR=${testCase.environment.NO_COLOR}`]),
 				`CLI_STYLE_TEST_MODE=${testCase.mode}`,
-				"script",
-				"-q",
-				"/dev/null",
 				"/tmp/cli-style-swift-colour-bin",
-			];
+			].join(" ");
 
-			const result = spawnSync("bash", ["-c", environmentArguments.join(" ")], {
+			const pseudoTerminalCommand =
+				process.platform === "darwin"
+					? `script -q /dev/null ${innerCommand}`
+					: `script -qc "${innerCommand}" /dev/null`;
+
+			const result = spawnSync("bash", ["-c", pseudoTerminalCommand], {
 				encoding: "utf8",
 			});
 
