@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.9.0 - 2026-07-16
+
+### Added
+
+- Added a `rowGroup` primitive (`rowGroup()` in JS, the `row-group` renderer for `cli-style render`, and the same generic `render()`/`cli_style_render`/`CliStyle.render` entry points in Python, Bash, and Swift) that aligns a group of related rows automatically, without the caller computing `labelWidth` by hand.
+
+### Fixed
+
+- Fixed the Python, Bash, and Swift adapters silently dropping `row()`, `span()`, and `divider()` options beyond their two or three main fields. `row()` now forwards `labelWidth`, `labelColour`, `valueColour`, and `separator`; `span()` forwards `weight`; `divider()` forwards `dividerWidth`, `dividerColour`, and `labelColour`.
+
 ## 0.8.1 - 2026-07-15
 
 ### Fixed
