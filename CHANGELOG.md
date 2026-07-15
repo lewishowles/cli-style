@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.8.1 - 2026-07-15
+
+### Fixed
+
+- Fixed the Python and Swift adapters losing ANSI colour: they now set `FORCE_COLOR=1` for the child process when the caller's own stdout is a TTY, unless the caller has already set `FORCE_COLOR` or `NO_COLOR`.
+- Documented that captured Bash output (command substitution) cannot auto-detect its eventual destination and requires an explicit `FORCE_COLOR=1` to opt into colour.
+
 ## 0.8.0 - 2026-07-05
 
 ### Added
