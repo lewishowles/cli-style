@@ -227,6 +227,7 @@ Renderer names are stable for `cli-style render`, `cli_style_render`, and Python
 | --------------------- | ------------------------------------- | ------------------------------------ | ---------------------------------- | -------------------------------------- | --------------------------------------------------------------- |
 | `status`              | `status(resultType, detail, options)` | `cli_style_status type label detail` | `status(type, label, detail)`      | `CliStyle.status(type, label, detail)` | Result line with symbol, label, and detail.                     |
 | `row`                 | `row(label, value, options)`          | `cli_style_row label value [result]` | `row(label, value, result)`        | `CliStyle.row(label, value, result)`   | Aligned label/value row, optionally marked with a result state. |
+| `row-group`           | `rowGroup(options)`                   | Use `cli_style_render`               | Use `render("row-group", ...)`     | Use `CliStyle.render`                  | Auto-aligned group of labelled value rows.                      |
 | `span`                | `span(value, tone, options)`          | `cli_style_span value [tone]`        | `span(value, tone)`                | `CliStyle.span(value, tone)`           | Inline colour or weight for a word, command, file, or value.    |
 | `hint`                | `hint(message, options)`              | `cli_style_hint message`             | `hint(message)`                    | `CliStyle.hint(message)`               | Informational hint line.                                        |
 | `divider`             | `divider(options)`                    | `cli_style_divider label`            | `divider(label)`                   | `CliStyle.divider(label)`              | Section divider with an optional label.                         |
@@ -281,6 +282,27 @@ Use these shapes with `cli-style render`, `cli_style_render`, or Python `render(
 - `result`: optional result type for a symbol and tone
 - `labelWidth`: optional minimum label width
 - `labelColour`, `valueColour`, `separator`: optional presentation overrides
+
+### `row-group`
+
+```json
+{
+	"rows": [
+		{
+			"label": "Package",
+			"value": "@lewishowles/components"
+		},
+		{
+			"label": "Version",
+			"value": "minor: 2.7.4 -> 2.8.0"
+		}
+	]
+}
+```
+
+- `rows`: labelled values to align and render
+- `labelWidth`: optional minimum width for every label
+- Per-row fields match `row`, including `label`, `value`, `result`, `labelColour`, `valueColour`, and `separator`
 
 ### `span`
 

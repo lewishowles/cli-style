@@ -13,6 +13,7 @@ import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
 import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
+import { rowGroup } from "../primitives/row-group.js";
 import { span } from "../primitives/span.js";
 import { status } from "../primitives/status.js";
 import { step, stepProgress } from "../primitives/step-progress.js";
@@ -70,6 +71,11 @@ const renderers = {
 		}),
 	row: (input, options) =>
 		row(input.label, input.value, {
+			...input,
+			...options,
+		}),
+	"row-group": (input, options) =>
+		rowGroup({
 			...input,
 			...options,
 		}),

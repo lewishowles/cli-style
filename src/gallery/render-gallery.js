@@ -14,6 +14,7 @@ import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
 import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
+import { rowGroup } from "../primitives/row-group.js";
 import { span } from "../primitives/span.js";
 import { status } from "../primitives/status.js";
 import { step, stepProgress, stepStates } from "../primitives/step-progress.js";
@@ -714,6 +715,30 @@ function renderPrimitives(options) {
 			...options,
 			labelWidth: 8,
 			result: resultTypes.FAILED,
+		}),
+		"",
+		"Row groups",
+		rowGroup({
+			...options,
+			rows: [
+				{
+					label: "Package",
+					value: "@lewishowles/components",
+				},
+				{
+					label: "Version",
+					value: "minor: 2.7.4 -> 2.8.0",
+				},
+				{
+					label: "Checks",
+					value: "type-check, unit, build",
+				},
+				{
+					label: "Bundle",
+					result: resultTypes.FAILED,
+					value: "is 22.3 KB, above the 12.0 KB budget",
+				},
+			],
 		}),
 	].join("\n");
 }
