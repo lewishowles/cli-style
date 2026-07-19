@@ -5,12 +5,21 @@ export { resolveTerminalCapabilities, resolveTheme } from "./capability/terminal
 export { isProfile } from "./profiles/profiles.js";
 
 export { renderHelp } from "./cli/help.js";
+export { parseCatalogueRequest, renderCatalogue } from "./cli/catalogue-command.js";
+export {
+	getRendererMetadata,
+	rendererCatalogue,
+	rendererNames,
+} from "./catalogue/renderer-catalogue.js";
+
 export {
 	adapterNames,
 	parseAdapterPathRequest,
 	renderAdapterPath,
 } from "./cli/adapter-path-command.js";
-export { parseRenderRequest, rendererNames, renderJsonInput } from "./cli/render-command.js";
+
+export { parseRenderRequest, renderJsonInput } from "./cli/render-command.js";
+
 export {
 	galleryFixtures,
 	gallerySections,
@@ -40,6 +49,7 @@ export { span } from "./primitives/span.js";
 export { status } from "./primitives/status.js";
 export { step, stepProgress, stepStates } from "./primitives/step-progress.js";
 export { table } from "./primitives/table.js";
+
 export {
 	createReporter,
 	renderGroup,
@@ -47,6 +57,7 @@ export {
 	renderReporterStatus,
 	renderSection,
 } from "./reporters/create-reporter.js";
+
 export {
 	chartColours,
 	chipColours,
@@ -61,6 +72,7 @@ export {
 	themes,
 	toneColours,
 } from "./theme/colours.js";
+
 export {
 	getHighestSeverityResult,
 	getResultSymbol,

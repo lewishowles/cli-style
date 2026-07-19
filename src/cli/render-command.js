@@ -19,6 +19,7 @@ import { status } from "../primitives/status.js";
 import { step, stepProgress } from "../primitives/step-progress.js";
 import { table } from "../primitives/table.js";
 import { isProfile, profiles } from "../profiles/profiles.js";
+export { rendererNames } from "../catalogue/renderer-catalogue.js";
 
 // Renderer names accepted by the custom-input render command.
 const renderers = {
@@ -118,7 +119,6 @@ const globalRenderingFlags = new Set([
 ]);
 
 // Renderer names exposed for help text and tests.
-export const rendererNames = Object.keys(renderers);
 
 /**
  * Parse render command arguments.

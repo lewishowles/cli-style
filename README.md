@@ -608,6 +608,19 @@ Tone values used by public APIs include `info`, `success`, `warning`, `danger`, 
 
 ## Gallery
 
+## Renderer discovery
+
+List the available renderers or inspect one renderer before constructing a JSON payload:
+
+```bash
+cli-style list
+cli-style list --json
+cli-style describe progress-bar
+cli-style describe progress-bar --json
+```
+
+`describe` includes the JavaScript API name, main input fields, and a focused gallery command when one is available.
+
 Use the gallery to review current renderer output:
 
 ```bash

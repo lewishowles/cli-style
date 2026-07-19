@@ -3,6 +3,7 @@
 import { Buffer } from "node:buffer";
 import { createCliStyle, renderGallery, renderHelp } from "../src/index.js";
 import { parseAdapterPathRequest, renderAdapterPath } from "../src/cli/adapter-path-command.js";
+import { parseCatalogueRequest, renderCatalogue } from "../src/cli/catalogue-command.js";
 import { parseRenderRequest, renderJsonInput } from "../src/cli/render-command.js";
 
 import {
@@ -50,6 +51,15 @@ if (command === undefined || command === "--help" || command === "-h") {
 		const selectedRequest = selectInteractiveGalleryRequest(request);
 
 		print(renderGallery(ui.options, selectedRequest));
+	} catch (error) {
+		console.error(error.message);
+		process.exitCode = 1;
+	}
+} else if (command === "list" || command === "describe") {
+	try {
+		const request = parseCatalogueRequest(command, args.slice(1));
+
+		print(renderCatalogue(request, ui.options));
 	} catch (error) {
 		console.error(error.message);
 		process.exitCode = 1;
