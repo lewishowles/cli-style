@@ -29,6 +29,7 @@ export const rendererCatalogue = [
 	["progress-bar", "primitive", "progressBar", ["max", "value"], undefined],
 	["row", "primitive", "row", ["label", "value"], undefined],
 	["row-group", "primitive", "rowGroup", ["rows"], undefined],
+	["sparkline", "primitive", "sparkline", ["values"], "sparkline"],
 	["span", "primitive", "span", ["tone", "value"], undefined],
 	["status", "primitive", "status", ["detail", "type"], undefined],
 	["step", "primitive", "step", ["label", "state"], undefined],

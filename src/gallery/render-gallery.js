@@ -15,6 +15,7 @@ import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
 import { rowGroup } from "../primitives/row-group.js";
+import { sparkline } from "../primitives/sparkline.js";
 import { span } from "../primitives/span.js";
 import { status } from "../primitives/status.js";
 import { step, stepProgress, stepStates } from "../primitives/step-progress.js";
@@ -115,7 +116,7 @@ export const galleryVariants = ["current", "no-colour", "no-unicode", "plain"];
 // Gallery sections available for focused output.
 export const gallerySections = ["primitives", "patterns"];
 
-// Pattern fixtures available for focused output and interactive search.
+// Fixtures available for focused output and interactive search.
 export const galleryFixtures = [
 	"diagnostic-report",
 	"reporter",
@@ -127,6 +128,7 @@ export const galleryFixtures = [
 	"compact-data-table-narrow",
 	"confirmation-result",
 	"next-step-block",
+	"sparkline",
 ];
 
 /**
@@ -179,7 +181,11 @@ function renderVariant(variant, options, request) {
 	const sections = [];
 
 	if (request.fixture !== undefined) {
-		sections.push(renderPatterns(resolvedVariant.options, request.fixture));
+		sections.push(
+			request.fixture === "sparkline"
+				? renderSparklineFixture(resolvedVariant.options)
+				: renderPatterns(resolvedVariant.options, request.fixture),
+		);
 	} else {
 		if (request.section === undefined || request.section === "primitives") {
 			sections.push(renderPrimitives(resolvedVariant.options));
@@ -623,6 +629,18 @@ function renderPatternFixture(fixture, options) {
 }
 
 /**
+ * Render the focused sparkline fixture.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Framed sparkline fixture output.
+ */
+function renderSparklineFixture(options) {
+	return ["Sparkline", frameExample(renderSparklineExample(options), options)].join("\n");
+}
+
+/**
  * Add gallery-only framing around one rendered example.
  *
  * @param  {string}  output
@@ -667,6 +685,9 @@ function renderPrimitives(options) {
 		"",
 		"Bar charts",
 		renderBarChartExample(options),
+		"",
+		"Sparklines",
+		renderSparklineExample(options),
 		"",
 		"Tables",
 		renderTableExample(options),
@@ -804,6 +825,55 @@ function renderBarChartExample(options) {
 			},
 		],
 	});
+}
+
+/**
+ * Render representative sparkline sequences.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Sparkline examples.
+ */
+function renderSparklineExample(options) {
+	const examples = [
+		{
+			label: "Rising",
+			tone: "success",
+			values: [1, 2, 3, 4, 5, 6],
+		},
+		{
+			label: "Falling",
+			tone: "danger",
+			values: [6, 5, 4, 3, 2, 1],
+		},
+		{
+			label: "Flat",
+			tone: "info",
+			values: [4, 4, 4, 4, 4, 4],
+		},
+		{
+			label: "Negative",
+			tone: "warning",
+			values: [-6, -4, -5, -2, -3, -1],
+		},
+		{
+			label: "Narrow mixed",
+			tone: "info",
+			values: [0, 10, -5, 5, 2, 8, -2],
+			width: 4,
+		},
+	];
+
+	return examples
+		.map((example) =>
+			sparkline({
+				...options,
+				...example,
+				width: example.width ?? 16,
+			}),
+		)
+		.join("\n");
 }
 
 /**

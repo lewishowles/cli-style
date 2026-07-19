@@ -45,6 +45,7 @@ export { panel } from "./primitives/panel.js";
 export { progressBar } from "./primitives/progress-bar.js";
 export { row } from "./primitives/row.js";
 export { rowGroup } from "./primitives/row-group.js";
+export { sparkline } from "./primitives/sparkline.js";
 export { span } from "./primitives/span.js";
 export { status } from "./primitives/status.js";
 export { step, stepProgress, stepStates } from "./primitives/step-progress.js";

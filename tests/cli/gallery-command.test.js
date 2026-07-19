@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { parseGalleryRequest } from "../../src/cli/gallery-command.js";
+import { renderGallery } from "../../src/gallery/render-gallery.js";
 
 describe("parseGalleryRequest", () => {
 	test("Defaults to the current terminal variant", () => {
@@ -36,6 +37,7 @@ describe("parseGalleryRequest", () => {
 		);
 		expect(parseGalleryRequest(["--fixture", "next-step-block"]).fixture).toBe("next-step-block");
 		expect(parseGalleryRequest(["--fixture", "reporter"]).fixture).toBe("reporter");
+		expect(parseGalleryRequest(["--fixture", "sparkline"]).fixture).toBe("sparkline");
 		expect(parseGalleryRequest(["--variants"])).toEqual({
 			fixture: undefined,
 			interactive: false,
@@ -52,6 +54,57 @@ describe("parseGalleryRequest", () => {
 			variants: true,
 			width: undefined,
 		});
+	});
+
+	test("Renders the sparkline fixture across all variants", () => {
+		const output = renderGallery(
+			{
+				colour: false,
+				unicode: true,
+			},
+			{
+				fixture: "sparkline",
+				variants: true,
+				width: 64,
+			},
+		);
+
+		expect(output.match(/Sparkline/g)).toHaveLength(4);
+		expect(output).toContain("Rising");
+		expect(output).toContain("Falling");
+		expect(output).toContain("Flat");
+		expect(output).toContain("Negative");
+		expect(output).toContain("Narrow mixed");
+	});
+
+	test("Colours sparkline trends only in colour-enabled variants", () => {
+		const output = renderGallery(
+			{
+				colour: true,
+				theme: "dark",
+				unicode: true,
+			},
+			{
+				fixture: "sparkline",
+				variants: true,
+				width: 64,
+			},
+		);
+
+		const currentStart = output.indexOf("Current terminal");
+		const noColourStart = output.indexOf("No colour");
+		const noUnicodeStart = output.indexOf("No Unicode");
+		const plainStart = output.indexOf("Plain");
+		const current = output.slice(currentStart, noColourStart);
+		const noColour = output.slice(noColourStart, noUnicodeStart);
+		const noUnicode = output.slice(noUnicodeStart, plainStart);
+		const plain = output.slice(plainStart);
+		const risingLine = (section) => section.split("\n").find((line) => line.includes("Rising:"));
+
+		expect(risingLine(current)).toContain("\u001b[");
+		expect(risingLine(noColour)).not.toContain("\u001b[");
+		expect(risingLine(noUnicode)).toContain("\u001b[");
+		expect(risingLine(plain)).not.toContain("\u001b[");
 	});
 
 	test("Parses global rendering flags and width", () => {

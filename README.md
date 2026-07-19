@@ -241,6 +241,7 @@ Renderer names are stable for `cli-style render`, `cli_style_render`, and Python
 | `table`               | `table(options)`                      | Use `cli_style_render`               | Use `render("table", ...)`         | Use `CliStyle.render`                  | Tabular records with narrow-width fallback.                     |
 | `progress-bar`        | `progressBar(options)`                | Use `cli_style_render`               | Use `render("progress-bar", ...)`  | Use `CliStyle.render`                  | Single progress value with numeric text.                        |
 | `bar-chart`           | `barChart(options)`                   | Use `cli_style_render`               | Use `render("bar-chart", ...)`     | Use `CliStyle.render`                  | Multi-row bar chart.                                            |
+| `sparkline`           | `sparkline(options)`                  | Use `cli_style_render`               | Use `render("sparkline", ...)`     | Use `CliStyle.render`                  | Compact trend with latest, minimum, and maximum values.         |
 | `step`                | `step(label, state, options)`         | Use `cli_style_render`               | Use `render("step", ...)`          | Use `CliStyle.render`                  | One workflow step.                                              |
 | `step-progress`       | `stepProgress(options)`               | Use `cli_style_render`               | Use `render("step-progress", ...)` | Use `CliStyle.render`                  | Numbered workflow steps.                                        |
 | `empty-state`         | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Use `render("empty-state", ...)`   | Use `CliStyle.render`                  | Empty result message.                                           |
@@ -337,12 +338,42 @@ Pre-render a `span` when only part of the hint needs emphasis.
 | `table`         | `columns`, `rows`, `width`             |
 | `progress-bar`  | `value`, `max`, `barWidth`, `tone`     |
 | `bar-chart`     | `rows`, `barWidth`                     |
+| `sparkline`     | `values`, `label`, `tone`, `width`     |
 | `step`          | `label`, `state`                       |
 | `step-progress` | `steps`, `current`                     |
 | `empty-state`   | `title`, `detail`                      |
 | `error-block`   | `title`, `lines`                       |
 
 For visual examples, run `cli-style gallery --section primitives`.
+
+### `sparkline`
+
+Pass finite numbers in time order. The rendered trend always includes `latest`, `min`, and `max` context. Set `width` to limit plotted samples, `tone` to choose an optional semantic colour, `colour: false` to disable ANSI output, or `unicode: false` for an ASCII-only ramp.
+
+```js
+sparkline({ label: "Deploys", values: [1, 2, 3, 5, 8] });
+// Deploys: ▁▂▃▅█ latest=8 min=1 max=8
+
+sparkline({ label: "Rollback rate", values: [8, 6, 4, 2], tone: "warning" });
+// Rollback rate: █▆▃▁ latest=2 min=2 max=8
+
+sparkline({ label: "Flat", values: [4, 4, 4, 4] });
+// Flat: ▄▄▄▄ latest=4 min=4 max=4
+
+sparkline({ label: "Negative", values: [-6, -4, -2], colour: false });
+// Negative: ▁▅█ latest=-2 min=-6 max=-2
+
+sparkline({ label: "Narrow", values: [0, 10, -5, 5, 2, 8], width: 4 });
+// Narrow: ▃█▁▇ latest=8 min=-5 max=10
+
+sparkline({ label: "No colour", values: [1, 3, 2], colour: false });
+// No colour: ▁█▅ latest=2 min=1 max=3
+
+sparkline({ label: "No Unicode", values: [1, 3, 2], unicode: false });
+// No Unicode: .#= latest=2 min=1 max=3
+```
+
+Empty or unusable `values` return `""`.
 
 ## Patterns
 

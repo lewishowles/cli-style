@@ -60,6 +60,25 @@ describe("renderJsonInput", () => {
 		expect(output).toBe("✓ Build passed 184 tests");
 	});
 
+	test("Renders a sparkline from caller JSON", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				label: "Latency",
+				values: [1, 4, 2],
+			}),
+			parseRenderRequest(["sparkline"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: false,
+				width: 3,
+			},
+		);
+
+		expect(output).toContain("Latency: .#-");
+		expect(output).toContain("latest=2 min=1 max=4");
+	});
+
 	test("Renders a pattern from caller JSON", () => {
 		const output = renderJsonInput(
 			JSON.stringify({
@@ -100,5 +119,6 @@ describe("renderJsonInput", () => {
 		expect(rendererNames).toContain("span");
 		expect(rendererNames).toContain("task-summary");
 		expect(rendererNames).toContain("diagnostic-report");
+		expect(rendererNames).toContain("sparkline");
 	});
 });
