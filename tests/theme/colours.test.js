@@ -24,6 +24,7 @@ describe("Colour tokens", () => {
 			"danger",
 			"info",
 			"muted",
+			"panelText",
 			"success",
 			"surface",
 			"surfaceRaised",
@@ -37,12 +38,20 @@ describe("Colour tokens", () => {
 		expect(getColourToken("warning", { theme: themes.LIGHT })).toBe("ansi-256:94");
 		expect(getColourToken("surface", { theme: themes.DARK })).toBe("ansi-256:234");
 		expect(getColourToken("surface", { theme: themes.LIGHT })).toBe("ansi-256:255");
+		expect(getColourToken("panelText", { theme: themes.DARK })).toBe("ansi-256:252");
+		expect(getColourToken("panelText", { theme: themes.LIGHT })).toBe("ansi-256:238");
 	});
 
 	test("Uses terminal defaults for the safe automatic palette", () => {
 		expect(getColourToken("text", { theme: themes.AUTO })).toBe("default-foreground");
 		expect(getColourToken("success", { theme: themes.AUTO })).toBe("default-foreground");
 		expect(getColourToken("surface", { theme: themes.AUTO })).toBe("default-background");
+		expect(getColourToken("panelText", { theme: themes.AUTO })).toBe("default-foreground");
+	});
+
+	test("Keeps the shared text token terminal-native", () => {
+		expect(getColourToken("text", { theme: themes.DARK })).toBe("default-foreground");
+		expect(getColourToken("text", { theme: themes.LIGHT })).toBe("default-foreground");
 	});
 
 	test("Resolves token references and direct hex values", () => {
@@ -75,6 +84,7 @@ describe("Visual token groups", () => {
 		expect(terminalColours.trafficLights.close).toBe("danger");
 		expect(chipColours.success.background).toBe("chipSuccess");
 		expect(panelColours.background).toBe("surface");
+		expect(panelColours.body).toBe("panelText");
 		expect(tableColours.primaryText).toBe("text");
 		expect(chartColours.barPositive).toBe("success");
 		expect(promptColours.active).toBe("success");

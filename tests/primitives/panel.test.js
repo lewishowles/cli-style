@@ -72,6 +72,7 @@ describe("panel", () => {
 		});
 
 		expect(output).toContain("\u001b[38;5;210m");
+		expect(output).toContain("\u001b[38;5;252m");
 		expect(output).toContain("\u001b[48;5;234m");
 		expect(stripAnsi(output)).toBe(
 			[
@@ -81,5 +82,34 @@ describe("panel", () => {
 				"▌                               ",
 			].join("\n"),
 		);
+	});
+
+	test("Uses a dark body foreground on a light panel surface", () => {
+		const output = panel({
+			colour: true,
+			lines: ["Configuration file missing"],
+			panelWidth: 32,
+			theme: "light",
+			title: "Error",
+			tone: "danger",
+		});
+
+		expect(output).toContain("\u001b[38;5;238m");
+		expect(output).toContain("\u001b[48;5;255m");
+		expect(stripAnsi(output)).toContain("Configuration file missing");
+	});
+
+	test("Keeps automatic theme panel text terminal-native", () => {
+		const output = panel({
+			colour: true,
+			lines: ["Configuration file missing"],
+			panelWidth: 32,
+			theme: "auto",
+			title: "Error",
+		});
+
+		expect(output).not.toContain("\u001b[38;5;");
+		expect(output).not.toContain("\u001b[48;5;");
+		expect(stripAnsi(output)).toContain("Configuration file missing");
 	});
 });

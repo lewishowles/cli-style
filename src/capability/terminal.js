@@ -3,6 +3,9 @@ import { isTheme, themes } from "../theme/colours.js";
 // Default terminal width when no stream width is available.
 const defaultWidth = 80;
 
+// Known terminal signals support a conservative dark palette when no theme is explicit.
+const terminalThemeSignals = ["COLORTERM", "TERM_PROGRAM"];
+
 /**
  * Resolve terminal output capabilities from injected args, env, and stream data.
  *
@@ -60,12 +63,12 @@ export function resolveTerminalCapabilities(options = {}) {
 }
 
 /**
- * Resolve a terminal theme from direct overrides and COLORFGBG.
+ * Resolve a terminal theme from explicit overrides and terminal signals.
  *
  * @param  {object}  options
  *     Theme resolution inputs.
  * @returns  {string}
- *     Resolved light, dark, or automatic theme.
+ *     Resolved light or dark theme.
  */
 export function resolveTheme(options = {}) {
 	const flagTheme = readThemeFlag(options.argv ?? []);
@@ -74,11 +77,33 @@ export function resolveTheme(options = {}) {
 		return flagTheme;
 	}
 
-	if (isTheme(options.theme)) {
+	if (isTheme(options.theme) && options.theme !== themes.AUTO) {
 		return options.theme;
 	}
 
-	return resolveColourFgBgTheme(options.env?.COLORFGBG);
+	const colourFgBgTheme = resolveColourFgBgTheme(options.env?.COLORFGBG);
+
+	if (colourFgBgTheme !== themes.AUTO) {
+		return colourFgBgTheme;
+	}
+
+	return resolveTerminalSignalTheme(options.env) ?? themes.DARK;
+}
+
+/**
+ * Resolve a conservative theme from best-effort terminal signals.
+ *
+ * @param  {object}  env
+ *     Environment values to inspect.
+ * @returns  {string|undefined}
+ *     Dark theme when a known terminal signal is present.
+ */
+function resolveTerminalSignalTheme(env = {}) {
+	if (terminalThemeSignals.some((signal) => env[signal])) {
+		return themes.DARK;
+	}
+
+	return undefined;
 }
 
 /**

@@ -568,7 +568,7 @@ Most renderers accept the same output options:
 | `unicode` | Whether Unicode symbols should be used.                                   |
 | `width`   | Available output width for renderers that adapt layout.                   |
 
-Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI, TTY, `NO_COLOR`, `FORCE_COLOR`, and terminal capability. `theme: "auto"` uses `COLORFGBG` when it exposes a recognised background slot. Unknown terminals retain their default foreground/background and omit fills.
+Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI, TTY, `NO_COLOR`, `FORCE_COLOR`, and terminal capability. `theme: "auto"` resolves in this order: explicit `--light`/`--dark` flags or `theme: "light"`/`"dark"`, recognised `COLORFGBG` background slot, `COLORTERM` or `TERM_PROGRAM`, then a dark fallback. The additional environment signals are best-effort terminal identifiers, so they select the conservative dark palette rather than claiming a light or dark preference. `NO_COLOR`, `TERM=dumb`, `--plain`, and explicit no-colour flags still disable colour.
 
 ### CLI and Bash flags
 

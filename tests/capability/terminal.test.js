@@ -172,6 +172,8 @@ describe("Terminal capability detection", () => {
 			resolveTerminalCapabilities({
 				env: {
 					COLORFGBG: "15;0",
+					COLORTERM: "truecolor",
+					TERM_PROGRAM: "vscode",
 				},
 			}).theme,
 		).toBe("dark");
@@ -179,20 +181,50 @@ describe("Terminal capability detection", () => {
 			resolveTerminalCapabilities({
 				env: {
 					COLORFGBG: "0;15",
+					COLORTERM: "truecolor",
+					TERM_PROGRAM: "vscode",
 				},
 			}).theme,
 		).toBe("light");
 	});
 
-	test("Uses safe automatic theme when COLORFGBG is unavailable or ambiguous", () => {
-		expect(resolveTerminalCapabilities().theme).toBe("auto");
+	test("Falls back to dark theme when COLORFGBG is unavailable or ambiguous", () => {
+		expect(resolveTerminalCapabilities().theme).toBe("dark");
 		expect(
 			resolveTerminalCapabilities({
 				env: {
 					COLORFGBG: "15;default",
 				},
 			}).theme,
-		).toBe("auto");
+		).toBe("dark");
+	});
+
+	test("Uses COLORTERM and TERM_PROGRAM as best-effort theme signals", () => {
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					COLORTERM: "truecolor",
+				},
+			}).theme,
+		).toBe("dark");
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					TERM_PROGRAM: "Apple_Terminal",
+				},
+			}).theme,
+		).toBe("dark");
+	});
+
+	test("Resolves an automatic theme option through terminal signals", () => {
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					TERM_PROGRAM: "vscode",
+				},
+				theme: "auto",
+			}).theme,
+		).toBe("dark");
 	});
 
 	test("Prefers explicit theme flags and options over COLORFGBG", () => {
@@ -201,6 +233,8 @@ describe("Terminal capability detection", () => {
 				argv: ["--dark"],
 				env: {
 					COLORFGBG: "0;15",
+					COLORTERM: "truecolor",
+					TERM_PROGRAM: "vscode",
 				},
 				theme: "light",
 			}).theme,
@@ -209,6 +243,8 @@ describe("Terminal capability detection", () => {
 			resolveTerminalCapabilities({
 				env: {
 					COLORFGBG: "15;0",
+					COLORTERM: "truecolor",
+					TERM_PROGRAM: "vscode",
 				},
 				theme: "light",
 			}).theme,

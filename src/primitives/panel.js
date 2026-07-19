@@ -72,7 +72,12 @@ function renderLine(line, width, isTitle, options) {
 	}
 
 	const renderedAccent = renderPanelColour(accent, options);
-	const renderedContent = background(content, panelColours.background, options);
+
+	const renderedContent = foreground(
+		background(content, panelColours.background, options),
+		panelColours.body,
+		options,
+	);
 
 	return `${renderedAccent}${isTitle ? style(renderedContent, "bold", options) : renderedContent}`;
 }
