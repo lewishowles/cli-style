@@ -46,7 +46,7 @@ describe("divider", () => {
 			dividerWidth: 8,
 		});
 
-		expect(output).toBe("\u001b[38;2;42;58;66m--------\u001b[0m");
+		expect(output).toBe("\u001b[38;5;239m--------\u001b[0m");
 		expect(stripAnsi(output)).toBe("--------");
 	});
 
@@ -57,9 +57,7 @@ describe("divider", () => {
 			label: "Primitives",
 		});
 
-		expect(output).toBe(
-			"\u001b[38;2;139;189;255mPrimitives\u001b[0m \u001b[38;2;42;58;66m---------\u001b[0m",
-		);
+		expect(output).toBe("\u001b[38;5;117mPrimitives\u001b[0m \u001b[38;5;239m---------\u001b[0m");
 		expect(stripAnsi(output)).toBe("Primitives ---------");
 	});
 });

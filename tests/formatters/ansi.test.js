@@ -3,12 +3,21 @@ import { describe, expect, test } from "bun:test";
 import { background, foreground, stripAnsi, style } from "../../src/index.js";
 
 describe("ANSI foreground colour", () => {
-	test("Applies token foreground colour when enabled", () => {
+	test("Applies dark semantic foreground colour when enabled", () => {
 		const output = foreground("Passed", "success", {
+			colour: true,
+			theme: "dark",
+		});
+
+		expect(output).toBe("\u001b[38;5;114mPassed\u001b[0m");
+	});
+
+	test("Uses the terminal foreground for automatic text", () => {
+		const output = foreground("Text", "text", {
 			colour: true,
 		});
 
-		expect(output).toBe("\u001b[38;2;143;223;114mPassed\u001b[0m");
+		expect(output).toBe("\u001b[39mText\u001b[0m");
 	});
 
 	test("Applies direct hex foreground colour when enabled", () => {
@@ -37,12 +46,22 @@ describe("ANSI foreground colour", () => {
 });
 
 describe("ANSI background colour", () => {
-	test("Applies token background colour when enabled", () => {
+	test("Applies light semantic background colour when enabled", () => {
 		const output = background("You", "success", {
 			colour: true,
+			theme: "light",
 		});
 
-		expect(output).toBe("\u001b[48;2;143;223;114mYou\u001b[0m");
+		expect(output).toBe("\u001b[48;5;28mYou\u001b[0m");
+	});
+
+	test("Uses the terminal background for automatic surfaces", () => {
+		const output = background("You", "surface", {
+			colour: true,
+			theme: "auto",
+		});
+
+		expect(output).toBe("\u001b[49mYou\u001b[0m");
 	});
 });
 

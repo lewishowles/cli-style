@@ -87,8 +87,8 @@ describe("barChart", () => {
 			],
 		});
 
-		expect(output).toContain("\u001b[38;2;244;189;95m████\u001b[0m");
-		expect(output).toContain("\u001b[38;2;196;135;69m██\u001b[0m");
+		expect(output).toContain("\u001b[38;5;215m████\u001b[0m");
+		expect(output).toContain("\u001b[38;5;215m██\u001b[0m");
 		expect(stripAnsi(output)).toBe(["Warnings  ████ 2", "Removed   ██   -1"].join("\n"));
 	});
 });

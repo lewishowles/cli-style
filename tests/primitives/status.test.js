@@ -74,7 +74,7 @@ describe("status", () => {
 			unicode: false,
 		});
 
-		expect(output).toBe("\u001b[1m\u001b[38;2;255;114;114mx Failed\u001b[0m\u001b[0m Secrets scan");
+		expect(output).toBe("\u001b[1m\u001b[38;5;210mx Failed\u001b[0m\u001b[0m Secrets scan");
 		expect(stripAnsi(output)).toBe("x Failed Secrets scan");
 	});
 });

@@ -71,8 +71,8 @@ describe("panel", () => {
 			tone: "danger",
 		});
 
-		expect(output).toContain("\u001b[38;2;255;114;114m");
-		expect(output).toContain("\u001b[48;2;15;24;27m");
+		expect(output).toContain("\u001b[38;5;210m");
+		expect(output).toContain("\u001b[48;5;234m");
 		expect(stripAnsi(output)).toBe(
 			[
 				"▌                               ",

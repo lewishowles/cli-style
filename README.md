@@ -533,16 +533,18 @@ Most renderers accept the same output options:
 | --------- | ------------------------------------------------------------------------- |
 | `profile` | Output profile: `human`, `agent`, `diagnostic`, `ci`, `plain`, or `json`. |
 | `colour`  | Whether ANSI colour should be applied.                                    |
+| `theme`   | `auto`, `light`, or `dark` semantic colour palette.                       |
 | `unicode` | Whether Unicode symbols should be used.                                   |
 | `width`   | Available output width for renderers that adapt layout.                   |
 
-Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI, TTY, `NO_COLOR`, `FORCE_COLOR`, and terminal capability.
+Use `createCliStyle()` to resolve these options from `argv`, `env`, `stdout`, CI, TTY, `NO_COLOR`, `FORCE_COLOR`, and terminal capability. `theme: "auto"` uses `COLORFGBG` when it exposes a recognised background slot. Unknown terminals retain their default foreground/background and omit fills.
 
 ### CLI and Bash flags
 
 | Flag                         | Purpose                                |
 | ---------------------------- | -------------------------------------- |
 | `--profile <name>`           | Render with a named profile.           |
+| `--light` / `--dark`         | Override automatic terminal theme.     |
 | `--plain`                    | Disable colour and Unicode decoration. |
 | `--no-colour` / `--no-color` | Disable ANSI colour.                   |
 | `--no-unicode`               | Use ASCII symbols.                     |
@@ -617,6 +619,8 @@ cli-style gallery --fixture audit-finding
 cli-style gallery --profile agent
 cli-style gallery --width 64
 cli-style gallery --variants
+cli-style gallery --light --section primitives
+cli-style gallery --dark --section primitives
 ```
 
 Use `--interactive` to select a section or fixture with `fzf` when it is installed.

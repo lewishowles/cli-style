@@ -65,6 +65,8 @@ describe("parseGalleryRequest", () => {
 		});
 		expect(parseGalleryRequest(["--profile=ci", "--width=48"]).width).toBe(48);
 		expect(parseGalleryRequest(["--no-colour", "--no-unicode"]).variant).toBe("current");
+		expect(parseGalleryRequest(["--light"]).variant).toBe("current");
+		expect(parseGalleryRequest(["--dark"]).variant).toBe("current");
 	});
 
 	test("Parses interactive mode", () => {

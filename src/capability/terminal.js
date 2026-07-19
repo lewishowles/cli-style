@@ -1,3 +1,5 @@
+import { isTheme, themes } from "../theme/colours.js";
+
 // Default terminal width when no stream width is available.
 const defaultWidth = 80;
 
@@ -47,9 +49,80 @@ export function resolveTerminalCapabilities(options = {}) {
 		isCi,
 		isDumb,
 		isTty,
+		theme: resolveTheme({
+			argv,
+			env,
+			theme: options.theme,
+		}),
 		unicode,
 		width,
 	};
+}
+
+/**
+ * Resolve a terminal theme from direct overrides and COLORFGBG.
+ *
+ * @param  {object}  options
+ *     Theme resolution inputs.
+ * @returns  {string}
+ *     Resolved light, dark, or automatic theme.
+ */
+export function resolveTheme(options = {}) {
+	const flagTheme = readThemeFlag(options.argv ?? []);
+
+	if (flagTheme !== undefined) {
+		return flagTheme;
+	}
+
+	if (isTheme(options.theme)) {
+		return options.theme;
+	}
+
+	return resolveColourFgBgTheme(options.env?.COLORFGBG);
+}
+
+/**
+ * Resolve known COLORFGBG background slots without guessing custom palettes.
+ *
+ * @param  {string}  colourFgBg
+ *     Terminal foreground and background capability string.
+ * @returns  {string}
+ *     Resolved light, dark, or automatic theme.
+ */
+function resolveColourFgBgTheme(colourFgBg) {
+	const background = colourFgBg?.split(";").at(-1);
+
+	if (background === "0" || background === "8") {
+		return themes.DARK;
+	}
+
+	if (background === "7" || background === "15") {
+		return themes.LIGHT;
+	}
+
+	return themes.AUTO;
+}
+
+/**
+ * Read the final explicit theme flag so later command arguments can override earlier ones.
+ *
+ * @param  {string[]}  argv
+ *     CLI arguments to inspect.
+ * @returns  {string|undefined}
+ *     Explicit theme when present.
+ */
+function readThemeFlag(argv) {
+	let theme;
+
+	for (const argument of argv) {
+		if (argument === "--dark") {
+			theme = themes.DARK;
+		} else if (argument === "--light") {
+			theme = themes.LIGHT;
+		}
+	}
+
+	return theme;
 }
 
 /**

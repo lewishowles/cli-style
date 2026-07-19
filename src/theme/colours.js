@@ -1,16 +1,87 @@
-// Semantic colour tokens for terminal output and generated previews.
+// Semantic colour roles used by renderers and public integrations.
 export const colourTokens = {
-	accent: "#c58cff",
-	background: "#070b0d",
-	border: "#2a3a42",
-	danger: "#ff7272",
-	info: "#8bbdff",
-	muted: "#7a8a92",
-	success: "#8fdf72",
-	surface: "#0f181b",
-	surfaceRaised: "#132024",
-	text: "#e8eef0",
-	warning: "#f4bd5f",
+	accent: "accent",
+	background: "background",
+	border: "border",
+	danger: "danger",
+	info: "info",
+	muted: "muted",
+	success: "success",
+	surface: "surface",
+	surfaceRaised: "surfaceRaised",
+	text: "text",
+	warning: "warning",
+};
+
+// Resolved theme names accepted by the public rendering options.
+export const themes = {
+	AUTO: "auto",
+	DARK: "dark",
+	LIGHT: "light",
+};
+
+const defaultBackground = "default-background";
+const defaultForeground = "default-foreground";
+
+// Theme palettes keep normal text on the user's terminal foreground.
+const palettes = {
+	[themes.AUTO]: {
+		accent: defaultForeground,
+		background: defaultBackground,
+		border: defaultForeground,
+		danger: defaultForeground,
+		info: defaultForeground,
+		muted: defaultForeground,
+		success: defaultForeground,
+		surface: defaultBackground,
+		surfaceRaised: defaultBackground,
+		text: defaultForeground,
+		warning: defaultForeground,
+		chipAgent: defaultBackground,
+		chipDanger: defaultBackground,
+		chipInfo: defaultBackground,
+		chipNeutral: defaultBackground,
+		chipSuccess: defaultBackground,
+		chipWarning: defaultBackground,
+	},
+	[themes.DARK]: {
+		accent: "ansi-256:183",
+		background: defaultBackground,
+		border: "ansi-256:239",
+		danger: "ansi-256:210",
+		info: "ansi-256:117",
+		muted: "ansi-256:246",
+		success: "ansi-256:114",
+		surface: "ansi-256:234",
+		surfaceRaised: "ansi-256:236",
+		text: defaultForeground,
+		warning: "ansi-256:215",
+		chipAgent: "ansi-256:58",
+		chipDanger: "ansi-256:52",
+		chipInfo: "ansi-256:17",
+		chipNeutral: "ansi-256:236",
+		chipSuccess: "ansi-256:22",
+		chipWarning: "ansi-256:58",
+	},
+	[themes.LIGHT]: {
+		accent: "ansi-256:25",
+		background: defaultBackground,
+		border: "ansi-256:250",
+		danger: "ansi-256:160",
+		info: "ansi-256:25",
+		muted: "ansi-256:242",
+		success: "ansi-256:28",
+		surface: "ansi-256:255",
+		surfaceRaised: "ansi-256:254",
+		text: defaultForeground,
+		warning: "ansi-256:94",
+		chipAgent: "ansi-256:229",
+		chipDanger: "ansi-256:224",
+		chipInfo: "ansi-256:153",
+		chipNeutral: "ansi-256:254",
+		chipSuccess: "ansi-256:194",
+		chipWarning: "ansi-256:229",
+	},
 };
 
 // Terminal frame colours for gallery-style previews.
@@ -19,40 +90,40 @@ export const terminalColours = {
 	border: "border",
 	title: "muted",
 	trafficLights: {
-		close: "#ff7272",
-		minimise: "#f4bd5f",
-		zoom: "#8fdf72",
+		close: "danger",
+		minimise: "warning",
+		zoom: "success",
 	},
 };
 
 // Chip and pill colour pairs for speaker labels and compact states.
 export const chipColours = {
 	agent: {
-		background: "#3a2815",
+		background: "chipAgent",
 		foreground: "warning",
 	},
 	danger: {
-		background: "#3c1d22",
+		background: "chipDanger",
 		foreground: "danger",
 	},
 	info: {
-		background: "#14273b",
+		background: "chipInfo",
 		foreground: "info",
 	},
 	neutral: {
-		background: "#172126",
+		background: "chipNeutral",
 		foreground: "muted",
 	},
 	success: {
-		background: "#18351f",
+		background: "chipSuccess",
 		foreground: "success",
 	},
 	user: {
-		background: "#1f3b1f",
+		background: "chipSuccess",
 		foreground: "success",
 	},
 	warning: {
-		background: "#3a2815",
+		background: "chipWarning",
 		foreground: "warning",
 	},
 };
@@ -77,7 +148,7 @@ export const tableColours = {
 
 // Chart colours for simple bars and positive/negative trend segments.
 export const chartColours = {
-	barNegative: "#c48745",
+	barNegative: "warning",
 	barPositive: "success",
 	barWarning: "warning",
 	label: "muted",
@@ -101,41 +172,73 @@ export const toneColours = {
 };
 
 /**
- * Resolve a colour token by name.
+ * Resolve a colour token by name for the active theme.
  *
  * @param  {string}  colourName
  *     Colour token name.
+ * @param  {object}  options
+ *     Rendering options.
+ * @param  {string}  options.theme
+ *     Resolved terminal theme.
  * @returns  {string|null}
- *     Hex colour value when supported.
+ *     ANSI-256, terminal-default, or null when unsupported.
  */
-export function getColourToken(colourName) {
-	return colourTokens[colourName] ?? null;
+export function getColourToken(colourName, options = {}) {
+	return palettes[resolveTheme(options.theme)][colourName] ?? null;
 }
 
 /**
  * Resolve a tone to a colour token value.
  *
  * @param  {string}  tone
- *     Tone name to resolve.
+ *     Semantic tone name.
+ * @param  {object}  options
+ *     Rendering options.
  * @returns  {string|null}
- *     Hex colour value when supported.
+ *     ANSI-256, terminal-default, or null when unsupported.
  */
-export function getToneColour(tone) {
-	return getColourToken(toneColours[tone]);
+export function getToneColour(tone, options = {}) {
+	return getColourToken(toneColours[tone], options);
 }
 
 /**
- * Resolve a direct hex colour or colour token reference.
+ * Resolve a colour token or direct hex value.
  *
  * @param  {string}  colour
- *     Hex colour value or colour token name.
+ *     Colour token name or hex colour.
+ * @param  {object}  options
+ *     Rendering options.
  * @returns  {string|null}
- *     Hex colour value when supported.
+ *     Resolved formatter colour value when supported.
  */
-export function resolveColourValue(colour) {
+export function resolveColourValue(colour, options = {}) {
 	if (colour?.startsWith("#")) {
 		return colour;
 	}
 
-	return getColourToken(colour);
+	return getColourToken(colour, options);
+}
+
+/**
+ * Check whether a value is a recognised theme name.
+ *
+ * @param  {string}  theme
+ *     Candidate theme name.
+ * @returns  {boolean}
+ *     Whether the theme can select a palette.
+ */
+export function isTheme(theme) {
+	return Object.values(themes).includes(theme);
+}
+
+/**
+ * Resolve an unknown theme to the safe automatic palette.
+ *
+ * @param  {string}  theme
+ *     Candidate theme name.
+ * @returns  {string}
+ *     Recognised theme name.
+ */
+function resolveTheme(theme) {
+	return isTheme(theme) ? theme : themes.DARK;
 }

@@ -82,9 +82,9 @@ describe("stepProgress", () => {
 			steps: ["Install", "Build", "Publish"],
 		});
 
-		expect(output).toContain("\u001b[38;2;143;223;114m✓\u001b[0m");
-		expect(output).toContain("\u001b[38;2;139;189;255m…\u001b[0m");
-		expect(output).toContain("\u001b[38;2;122;138;146m–\u001b[0m");
+		expect(output).toContain("\u001b[38;5;114m✓\u001b[0m");
+		expect(output).toContain("\u001b[38;5;117m…\u001b[0m");
+		expect(output).toContain("\u001b[38;5;246m–\u001b[0m");
 		expect(stripAnsi(output)).toBe(["1/3 ✓ Install", "2/3 … Build", "3/3 – Publish"].join("\n"));
 	});
 });

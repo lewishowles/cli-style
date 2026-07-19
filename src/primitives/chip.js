@@ -21,7 +21,7 @@ const fallbackTone = "neutral";
 export function chip(label, tone = fallbackTone, options = {}) {
 	const token = chipColours[tone] ?? chipColours[fallbackTone];
 
-	if (options.colour !== true) {
+	if (options.colour !== true || options.theme === "auto") {
 		return `[${label}]`;
 	}
 

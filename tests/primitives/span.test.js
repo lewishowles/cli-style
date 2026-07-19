@@ -17,7 +17,7 @@ describe("span", () => {
 		});
 
 		expect(output).toContain("\u001b[1m");
-		expect(output).toContain("\u001b[38;2;139;189;255m");
+		expect(output).toContain("\u001b[38;5;117m");
 		expect(stripAnsi(output)).toBe("npm run docs:readme");
 	});
 
@@ -30,7 +30,7 @@ describe("span", () => {
 			colour: true,
 		});
 
-		expect(output).toContain("\u001b[38;2;139;189;255m");
+		expect(output).toContain("\u001b[38;5;117m");
 		expect(stripAnsi(output)).toBe("i Hint: Run npm run docs:readme before release.");
 	});
 });

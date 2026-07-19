@@ -11,6 +11,7 @@ import {
 	resolveColourValue,
 	tableColours,
 	terminalColours,
+	themes,
 	toneColours,
 } from "../../src/index.js";
 
@@ -31,45 +32,21 @@ describe("Colour tokens", () => {
 		]);
 	});
 
-	test("Uses hex colour values", () => {
-		const hexColour = /^#[\da-f]{6}$/u;
-
-		for (const colour of Object.values(colourTokens)) {
-			expect(colour).toMatch(hexColour);
-		}
+	test("Resolves approved light and dark ANSI-256 palettes", () => {
+		expect(getColourToken("success", { theme: themes.DARK })).toBe("ansi-256:114");
+		expect(getColourToken("warning", { theme: themes.LIGHT })).toBe("ansi-256:94");
+		expect(getColourToken("surface", { theme: themes.DARK })).toBe("ansi-256:234");
+		expect(getColourToken("surface", { theme: themes.LIGHT })).toBe("ansi-256:255");
 	});
 
-	test("Keeps semantic colour values distinct", () => {
-		const values = Object.values(colourTokens);
-		const uniqueValues = new Set(values);
-
-		expect(uniqueValues.size).toBe(values.length);
-	});
-
-	test("Keeps text colours readable on dark surfaces", () => {
-		const pairings = [
-			[colourTokens.text, colourTokens.background],
-			[colourTokens.muted, colourTokens.background],
-			[colourTokens.muted, colourTokens.surface],
-			[colourTokens.muted, colourTokens.surfaceRaised],
-			[
-				resolveColourValue(chipColours.neutral.foreground),
-				resolveColourValue(chipColours.neutral.background),
-			],
-		];
-
-		for (const [foreground, background] of pairings) {
-			expect(getContrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
-		}
-	});
-
-	test("Resolves colour token by name", () => {
-		expect(getColourToken("success")).toBe(colourTokens.success);
-		expect(getColourToken("missing")).toBeNull();
+	test("Uses terminal defaults for the safe automatic palette", () => {
+		expect(getColourToken("text", { theme: themes.AUTO })).toBe("default-foreground");
+		expect(getColourToken("success", { theme: themes.AUTO })).toBe("default-foreground");
+		expect(getColourToken("surface", { theme: themes.AUTO })).toBe("default-background");
 	});
 
 	test("Resolves token references and direct hex values", () => {
-		expect(resolveColourValue("success")).toBe(colourTokens.success);
+		expect(resolveColourValue("success", { theme: themes.LIGHT })).toBe("ansi-256:28");
 		expect(resolveColourValue("#123456")).toBe("#123456");
 		expect(resolveColourValue("missing")).toBeNull();
 	});
@@ -87,80 +64,19 @@ describe("Tone colours", () => {
 	});
 
 	test("Resolves tone colour values", () => {
-		expect(getToneColour("danger")).toBe(colourTokens.danger);
+		expect(getToneColour("danger", { theme: themes.DARK })).toBe("ansi-256:210");
 		expect(getToneColour("missing")).toBeNull();
 	});
 });
 
 describe("Visual token groups", () => {
-	test("Defines terminal chrome colours", () => {
-		expect(resolveColourValue(terminalColours.background)).toBe(colourTokens.background);
-		expect(resolveColourValue(terminalColours.border)).toBe(colourTokens.border);
-		expect(resolveColourValue(terminalColours.trafficLights.close)).toBe(colourTokens.danger);
-	});
-
-	test("Defines chip foreground and background pairs", () => {
-		expect(Object.keys(chipColours).sort()).toEqual([
-			"agent",
-			"danger",
-			"info",
-			"neutral",
-			"success",
-			"user",
-			"warning",
-		]);
-
-		for (const token of Object.values(chipColours)) {
-			expect(resolveColourValue(token.background)).toMatch(/^#[\da-f]{6}$/u);
-			expect(resolveColourValue(token.foreground)).toMatch(/^#[\da-f]{6}$/u);
-		}
-	});
-
-	test("Defines panel, table, chart, and prompt groups", () => {
-		expect(resolveColourValue(panelColours.background)).toBe(colourTokens.surface);
-		expect(resolveColourValue(tableColours.header)).toBe(colourTokens.muted);
-		expect(resolveColourValue(chartColours.barPositive)).toBe(colourTokens.success);
-		expect(resolveColourValue(promptColours.active)).toBe(colourTokens.success);
+	test("Uses semantic token names across visual groups", () => {
+		expect(terminalColours.background).toBe("background");
+		expect(terminalColours.trafficLights.close).toBe("danger");
+		expect(chipColours.success.background).toBe("chipSuccess");
+		expect(panelColours.background).toBe("surface");
+		expect(tableColours.primaryText).toBe("text");
+		expect(chartColours.barPositive).toBe("success");
+		expect(promptColours.active).toBe("success");
 	});
 });
-
-/**
- * Calculate WCAG contrast ratio for two hex colours.
- *
- * @param  {string}  foreground
- *     Foreground hex colour.
- * @param  {string}  background
- *     Background hex colour.
- * @returns  {number}
- *     Contrast ratio between the two colours.
- */
-function getContrastRatio(foreground, background) {
-	const foregroundLuminance = getRelativeLuminance(foreground);
-	const backgroundLuminance = getRelativeLuminance(background);
-	const lightest = Math.max(foregroundLuminance, backgroundLuminance);
-	const darkest = Math.min(foregroundLuminance, backgroundLuminance);
-
-	return (lightest + 0.05) / (darkest + 0.05);
-}
-
-/**
- * Calculate relative luminance for a hex colour.
- *
- * @param  {string}  colour
- *     Hex colour to measure.
- * @returns  {number}
- *     Relative luminance from 0 to 1.
- */
-function getRelativeLuminance(colour) {
-	const [red, green, blue] = [1, 3, 5].map((start) => {
-		const channel = Number.parseInt(colour.slice(start, start + 2), 16) / 255;
-
-		if (channel <= 0.03928) {
-			return channel / 12.92;
-		}
-
-		return ((channel + 0.055) / 1.055) ** 2.4;
-	});
-
-	return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-}

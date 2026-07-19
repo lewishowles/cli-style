@@ -166,4 +166,52 @@ describe("Terminal capability detection", () => {
 
 		expect(capabilities.width).toBe(80);
 	});
+
+	test("Resolves COLORFGBG background slots", () => {
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					COLORFGBG: "15;0",
+				},
+			}).theme,
+		).toBe("dark");
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					COLORFGBG: "0;15",
+				},
+			}).theme,
+		).toBe("light");
+	});
+
+	test("Uses safe automatic theme when COLORFGBG is unavailable or ambiguous", () => {
+		expect(resolveTerminalCapabilities().theme).toBe("auto");
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					COLORFGBG: "15;default",
+				},
+			}).theme,
+		).toBe("auto");
+	});
+
+	test("Prefers explicit theme flags and options over COLORFGBG", () => {
+		expect(
+			resolveTerminalCapabilities({
+				argv: ["--dark"],
+				env: {
+					COLORFGBG: "0;15",
+				},
+				theme: "light",
+			}).theme,
+		).toBe("dark");
+		expect(
+			resolveTerminalCapabilities({
+				env: {
+					COLORFGBG: "15;0",
+				},
+				theme: "light",
+			}).theme,
+		).toBe("light");
+	});
 });

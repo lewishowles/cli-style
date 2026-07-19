@@ -100,7 +100,7 @@ export function stripAnsi(value) {
  *     Coloured text, or the original text when colour is disabled.
  */
 function wrapColour(value, colour, options, createCode) {
-	const resolvedColour = resolveColourValue(colour);
+	const resolvedColour = resolveColourValue(colour, options);
 
 	if (options.colour !== true || resolvedColour === null) {
 		return value;
@@ -118,6 +118,14 @@ function wrapColour(value, colour, options, createCode) {
  *     ANSI foreground sequence.
  */
 function createForegroundCode(colour) {
+	if (colour === "default-foreground") {
+		return "\u001b[39m";
+	}
+
+	if (colour.startsWith("ansi-256:")) {
+		return `\u001b[38;5;${colour.slice("ansi-256:".length)}m`;
+	}
+
 	const { blue, green, red } = parseHexColour(colour);
 
 	return `\u001b[38;2;${red};${green};${blue}m`;
@@ -132,6 +140,14 @@ function createForegroundCode(colour) {
  *     ANSI background sequence.
  */
 function createBackgroundCode(colour) {
+	if (colour === "default-background") {
+		return "\u001b[49m";
+	}
+
+	if (colour.startsWith("ansi-256:")) {
+		return `\u001b[48;5;${colour.slice("ansi-256:".length)}m`;
+	}
+
 	const { blue, green, red } = parseHexColour(colour);
 
 	return `\u001b[48;2;${red};${green};${blue}m`;

@@ -122,9 +122,9 @@ describe("table", () => {
 			width: 80,
 		});
 
-		expect(output).toContain("\u001b[38;2;122;138;146mName ");
-		expect(output).toContain("\u001b[38;2;42;58;66m");
-		expect(output).toContain("\u001b[38;2;232;238;240mBuild");
+		expect(output).toContain("\u001b[38;5;246mName ");
+		expect(output).toContain("\u001b[38;5;239m");
+		expect(output).toContain("\u001b[39mBuild");
 		expect(stripAnsi(output)).toBe(["Name   Status", "─────  ──────", "Build  Passed"].join("\n"));
 	});
 });

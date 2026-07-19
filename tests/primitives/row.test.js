@@ -33,7 +33,7 @@ describe("row", () => {
 			colour: true,
 		});
 
-		expect(output).toBe("\u001b[38;2;122;138;146mPackage\u001b[0m  @lewishowles/components");
+		expect(output).toBe("\u001b[38;5;246mPackage\u001b[0m  @lewishowles/components");
 		expect(stripAnsi(output)).toBe("Package  @lewishowles/components");
 	});
 
@@ -43,9 +43,7 @@ describe("row", () => {
 			valueColour: "success",
 		});
 
-		expect(output).toBe(
-			"\u001b[38;2;122;138;146mStatus\u001b[0m  \u001b[38;2;143;223;114mpassed\u001b[0m",
-		);
+		expect(output).toBe("\u001b[38;5;246mStatus\u001b[0m  \u001b[38;5;114mpassed\u001b[0m");
 		expect(stripAnsi(output)).toBe("Status  passed");
 	});
 
@@ -67,7 +65,7 @@ describe("row", () => {
 		});
 
 		expect(output).toBe(
-			"\u001b[38;2;255;114;114mx Package size\u001b[0m  \u001b[38;2;255;114;114mover budget\u001b[0m",
+			"\u001b[38;5;210mx Package size\u001b[0m  \u001b[38;5;210mover budget\u001b[0m",
 		);
 		expect(stripAnsi(output)).toBe("x Package size  over budget");
 	});

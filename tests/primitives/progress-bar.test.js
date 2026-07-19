@@ -65,8 +65,8 @@ describe("progressBar", () => {
 			value: 2,
 		});
 
-		expect(output).toContain("\u001b[38;2;244;189;95m██\u001b[0m");
-		expect(output).toContain("\u001b[38;2;122;138;146m░░\u001b[0m");
+		expect(output).toContain("\u001b[38;5;215m██\u001b[0m");
+		expect(output).toContain("\u001b[38;5;246m░░\u001b[0m");
 		expect(stripAnsi(output)).toBe("[██░░] 50% (2/4)");
 	});
 });

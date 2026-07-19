@@ -108,7 +108,14 @@ const renderers = {
 };
 
 // Global rendering flags accepted after `render <renderer>`.
-const globalRenderingFlags = new Set(["--no-color", "--no-colour", "--no-unicode", "--plain"]);
+const globalRenderingFlags = new Set([
+	"--dark",
+	"--light",
+	"--no-color",
+	"--no-colour",
+	"--no-unicode",
+	"--plain",
+]);
 
 // Renderer names exposed for help text and tests.
 export const rendererNames = Object.keys(renderers);

@@ -16,9 +16,7 @@ describe("chip", () => {
 			colour: true,
 		});
 
-		expect(output).toBe(
-			"\u001b[48;2;31;59;31m\u001b[1m\u001b[38;2;143;223;114m You \u001b[0m\u001b[0m\u001b[0m",
-		);
+		expect(output).toBe("\u001b[48;5;22m\u001b[1m\u001b[38;5;114m You \u001b[0m\u001b[0m\u001b[0m");
 		expect(stripAnsi(output)).toBe(" You ");
 	});
 

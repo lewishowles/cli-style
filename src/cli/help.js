@@ -17,6 +17,7 @@ const helpLines = [
 	"  current, no-colour, no-unicode, plain",
 	"",
 	"Options:",
+	"  --light, --dark     Override automatic terminal-theme detection.",
 	"  --section <name>    Show primitives or patterns.",
 	"  --fixture <name>    Show one named pattern fixture.",
 	"  --profile <name>    Render with a text profile.",

@@ -82,9 +82,9 @@ describe("Feedback primitives", () => {
 			colour: true,
 		});
 
-		expect(hintOutput).toContain("\u001b[38;2;139;189;255m");
-		expect(emptyOutput).toContain("\u001b[38;2;122;138;146m");
-		expect(errorOutput).toContain("\u001b[38;2;255;114;114m");
+		expect(hintOutput).toContain("\u001b[38;5;117m");
+		expect(emptyOutput).toContain("\u001b[38;5;246m");
+		expect(errorOutput).toContain("\u001b[38;5;210m");
 		expect(stripAnsi(hintOutput)).toBe("i Hint: Review the warning.");
 		expect(stripAnsi(emptyOutput)).toBe("– No results");
 		expect(stripAnsi(errorOutput)).toContain("× Error: Build failed");

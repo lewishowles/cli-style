@@ -4,7 +4,14 @@ import { galleryFixtures, gallerySections, galleryVariants } from "../gallery/re
 import { isProfile, profiles } from "../profiles/profiles.js";
 
 // Global rendering flags accepted after `gallery` for focused review commands.
-const globalRenderingFlags = new Set(["--no-color", "--no-colour", "--no-unicode", "--plain"]);
+const globalRenderingFlags = new Set([
+	"--dark",
+	"--light",
+	"--no-color",
+	"--no-colour",
+	"--no-unicode",
+	"--plain",
+]);
 
 /**
  * Parse gallery command arguments.
