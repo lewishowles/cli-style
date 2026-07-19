@@ -39,12 +39,6 @@ Planned functionality:
 - Split single-value progress from multi-row charts: public API should expose `progressBar()` and `barChart()`, not one overloaded `bar()`.
 - Shell, Python, and Swift consumers may need native adapters or deliberately small fallbacks; do not force every script through Node without reviewing cost.
 
-## Specs
-
-- `.agent/specs/package-contract.md` defines API, profile, accessibility, symbol, colour, and test-matrix decisions.
-- `.agent/specs/implementation-roadmap.md` defines package build order and review gates.
-- `.agent/specs/adoption-roadmap.md` defines target repositories and rollout order.
-
 ## Gotchas
 
 - Do not style machine-readable JSON.
