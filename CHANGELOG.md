@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+## 0.10.0 - 2026-07-20
+
+### Added
+
+- Added light and dark ANSI-256 colour palettes with automatic theme detection (explicit flag/option, `COLORFGBG`, then a `COLORTERM`/`TERM_PROGRAM` best-effort signal, falling back to dark).
+- Added `cli-style list` and `cli-style describe` for static renderer catalogue discovery.
+- Added a `sparkline()` renderer (`sparkline` for `cli-style render`) for compact trend display with latest, minimum, and maximum values.
+- Added a `diffBlock()` renderer (`diff-block` for `cli-style render`) for structured added/removed/context/header diff presentation.
+
+### Fixed
+
+- Fixed panel body text losing legibility against its background fill in some theme/terminal combinations by giving panels their own explicit theme-matched text colour instead of relying on the terminal-inherited default.
+
 ## 0.9.0 - 2026-07-16
 
 ### Added
