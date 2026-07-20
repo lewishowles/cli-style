@@ -100,6 +100,31 @@ describe("renderJsonInput", () => {
 		expect(output).toContain("- Add adapters");
 	});
 
+	test("Renders a structured diff block from caller JSON", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				lines: [
+					{
+						text: "next()",
+						type: "header",
+					},
+					{
+						text: "return next;",
+						type: "added",
+					},
+				],
+			}),
+			parseRenderRequest(["diff-block"]),
+			{
+				colour: false,
+				profile: profiles.CI,
+				unicode: false,
+			},
+		);
+
+		expect(output).toBe(["@@ next()", "+ return next;"].join("\n"));
+	});
+
 	test("Rejects invalid input and json profile", () => {
 		expect(() => renderJsonInput("{", parseRenderRequest(["status"]))).toThrow(
 			"Render input must be valid JSON",
@@ -119,6 +144,7 @@ describe("renderJsonInput", () => {
 		expect(rendererNames).toContain("span");
 		expect(rendererNames).toContain("task-summary");
 		expect(rendererNames).toContain("diagnostic-report");
+		expect(rendererNames).toContain("diff-block");
 		expect(rendererNames).toContain("sparkline");
 	});
 });

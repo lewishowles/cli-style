@@ -4,6 +4,7 @@ import { commandResult } from "../patterns/command-result.js";
 import { compactDataTable } from "../patterns/compact-data-table.js";
 import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
+import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { stripAnsi } from "../formatters/ansi.js";
@@ -128,6 +129,7 @@ export const galleryFixtures = [
 	"compact-data-table-narrow",
 	"confirmation-result",
 	"next-step-block",
+	"diff-block",
 	"sparkline",
 ];
 
@@ -440,6 +442,32 @@ function renderPatterns(options, fixture) {
 		options,
 	);
 
+	const diff = diffBlock(
+		{
+			lines: [
+				{
+					text: "render()",
+					type: "header",
+				},
+				{
+					text: "return nextStep;",
+					type: "added",
+				},
+				{
+					text: "return currentStep;",
+					type: "removed",
+				},
+				{
+					text: "const currentStep = getStep();",
+					type: "context",
+				},
+			],
+			path: "src/render.js",
+			title: "Renderer change",
+		},
+		options,
+	);
+
 	const reporter = createReporter(options);
 
 	reporter.divider("Project setup", "Claude + Codex");
@@ -567,6 +595,7 @@ function renderPatterns(options, fixture) {
 		"compact-data-table-narrow": ["Compact data table (narrow)", narrowCompactTable],
 		"confirmation-result": ["Confirmation result", confirmation],
 		"diagnostic-report": ["Diagnostic report", report],
+		"diff-block": ["Diff block", diff],
 		"next-step-block": ["Next-step block", nextStep],
 		reporter: ["Reporter", reporterOutput],
 		"task-summary": ["Task summary", summary],
@@ -599,6 +628,9 @@ function renderPatterns(options, fixture) {
 		"",
 		"Audit finding",
 		frameExample(audit, options),
+		"",
+		"Diff block",
+		frameExample(diff, options),
 		"",
 		"Compact data table",
 		frameExample(compactTable, options),

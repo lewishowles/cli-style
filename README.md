@@ -246,6 +246,7 @@ Renderer names are stable for `cli-style render`, `cli_style_render`, and Python
 | `step-progress`       | `stepProgress(options)`               | Use `cli_style_render`               | Use `render("step-progress", ...)` | Use `CliStyle.render`                  | Numbered workflow steps.                                        |
 | `empty-state`         | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Use `render("empty-state", ...)`   | Use `CliStyle.render`                  | Empty result message.                                           |
 | `error-block`         | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Use `render("error-block", ...)`   | Use `CliStyle.render`                  | Structured error block.                                         |
+| `diff-block`          | `diffBlock(diff, options)`            | Use `cli_style_render`               | Use `render("diff-block", ...)`    | Use `CliStyle.render`                  | Structured added, removed, context, and header lines.           |
 
 Use `render("<renderer>", data, ...)` (Python) or `CliStyle.render(_:data:options:)` (Swift) for aggregate patterns (`diagnostic-report`, `agent-transcript`, `compact-data-table`) or any renderer with multi-item fields.
 
@@ -389,6 +390,26 @@ Patterns are built-in composite renderers for common report shapes. They use the
 | `confirmation-result` | `confirmationResult(confirmation, options)` | Confirmation outcome with detail.     | `title`, `state`, `action`, `item`, `detail`                                         |
 | `next-step-block`     | `nextStepBlock(nextStep, options)`          | Next-step guidance.                   | `title`, `next`, `reason`, `commands`, `alternatives`                                |
 | `compact-data-table`  | `compactDataTable(data, options)`           | Titled compact data table.            | `title`, `summary`, `columns`, `rows`                                                |
+| `diff-block`          | `diffBlock(diff, options)`                  | Structured diff presentation.         | `title`, `path`, `lines`                                                             |
+
+### `diff-block`
+
+Pass structured lines with one of four types. The renderer adds stable textual prefixes, so colour is optional and never carries meaning alone.
+
+```json
+{
+	"title": "Renderer change",
+	"path": "src/render.js",
+	"lines": [
+		{ "type": "header", "text": "render()" },
+		{ "type": "added", "text": "return nextStep;" },
+		{ "type": "removed", "text": "return currentStep;" },
+		{ "type": "context", "text": "const currentStep = getStep();" }
+	]
+}
+```
+
+`diff-block` presents structured data only. It does not parse unified-diff strings, calculate patches, or apply changes. Invalid line entries are ignored safely.
 
 For visual examples, run `cli-style gallery --section patterns`.
 

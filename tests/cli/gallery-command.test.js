@@ -36,6 +36,7 @@ describe("parseGalleryRequest", () => {
 			"confirmation-result",
 		);
 		expect(parseGalleryRequest(["--fixture", "next-step-block"]).fixture).toBe("next-step-block");
+		expect(parseGalleryRequest(["--fixture", "diff-block"]).fixture).toBe("diff-block");
 		expect(parseGalleryRequest(["--fixture", "reporter"]).fixture).toBe("reporter");
 		expect(parseGalleryRequest(["--fixture", "sparkline"]).fixture).toBe("sparkline");
 		expect(parseGalleryRequest(["--variants"])).toEqual({
@@ -75,6 +76,68 @@ describe("parseGalleryRequest", () => {
 		expect(output).toContain("Flat");
 		expect(output).toContain("Negative");
 		expect(output).toContain("Narrow mixed");
+	});
+
+	test("Renders the diff-block fixture across all variants", () => {
+		const output = renderGallery(
+			{
+				colour: false,
+				unicode: true,
+			},
+			{
+				fixture: "diff-block",
+				variants: true,
+				width: 72,
+			},
+		);
+
+		expect(output.match(/Diff block/g)).toHaveLength(4);
+		expect(output).toContain("+ return nextStep;");
+		expect(output).toContain("- return currentStep;");
+		expect(output).toContain("  const currentStep = getStep();");
+	});
+
+	test("Fills diff rows only in colour-enabled gallery variants", () => {
+		for (const palette of [
+			{
+				addedBackground: "\u001b[48;5;22m",
+				addedText: "\u001b[38;5;114m",
+				theme: "dark",
+			},
+			{
+				addedBackground: "\u001b[48;5;194m",
+				addedText: "\u001b[38;5;22m",
+				theme: "light",
+			},
+		]) {
+			const output = renderGallery(
+				{
+					colour: true,
+					theme: palette.theme,
+					unicode: true,
+				},
+				{
+					fixture: "diff-block",
+					variants: true,
+					width: 72,
+				},
+			);
+
+			const currentStart = output.indexOf("Current terminal");
+			const noColourStart = output.indexOf("No colour");
+			const noUnicodeStart = output.indexOf("No Unicode");
+			const plainStart = output.indexOf("Plain");
+			const current = output.slice(currentStart, noColourStart);
+			const noColour = output.slice(noColourStart, noUnicodeStart);
+			const noUnicode = output.slice(noUnicodeStart, plainStart);
+			const plain = output.slice(plainStart);
+
+			expect(current).toContain(palette.addedBackground);
+			expect(current).toContain(palette.addedText);
+			expect(noColour).not.toContain("\u001b[48;");
+			expect(noUnicode).toContain(palette.addedBackground);
+			expect(plain).not.toContain("\u001b[48;");
+		}
 	});
 
 	test("Colours sparkline trends only in colour-enabled variants", () => {

@@ -4,6 +4,10 @@ export const colourTokens = {
 	background: "background",
 	border: "border",
 	danger: "danger",
+	diffAddedBackground: "diffAddedBackground",
+	diffAddedText: "diffAddedText",
+	diffRemovedBackground: "diffRemovedBackground",
+	diffRemovedText: "diffRemovedText",
 	info: "info",
 	muted: "muted",
 	panelText: "panelText",
@@ -31,6 +35,10 @@ const palettes = {
 		background: defaultBackground,
 		border: defaultForeground,
 		danger: defaultForeground,
+		diffAddedBackground: defaultBackground,
+		diffAddedText: defaultForeground,
+		diffRemovedBackground: defaultBackground,
+		diffRemovedText: defaultForeground,
 		info: defaultForeground,
 		muted: defaultForeground,
 		panelText: defaultForeground,
@@ -51,6 +59,10 @@ const palettes = {
 		background: defaultBackground,
 		border: "ansi-256:239",
 		danger: "ansi-256:210",
+		diffAddedBackground: "ansi-256:22",
+		diffAddedText: "ansi-256:114",
+		diffRemovedBackground: "ansi-256:52",
+		diffRemovedText: "ansi-256:210",
 		info: "ansi-256:117",
 		muted: "ansi-256:246",
 		panelText: "ansi-256:252",
@@ -71,6 +83,10 @@ const palettes = {
 		background: defaultBackground,
 		border: "ansi-256:250",
 		danger: "ansi-256:160",
+		diffAddedBackground: "ansi-256:194",
+		diffAddedText: "ansi-256:22",
+		diffRemovedBackground: "ansi-256:224",
+		diffRemovedText: "ansi-256:124",
 		info: "ansi-256:25",
 		muted: "ansi-256:242",
 		panelText: "ansi-256:238",
@@ -129,6 +145,18 @@ export const chipColours = {
 	warning: {
 		background: "chipWarning",
 		foreground: "warning",
+	},
+};
+
+// Diff row colours pair forced backgrounds with explicit readable text tokens.
+export const diffColours = {
+	added: {
+		background: "diffAddedBackground",
+		foreground: "diffAddedText",
+	},
+	removed: {
+		background: "diffRemovedBackground",
+		foreground: "diffRemovedText",
 	},
 };
 

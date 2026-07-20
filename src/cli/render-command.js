@@ -4,6 +4,7 @@ import { commandResult } from "../patterns/command-result.js";
 import { compactDataTable } from "../patterns/compact-data-table.js";
 import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
+import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
@@ -40,6 +41,7 @@ const renderers = {
 	"compact-data-table": (input, options) => compactDataTable(input, options),
 	"confirmation-result": (input, options) => confirmationResult(input, options),
 	"diagnostic-report": (input, options) => diagnosticReport(input, options),
+	"diff-block": (input, options) => diffBlock(input, options),
 	divider: (input, options) =>
 		divider({
 			...input,

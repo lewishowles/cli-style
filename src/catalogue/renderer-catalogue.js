@@ -20,6 +20,7 @@ export const rendererCatalogue = [
 		["findings", "summary"],
 		"diagnostic-report",
 	],
+	["diff-block", "pattern", "diffBlock", ["lines"], "diff-block"],
 	["divider", "primitive", "divider", ["label"], undefined],
 	["empty-state", "primitive", "emptyState", ["detail", "title"], undefined],
 	["error-block", "primitive", "errorBlock", ["lines", "title"], undefined],
