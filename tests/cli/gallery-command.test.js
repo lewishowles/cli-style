@@ -91,10 +91,10 @@ describe("parseGalleryRequest", () => {
 			},
 		);
 
-		expect(output.match(/Diff block/g)).toHaveLength(4);
-		expect(output).toContain("+ return nextStep;");
-		expect(output).toContain("- return currentStep;");
-		expect(output).toContain("  const currentStep = getStep();");
+		expect(output.match(/Renderer change \(\+1 -1\)/g)).toHaveLength(4);
+		expect(output).toContain("102 + return nextStep;");
+		expect(output).toContain("101     - return currentStep;");
+		expect(output).toContain("100       const currentStep = getStep();");
 	});
 
 	test("Fills diff rows only in colour-enabled gallery variants", () => {

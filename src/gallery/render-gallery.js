@@ -450,14 +450,18 @@ function renderPatterns(options, fixture) {
 					type: "header",
 				},
 				{
+					newLineNumber: 102,
 					text: "return nextStep;",
 					type: "added",
 				},
 				{
+					oldLineNumber: 101,
 					text: "return currentStep;",
 					type: "removed",
 				},
 				{
+					newLineNumber: 100,
+					oldLineNumber: 100,
 					text: "const currentStep = getStep();",
 					type: "context",
 				},

@@ -402,14 +402,21 @@ Pass structured lines with one of four types. The renderer adds stable textual p
 	"path": "src/render.js",
 	"lines": [
 		{ "type": "header", "text": "render()" },
-		{ "type": "added", "text": "return nextStep;" },
-		{ "type": "removed", "text": "return currentStep;" },
-		{ "type": "context", "text": "const currentStep = getStep();" }
+		{ "type": "added", "newLineNumber": 102, "text": "return nextStep;" },
+		{ "type": "removed", "oldLineNumber": 101, "text": "return currentStep;" },
+		{
+			"type": "context",
+			"oldLineNumber": 100,
+			"newLineNumber": 100,
+			"text": "const currentStep = getStep();"
+		}
 	]
 }
 ```
 
-`diff-block` presents structured data only. It does not parse unified-diff strings, calculate patches, or apply changes. Invalid line entries are ignored safely.
+`oldLineNumber` and `newLineNumber` are optional caller-supplied fields. Added lines use the new number, removed lines use the old number, and context lines use both. Numbered blocks show a stable gutter and computed `(+added -removed)` summary. Missing numbers fall back to the unnumbered output.
+
+`diff-block` presents structured data only. It does not parse unified-diff strings, calculate patches or line numbers, or apply changes. Invalid line entries are ignored safely.
 
 For visual examples, run `cli-style gallery --section patterns`.
 

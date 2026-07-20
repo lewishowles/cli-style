@@ -36,6 +36,33 @@ const plainOutput = [
 	"  const current = true;",
 ].join("\n");
 
+const numberedDiff = {
+	lines: [
+		{
+			text: "src/app.js",
+			type: "header",
+		},
+		{
+			newLineNumber: 12,
+			text: "const next = true;",
+			type: "added",
+		},
+		{
+			oldLineNumber: 12,
+			text: "const next = false;",
+			type: "removed",
+		},
+		{
+			newLineNumber: 11,
+			oldLineNumber: 11,
+			text: "const current = true;",
+			type: "context",
+		},
+	],
+	path: "src/app.js",
+	title: "Release diff",
+};
+
 describe("diffBlock", () => {
 	test("Renders every line type with stable prefixes across text profiles", () => {
 		for (const profile of [profiles.HUMAN, profiles.DIAGNOSTIC, profiles.CI, profiles.PLAIN]) {
@@ -116,6 +143,87 @@ describe("diffBlock", () => {
 		expect(output).not.toContain("\u001b[");
 	});
 
+	test("Renders stable old and new gutters with a computed change summary", () => {
+		const output = diffBlock(numberedDiff, {
+			colour: false,
+			profile: profiles.CI,
+		});
+
+		expect(output).toBe(
+			[
+				"Release diff (+1 -1)",
+				"",
+				"Path: src/app.js",
+				"",
+				"      @@ src/app.js",
+				"   12 + const next = true;",
+				"12    - const next = false;",
+				"11      const current = true;",
+			].join("\n"),
+		);
+	});
+
+	test("Uses the same numbered gutter inside agent diff fences", () => {
+		const output = diffBlock(numberedDiff, {
+			colour: false,
+			profile: profiles.AGENT,
+		});
+
+		expect(output).toContain("# Release diff (+1 -1)");
+		expect(output).toContain("```diff\n      @@ src/app.js");
+		expect(output).toContain("   12 + const next = true;");
+	});
+
+	test("Colours numbered summary values without changing its text contract", () => {
+		const output = diffBlock(numberedDiff, {
+			colour: true,
+			profile: profiles.HUMAN,
+			theme: "dark",
+		});
+
+		expect(output).toContain("\u001b[38;5;114m+1");
+		expect(output).toContain("\u001b[38;5;210m-1");
+		expect(stripAnsi(output)).toContain("Release diff (+1 -1)");
+
+		for (const profile of [profiles.CI, profiles.PLAIN]) {
+			const plainProfileOutput = diffBlock(numberedDiff, {
+				colour: true,
+				profile,
+				theme: "dark",
+			});
+
+			expect(plainProfileOutput.split("\n\n")[0]).toBe("Release diff (+1 -1)");
+		}
+	});
+
+	test("Falls back to the unnumbered block when any code line lacks numbers", () => {
+		const output = diffBlock(
+			{
+				lines: [
+					{
+						newLineNumber: 12,
+						text: "const next = true;",
+						type: "added",
+					},
+					{
+						text: "const current = true;",
+						type: "context",
+					},
+				],
+				title: "Partial diff",
+			},
+			{
+				colour: false,
+				profile: profiles.CI,
+			},
+		);
+
+		expect(output).toBe(
+			["Partial diff", ["+ const next = true;", "  const current = true;"].join("\n")].join("\n\n"),
+		);
+		expect(output).not.toContain("(+");
+	});
+
 	test("Uses an optional heading and path around an agent diff fence", () => {
 		const output = diffBlock(diff, {
 			colour: false,
@@ -140,10 +248,10 @@ describe("diffBlock", () => {
 
 	test("Returns structured input unchanged for the JSON profile", () => {
 		expect(
-			diffBlock(diff, {
+			diffBlock(numberedDiff, {
 				profile: profiles.JSON,
 			}),
-		).toBe(diff);
+		).toBe(numberedDiff);
 	});
 
 	test("Ignores invalid lines and preserves valid blank lines", () => {
