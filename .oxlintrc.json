@@ -14,7 +14,7 @@
 		"builtin": true,
 		"node": true
 	},
-	"ignorePatterns": ["node_modules/**", "**/dist/*", ".codebase-memory/**", ".boilersuit/**"],
+	"ignorePatterns": ["node_modules/**", "**/dist/*", "**/.*"],
 	"rules": {
 		"no-case-declarations": "error",
 		"no-empty": "error",

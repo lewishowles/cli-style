@@ -1,11 +1,5 @@
 {
-	"ignorePatterns": [
-		".codebase-memory/**",
-		".boilersuit/**",
-		"node_modules/**",
-		"dist/**",
-		"build/**"
-	],
+	"ignorePatterns": ["node_modules/**", "dist/**", "build/**", "**/.*"],
 	"htmlWhitespaceSensitivity": "ignore",
 	"printWidth": 100,
 	"semi": true,
