@@ -158,7 +158,7 @@ describe("Adapter smoke tests", () => {
 		expect(lines[6]).toBe("Config     => C:\\repo\\setup.json");
 		expect(lines[7]).toContain("\u001b[2m");
 		expect(stripAnsi(lines[7])).toBe("Weighted");
-		expect(lines[8]).toBe("\u001b[38;2;122;138;146mSource\u001b[0m  value");
+		expect(lines[8]).toBe("\u001b[38;5;246mSource\u001b[0m  value");
 		expect(lines[9]).toBe("Saved --");
 		expect(result.stderr).toBe("");
 	});
@@ -385,7 +385,7 @@ describe("Adapter smoke tests", () => {
 		expect(lines[5]).toBe("Config     => C:\\repo\\setup.json");
 		expect(lines[6]).toContain("\u001b[2m");
 		expect(stripAnsi(lines[6])).toBe("Weighted");
-		expect(lines[7]).toBe("\u001b[38;2;122;138;146mSource\u001b[0m  value");
+		expect(lines[7]).toBe("\u001b[38;5;246mSource\u001b[0m  value");
 		expect(lines[8]).toBe("Saved --");
 		expect(result.stderr).toBe("");
 	});

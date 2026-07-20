@@ -40,7 +40,7 @@ describe("Initialisation", () => {
 			isDumb: false,
 			isTty: false,
 			profile: profiles.HUMAN,
-			theme: "auto",
+			theme: "dark",
 			unicode: true,
 			width: 80,
 		});

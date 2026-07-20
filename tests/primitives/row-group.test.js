@@ -90,7 +90,7 @@ describe("rowGroup", () => {
 			],
 		});
 
-		expect(output).toContain("\u001b[38;2;143;223;114mOne");
+		expect(output).toContain("\u001b[38;5;114mOne");
 		expect(stripAnsi(output).split("\n")[0]).toBe("One    => value");
 	});
 });
