@@ -582,6 +582,31 @@ const reporter = createReporter({
 });
 ```
 
+## Spinner
+
+Use a spinner when a JavaScript script runs a long task and needs progress feedback. Spinner output always goes to stderr, so piped or JSON stdout stays clean. On a non-interactive target (CI, plain, JSON, agent profiles, or non-TTY stdout) it prints a static start line and result line instead of animating.
+
+```js
+import { createCliStyle } from "@lewishowles/cli-style";
+
+const ui = createCliStyle();
+
+await ui.spinner.run("Building", async () => {
+	await runBuild();
+});
+```
+
+For cases that don't fit one awaited call, use the manual handle:
+
+```js
+const spinner = ui.spinner("Building");
+
+spinner.update("Building (2/3)");
+spinner.succeed("Build complete");
+```
+
+Only one spinner can be active at a time; starting a second while one is running throws.
+
 ## Options and flags
 
 ### JavaScript options

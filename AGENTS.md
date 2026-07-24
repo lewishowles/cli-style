@@ -17,6 +17,7 @@ Planned functionality:
 - Pure string renderers for chips, panels, statuses, tables, rows, progress bars, bar charts, dividers, hints, and error blocks
 - Opinionated patterns for diagnostics, command results, agent transcripts, audit findings, compact data tables, confirmation results, and next-step blocks
 - A read-only gallery command to review every style before adoption
+- A spinner/loading indicator for long-running tasks, with a manual handle and a promise-wrapped `run()` helper
 
 ## Tech choices
 

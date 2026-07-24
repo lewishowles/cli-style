@@ -29,6 +29,7 @@ export {
 
 export { background, foreground, stripAnsi, style } from "./formatters/ansi.js";
 export { defaultWidth, minimumWidth, normaliseWidth } from "./formatters/width.js";
+export { renderSpinnerFrame, runSpinner, spinner } from "./interactive/spinner.js";
 export { agentTranscript } from "./patterns/agent-transcript.js";
 export { auditFinding } from "./patterns/audit-finding.js";
 export { commandResult } from "./patterns/command-result.js";

@@ -1,5 +1,6 @@
 import { resolveProfile } from "./capability/resolve-profile.js";
 import { resolveTerminalCapabilities } from "./capability/terminal.js";
+import { runSpinner, spinner as startSpinner } from "./interactive/spinner.js";
 import { profiles } from "./profiles/profiles.js";
 import { createReporter } from "./reporters/create-reporter.js";
 
@@ -23,6 +24,18 @@ export function createCliStyle(options = {}) {
 	applyExplicitOption(resolvedOptions, options, "unicode");
 	applyExplicitOption(resolvedOptions, options, "width");
 
+	const spinner = (text, spinnerOptions = {}) =>
+		startSpinner(text, {
+			...resolvedOptions,
+			...spinnerOptions,
+		});
+
+	spinner.run = (text, fn, spinnerOptions = {}) =>
+		runSpinner(text, fn, {
+			...resolvedOptions,
+			...spinnerOptions,
+		});
+
 	return {
 		options: resolvedOptions,
 		print: (value) => {
@@ -33,6 +46,7 @@ export function createCliStyle(options = {}) {
 				...resolvedOptions,
 				...reporterOptions,
 			}),
+		spinner,
 		write: (value) => {
 			process.stdout.write(value);
 		},

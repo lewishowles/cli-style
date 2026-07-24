@@ -8,6 +8,7 @@ import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { stripAnsi } from "../formatters/ansi.js";
+import { renderSpinnerFrame } from "../interactive/spinner.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
@@ -131,6 +132,7 @@ export const galleryFixtures = [
 	"next-step-block",
 	"diff-block",
 	"sparkline",
+	"spinner",
 ];
 
 /**
@@ -183,11 +185,7 @@ function renderVariant(variant, options, request) {
 	const sections = [];
 
 	if (request.fixture !== undefined) {
-		sections.push(
-			request.fixture === "sparkline"
-				? renderSparklineFixture(resolvedVariant.options)
-				: renderPatterns(resolvedVariant.options, request.fixture),
-		);
+		sections.push(renderFocusedFixture(request.fixture, resolvedVariant.options));
 	} else {
 		if (request.section === undefined || request.section === "primitives") {
 			sections.push(renderPrimitives(resolvedVariant.options));
@@ -677,6 +675,40 @@ function renderSparklineFixture(options) {
 }
 
 /**
+ * Render the focused spinner fixture.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Framed spinner fixture output.
+ */
+function renderSpinnerFixture(options) {
+	return ["Spinner", frameExample(renderSpinnerExample(options), options)].join("\n");
+}
+
+/**
+ * Render one fixture selected through `--fixture`.
+ *
+ * @param  {string}  fixture
+ *     Requested fixture name.
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Framed fixture output.
+ */
+function renderFocusedFixture(fixture, options) {
+	if (fixture === "sparkline") {
+		return renderSparklineFixture(options);
+	}
+
+	if (fixture === "spinner") {
+		return renderSpinnerFixture(options);
+	}
+
+	return renderPatterns(options, fixture);
+}
+
+/**
  * Add gallery-only framing around one rendered example.
  *
  * @param  {string}  output
@@ -718,6 +750,9 @@ function renderPrimitives(options) {
 		"",
 		"Progress bars",
 		...renderProgressExamples(options),
+		"",
+		"Spinner",
+		renderSpinnerExample(options),
 		"",
 		"Bar charts",
 		renderBarChartExample(options),
@@ -910,6 +945,26 @@ function renderSparklineExample(options) {
 			}),
 		)
 		.join("\n");
+}
+
+/**
+ * Render static loading, success, and fail frames for the spinner primitive.
+ *
+ * The gallery shows fixed snapshots rather than a live animation, so no timer is started.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Spinner state examples.
+ */
+function renderSpinnerExample(options) {
+	const label = "Running task";
+
+	return [
+		renderSpinnerFrame(label, 0, options),
+		status(resultTypes.SUCCESS, "", { ...options, label }),
+		status(resultTypes.FAILED, "", { ...options, label }),
+	].join("\n");
 }
 
 /**
