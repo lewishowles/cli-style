@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.11.0 - 2026-07-24
+
+### Added
+
+- Added a spinner/loading indicator for long-running JavaScript tasks: `ui.spinner.run(text, fn)` wraps a single async call, and `ui.spinner(text)` returns a handle (`update`, `succeed`, `fail`, `stop`) for cases that don't fit one call. Output always goes to stderr, animates only on an interactive terminal, and falls back to a static start/result line under CI, plain, JSON, or agent profiles. JavaScript-only; not available through the Bash, Python, or Swift adapters.
+
 ## 0.10.0 - 2026-07-20
 
 ### Added
