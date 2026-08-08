@@ -32,14 +32,14 @@
 		"check": "vp check --fix",
 		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
 		"package:binary": "scripts/package-binary.sh",
-		"prepare": "vp config",
+		"prepare": "vp config --no-agent",
 		"smoke:binary": "./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json",
 		"test:unit": "bun test"
 	},
 	"devDependencies": {
 		"@stylistic/eslint-plugin": "^5.10.0",
-		"vite": "npm:@voidzero-dev/vite-plus-core@0.2.1",
-		"vite-plus": "0.2.1"
+		"vite": "npm:@voidzero-dev/vite-plus-core@0.2.8",
+		"vite-plus": "0.2.8"
 	},
 	"engines": {
 		"node": ">=20"
