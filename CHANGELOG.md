@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.12.1 - 2026-08-20
+
+### Fixed
+
+- Fixed `row()` (and `rowGroup()`) wrapping long values one character per line when a long label left very little room for the value. Values now print unwrapped when the available width is too small to wrap usefully; an explicit `wrapWidth` still overrides the fallback.
+
 ## 0.12.0 - 2026-08-20
 
 ### Added
