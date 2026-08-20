@@ -91,22 +91,39 @@ describe("row", () => {
 		expect(output).toBe("Details  one two\n         three four");
 	});
 
-	test("Uses the terminal width when a wrapping width is not provided", () => {
+	test("Uses the terminal width to wrap a value when wrapping width is not provided", () => {
 		const output = row("Details", "one two three four", {
 			colour: false,
-			width: 12,
+			width: 24,
+		});
+
+		expect(output).toBe("Details  one two three\n         four");
+	});
+
+	test("Uses an explicit wrapping width when a long label leaves no automatic width", () => {
+		const label = "A".repeat(100);
+
+		const output = row(label, "one two three", {
+			colour: false,
+			width: 80,
+			wrapWidth: 5,
 		});
 
 		expect(output).toBe(
-			[
-				"Details  one",
-				`${" ".repeat(9)}two`,
-				`${" ".repeat(9)}thr`,
-				`${" ".repeat(9)}ee`,
-				`${" ".repeat(9)}fou`,
-				`${" ".repeat(9)}r`,
-			].join("\n"),
+			[`${label}  one`, `${" ".repeat(102)}two`, `${" ".repeat(102)}three`].join("\n"),
 		);
+	});
+
+	test("Keeps values unwrapped when a label exceeds the terminal width", () => {
+		const label = "A".repeat(100);
+		const value = "pending (chk_example)";
+
+		const output = row(label, value, {
+			colour: false,
+			width: 80,
+		});
+
+		expect(output).toBe(`${label}  ${value}`);
 	});
 
 	test("Passes through raw values when wrapping is disabled", () => {

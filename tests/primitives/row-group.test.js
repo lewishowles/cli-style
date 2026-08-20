@@ -114,4 +114,17 @@ describe("rowGroup", () => {
 		expect(output).toContain("One  one two\n     three four");
 		expect(output).toContain("Two  keeps this raw value together");
 	});
+
+	test("Keeps values unwrapped when a shared label exceeds the terminal width", () => {
+		const label = "A".repeat(100);
+		const value = "pending (chk_example)";
+
+		const output = rowGroup({
+			colour: false,
+			rows: [{ label, value }],
+			width: 80,
+		});
+
+		expect(output).toBe(`${label}  ${value}`);
+	});
 });

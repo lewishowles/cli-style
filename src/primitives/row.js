@@ -11,6 +11,9 @@ const defaultSeparator = "  ";
 // Keeps a wrapped value within a typical narrow terminal column.
 const defaultWrapWidth = 64;
 
+// Avoid character-per-line wrapping when labels leave no useful value width.
+const minimumWrapWidth = 10;
+
 /**
  * Render a labelled value row.
  *
@@ -33,7 +36,9 @@ const defaultWrapWidth = 64;
  * @param  {string}  options.valueColour
  *     Optional colour token for the value.
  * @param  {number}  options.width
- *     Total row width used to calculate the available value width.
+ *     Total row width used to calculate the available value width. When a
+ *     long label leaves less than the minimum wrap width, the value renders
+ *     unwrapped on one line instead of wrapping.
  * @param  {boolean}  options.wrap
  *     Set to false to keep the value on one line instead of wrapping it.
  * @param  {number}  options.wrapWidth
@@ -54,16 +59,23 @@ export function row(label, value = "", options = {}) {
 
 	const renderedValue = renderValue(value, options);
 	const separator = options.separator ?? defaultSeparator;
+	const unwrappedRow = `${renderedLabel}${separator}${renderedValue}`;
 
 	if (options.wrap === false) {
-		return `${renderedLabel}${separator}${renderedValue}`;
+		return unwrappedRow;
 	}
 
-	const wrapWidth =
-		options.wrapWidth ??
-		(Number.isFinite(options.width)
-			? Math.max(1, options.width - labelWidth - separator.length)
-			: defaultWrapWidth);
+	const availableWrapWidth = Number.isFinite(options.width)
+		? options.width - labelWidth - separator.length
+		: defaultWrapWidth;
+
+	const hasExplicitWrapWidth = options.wrapWidth !== undefined && options.wrapWidth !== null;
+
+	if (!hasExplicitWrapWidth && availableWrapWidth < minimumWrapWidth) {
+		return unwrappedRow;
+	}
+
+	const wrapWidth = options.wrapWidth ?? availableWrapWidth;
 
 	const valueLines = wrapText(value, wrapWidth);
 	const continuationIndent = " ".repeat(labelWidth + separator.length);

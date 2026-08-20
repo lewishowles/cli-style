@@ -831,6 +831,10 @@ function renderPrimitives(options) {
 				wrap: false,
 			},
 		),
+		row("Long label ".repeat(10), "pending (chk_example)", {
+			...options,
+			width: 80,
+		}),
 		"",
 		"Row groups",
 		rowGroup({
