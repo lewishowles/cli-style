@@ -1,5 +1,6 @@
 import { foreground, style } from "../formatters/ansi.js";
 import { getResultSymbol, resultTypes } from "../theme/results.js";
+import { labelledLine } from "./labelled-line.js";
 import { panel } from "./panel.js";
 
 /**
@@ -15,15 +16,11 @@ import { panel } from "./panel.js";
  *     Rendered hint.
  */
 export function hint(message = "", options = {}) {
-	const prefix = "i Hint:";
-
-	if (options.colour !== true) {
-		return `${prefix} ${message}`;
-	}
-
-	const renderedPrefix = style(foreground(prefix, "info", options), "bold", options);
-
-	return `${renderedPrefix} ${message}`;
+	return labelledLine("Hint", message, {
+		icon: "i",
+		tone: "info",
+		...options,
+	});
 }
 
 /**

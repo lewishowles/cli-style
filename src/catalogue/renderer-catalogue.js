@@ -25,6 +25,13 @@ export const rendererCatalogue = [
 	["empty-state", "primitive", "emptyState", ["detail", "title"], undefined],
 	["error-block", "primitive", "errorBlock", ["lines", "title"], undefined],
 	["hint", "primitive", "hint", ["message"], undefined],
+	[
+		"labelled-line",
+		"primitive",
+		"labelledLine",
+		["icon", "label", "message", "wrap", "wrapWidth"],
+		undefined,
+	],
 	["next-step-block", "pattern", "nextStepBlock", ["next", "reason"], "next-step-block"],
 	["panel", "primitive", "panel", ["lines", "title", "tone"], undefined],
 	["progress-bar", "primitive", "progressBar", ["max", "value"], undefined],

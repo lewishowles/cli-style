@@ -43,6 +43,7 @@ export { barChart } from "./primitives/bar-chart.js";
 export { chip } from "./primitives/chip.js";
 export { divider } from "./primitives/divider.js";
 export { emptyState, errorBlock, hint } from "./primitives/feedback.js";
+export { labelledLine } from "./primitives/labelled-line.js";
 export { panel } from "./primitives/panel.js";
 export { progressBar } from "./primitives/progress-bar.js";
 export { row } from "./primitives/row.js";

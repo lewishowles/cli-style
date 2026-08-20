@@ -11,6 +11,7 @@ import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
 import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
+import { labelledLine } from "../primitives/labelled-line.js";
 import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
@@ -59,6 +60,11 @@ const renderers = {
 		}),
 	hint: (input, options) =>
 		hint(input.message, {
+			...input,
+			...options,
+		}),
+	"labelled-line": (input, options) =>
+		labelledLine(input.label, input.message, {
 			...input,
 			...options,
 		}),

@@ -143,6 +143,10 @@ describe("Adapter smoke tests", () => {
 			],
 			{
 				encoding: "utf8",
+				env: {
+					...process.env,
+					TERM: "xterm-256color",
+				},
 			},
 		);
 
@@ -345,6 +349,7 @@ describe("Adapter smoke tests", () => {
 		const environment = {
 			...process.env,
 			FORCE_COLOR: "1",
+			TERM: "xterm-256color",
 		};
 
 		delete environment.NO_COLOR;
@@ -687,7 +692,7 @@ describe("Adapter smoke tests", () => {
 					"  }",
 					"}",
 					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && env -u NO_COLOR FORCE_COLOR=1 /tmp/cli-style-swift-bin",
+					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 /tmp/cli-style-swift-bin",
 				].join("\n"),
 			],
 			{

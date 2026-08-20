@@ -13,6 +13,7 @@ import { barChart } from "../primitives/bar-chart.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
 import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
+import { labelledLine } from "../primitives/labelled-line.js";
 import { panel } from "../primitives/panel.js";
 import { progressBar } from "../primitives/progress-bar.js";
 import { row } from "../primitives/row.js";
@@ -771,6 +772,11 @@ function renderPrimitives(options) {
 		"",
 		"Feedback",
 		hint(`Run ${span("npm run docs:readme", "info", options)}`, options),
+		labelledLine("Notice", "Reusable labelled output", {
+			...options,
+			icon: "!",
+			tone: "warning",
+		}),
 		emptyState("No results", "tone: muted", options),
 		errorBlock("Failed", ["tone: danger"], {
 			...options,
