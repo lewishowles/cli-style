@@ -808,6 +808,23 @@ function renderPrimitives(options) {
 			labelWidth: 8,
 			result: resultTypes.FAILED,
 		}),
+		row(
+			"Description",
+			"This value wraps at the default width so long diagnostic details remain readable in a terminal.",
+			{
+				...options,
+				labelWidth: 11,
+			},
+		),
+		row(
+			"Raw output",
+			"This long value keeps its original line because wrapping is disabled for raw output.",
+			{
+				...options,
+				labelWidth: 11,
+				wrap: false,
+			},
+		),
 		"",
 		"Row groups",
 		rowGroup({
@@ -829,6 +846,10 @@ function renderPrimitives(options) {
 					label: "Bundle",
 					result: resultTypes.FAILED,
 					value: "is 22.3 KB, above the 12.0 KB budget",
+				},
+				{
+					label: "Description",
+					value: "This group value inherits the default wrapping used by each row in the group.",
 				},
 			],
 		}),

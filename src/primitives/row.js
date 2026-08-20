@@ -1,4 +1,5 @@
 import { foreground } from "../formatters/ansi.js";
+import { wrapText } from "../formatters/wrap.js";
 import { getResultSymbol, getResultToken } from "../theme/results.js";
 
 // Row labels use the same subdued tone as table headers by default.
@@ -6,6 +7,9 @@ const defaultLabelColour = "muted";
 
 // Rows use a compact gap that still reads cleanly in plain terminals.
 const defaultSeparator = "  ";
+
+// Keeps a wrapped value within a typical narrow terminal column.
+const defaultWrapWidth = 64;
 
 /**
  * Render a labelled value row.
@@ -28,6 +32,12 @@ const defaultSeparator = "  ";
  *     Text between label and value.
  * @param  {string}  options.valueColour
  *     Optional colour token for the value.
+ * @param  {number}  options.width
+ *     Total row width used to calculate the available value width.
+ * @param  {boolean}  options.wrap
+ *     Set to false to keep the value on one line instead of wrapping it.
+ * @param  {number}  options.wrapWidth
+ *     Column width at which a value wraps onto a new line.
  * @returns  {string}
  *     Rendered row.
  */
@@ -45,7 +55,22 @@ export function row(label, value = "", options = {}) {
 	const renderedValue = renderValue(value, options);
 	const separator = options.separator ?? defaultSeparator;
 
-	return `${renderedLabel}${separator}${renderedValue}`;
+	if (options.wrap === false) {
+		return `${renderedLabel}${separator}${renderedValue}`;
+	}
+
+	const wrapWidth =
+		options.wrapWidth ??
+		(Number.isFinite(options.width)
+			? Math.max(1, options.width - labelWidth - separator.length)
+			: defaultWrapWidth);
+
+	const valueLines = wrapText(value, wrapWidth);
+	const continuationIndent = " ".repeat(labelWidth + separator.length);
+	const renderedValueLines = valueLines.map((line) => renderValue(line, options));
+	const wrappedValue = renderedValueLines.join(`\n${continuationIndent}`);
+
+	return `${renderedLabel}${separator}${wrappedValue}`;
 }
 
 /**

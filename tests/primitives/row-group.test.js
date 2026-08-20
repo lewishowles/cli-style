@@ -93,4 +93,25 @@ describe("rowGroup", () => {
 		expect(output).toContain("\u001b[38;5;114mOne");
 		expect(stripAnsi(output).split("\n")[0]).toBe("One    => value");
 	});
+
+	test("Passes wrapping options through to each row", () => {
+		const output = rowGroup({
+			colour: false,
+			rows: [
+				{
+					label: "One",
+					value: "one two three four",
+				},
+				{
+					label: "Two",
+					value: "keeps this raw value together",
+					wrap: false,
+				},
+			],
+			wrapWidth: 12,
+		});
+
+		expect(output).toContain("One  one two\n     three four");
+		expect(output).toContain("Two  keeps this raw value together");
+	});
 });
