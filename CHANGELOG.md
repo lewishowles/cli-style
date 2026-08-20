@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.12.0 - 2026-08-20
+
+### Added
+
+- Added `labelledLine(label, message, options)`, a general icon/label/message renderer with a configurable tone. `hint()` now delegates to it instead of duplicating its own rendering, with unchanged output for existing callers.
+- `row()` now wraps long values within the available row width (64 columns by default), instead of overflowing the line. Override with `wrapWidth`, or disable with `wrap: false`.
+
 ## 0.11.0 - 2026-07-24
 
 ### Added
