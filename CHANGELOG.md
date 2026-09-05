@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.13.0 - 2026-09-05
+
+### Added
+
+- Added Python `table()` and `row_group()` wrapper functions to the Python adapter, matching the existing shell/JS renderers.
+- `table()` columns can now set `maxWidth` and `overflow` (`'truncate'`, the default, or `'wrap'`) to cap a column's width and control how long values render within it.
+
 ## 0.12.1 - 2026-08-20
 
 ### Fixed
