@@ -70,6 +70,93 @@ describe("table", () => {
 		);
 	});
 
+	test("Truncates capped columns without falling back to blocks", () => {
+		const output = table({
+			colour: false,
+			columns: [
+				{
+					key: "source",
+					label: "Source",
+				},
+				{
+					key: "path",
+					label: "Path",
+					maxWidth: 10,
+				},
+			],
+			rows: [
+				{
+					path: "configuration/agents/skills",
+					source: "Build",
+				},
+			],
+			width: 20,
+		});
+
+		expect(output).toBe(["Source  Path", "──────  ──────────", "Build   configura…"].join("\n"));
+	});
+
+	test("Truncates capped headers without column drift", () => {
+		const output = table({
+			colour: false,
+			columns: [
+				{
+					key: "path",
+					label: "Path",
+					maxWidth: 3,
+				},
+				{
+					key: "extra",
+					label: "Extra",
+				},
+			],
+			rows: [
+				{
+					extra: "x",
+					path: "configuration/agents/skills",
+				},
+			],
+			width: 30,
+		});
+
+		expect(output).toBe(["Pa…  Extra", "───  ─────", "co…  x"].join("\n"));
+	});
+
+	test("Wraps capped columns without falling back to blocks", () => {
+		const output = table({
+			colour: false,
+			columns: [
+				{
+					key: "source",
+					label: "Source",
+				},
+				{
+					key: "path",
+					label: "Path",
+					maxWidth: 10,
+					overflow: "wrap",
+				},
+			],
+			rows: [
+				{
+					path: "configuration/agents/skills",
+					source: "Build",
+				},
+			],
+			width: 20,
+		});
+
+		expect(output).toBe(
+			[
+				"Source  Path",
+				"──────  ──────────",
+				"Build   configurat",
+				"        ion/agents",
+				"        /skills",
+			].join("\n"),
+		);
+	});
+
 	test("Uses an ASCII header rule when Unicode is disabled", () => {
 		const output = table({
 			colour: false,

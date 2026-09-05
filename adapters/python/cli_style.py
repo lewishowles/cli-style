@@ -159,6 +159,50 @@ def row(
 	return render("row", data, **kwargs)
 
 
+# Render an aligned table from Python values.
+#
+# @param  {list[dict[str, Any]]}  columns
+#     Table column definitions, including per-column overflow settings.
+# @param  {list[dict[str, Any]]}  rows
+#     Table row values.
+# @param  {bool|None}  unicode
+#     Optional Unicode border preference.
+# @param  {int|None}  width
+#     Optional table width.
+def table(
+	columns: list[dict[str, Any]],
+	rows: list[dict[str, Any]],
+	*,
+	unicode: bool | None = None,
+	width: int | None = None,
+	**kwargs: Any,
+) -> str:
+	return render("table", {
+		"columns": columns,
+		"rows": rows,
+		"unicode": unicode,
+		"width": width,
+	}, **kwargs)
+
+
+# Render a group of labelled value rows from Python values.
+#
+# @param  {list[dict[str, Any]]}  rows
+#     Labelled values to render together.
+# @param  {int|None}  label_width
+#     Optional minimum label width.
+def row_group(
+	rows: list[dict[str, Any]],
+	*,
+	label_width: int | None = None,
+	**kwargs: Any,
+) -> str:
+	return render("row-group", {
+		"rows": rows,
+		"labelWidth": label_width,
+	}, **kwargs)
+
+
 # Render an inline span from Python values.
 #
 # @param  {str}  value

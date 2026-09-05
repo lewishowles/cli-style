@@ -764,6 +764,12 @@ function renderPrimitives(options) {
 		"Tables",
 		renderTableExample(options),
 		"",
+		"Truncated tables",
+		renderOverflowTableExample(options, "truncate"),
+		"",
+		"Wrapped tables",
+		renderOverflowTableExample(options, "wrap"),
+		"",
 		"Narrow tables",
 		renderTableExample({
 			...options,
@@ -895,6 +901,40 @@ function renderTableExample(options) {
 			{
 				check: "unit",
 				result: "warning",
+			},
+		],
+	});
+}
+
+/**
+ * Render a table with a long-detail column capped by maxWidth.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @param  {string}  overflow
+ *     Overflow mode ('truncate' or 'wrap') for the capped column.
+ * @returns  {string}
+ *     Table example.
+ */
+function renderOverflowTableExample(options, overflow) {
+	return table({
+		...options,
+		columns: [
+			{
+				key: "source",
+				label: "Source",
+			},
+			{
+				key: "detail",
+				label: "Detail",
+				maxWidth: 28,
+				overflow,
+			},
+		],
+		rows: [
+			{
+				detail: "packages/cli-style/src/primitives/table.js",
+				source: "Table",
 			},
 		],
 	});

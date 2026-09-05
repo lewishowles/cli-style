@@ -1,8 +1,6 @@
 import { foreground } from "../formatters/ansi.js";
+import { defaultWidth, minimumWidth, normaliseWidth } from "../formatters/width.js";
 import { tableColours } from "../theme/colours.js";
-
-// Tables assume a standard terminal width when no capability is provided.
-const defaultWidth = 80;
 
 // Columns use a compact but readable gap.
 const columnSeparator = "  ";
@@ -15,7 +13,9 @@ const columnSeparator = "  ";
  * @param  {boolean}  options.colour
  *     Whether ANSI colour should be applied.
  * @param  {object[]}  options.columns
- *     Column keys and labels.
+ *     Column keys and labels. A column may set maxWidth to cap its width,
+ *     with overflow ('truncate', the default, or 'wrap') controlling how
+ *     values beyond that width render.
  * @param  {object[]}  options.rows
  *     Table records.
  * @param  {boolean}  options.unicode
@@ -39,7 +39,18 @@ export function table(options = {}) {
 		widths.reduce((total, width) => total + width, 0) +
 		columnSeparator.length * (columns.length - 1);
 
-	const availableWidth = Number.isFinite(options.width) ? options.width : defaultWidth;
+	const requestedWidth = Number.isFinite(options.width) ? options.width : undefined;
+
+	// Let a requested width smaller than minimumWidth pass through unclamped.
+	const minimumTableWidth =
+		requestedWidth === undefined
+			? minimumWidth
+			: Math.max(1, Math.min(requestedWidth, minimumWidth));
+
+	const availableWidth = normaliseWidth(requestedWidth, {
+		defaultWidth,
+		minWidth: minimumTableWidth,
+	});
 
 	if (naturalWidth > availableWidth) {
 		return renderBlocks(columns, rows, options);
@@ -99,9 +110,65 @@ function normaliseRows(rows) {
  *     Column widths.
  */
 function columnWidths(columns, rows) {
-	return columns.map((column) =>
-		Math.max(column.label.length, ...rows.map((row) => cellValue(row[column.key]).length)),
-	);
+	return columns.map((column) => {
+		const naturalWidth = Math.max(
+			column.label.length,
+			...rows.map((row) => cellValue(row[column.key]).length),
+		);
+
+		const maxWidth = columnMaxWidth(column);
+
+		return maxWidth === null ? naturalWidth : Math.min(naturalWidth, maxWidth);
+	});
+}
+
+/**
+ * Return a column's configured width cap, if any.
+ *
+ * @param  {object}  column
+ *     Table column.
+ * @returns  {number|null}
+ *     Normalised maxWidth, or null when the column has none.
+ */
+function columnMaxWidth(column) {
+	if (!Number.isFinite(column.maxWidth) || column.maxWidth < 1) {
+		return null;
+	}
+
+	return normaliseWidth(column.maxWidth, {
+		defaultWidth: 1,
+		minWidth: 1,
+	});
+}
+
+/**
+ * Split a cell's value into the lines it renders as within a fixed-width column.
+ *
+ * @param  {string}  value
+ *     Cell value.
+ * @param  {object}  column
+ *     Table column, read for its overflow mode.
+ * @param  {number}  width
+ *     Column width.
+ * @returns  {string[]}
+ *     Lines the cell renders as; truncated to one line with a trailing
+ *     ellipsis unless the column's overflow is 'wrap'.
+ */
+function columnLines(value, column, width) {
+	if (value.length <= width) {
+		return [value];
+	}
+
+	if (column.overflow === "wrap") {
+		return Array.from(
+			{
+				length: Math.ceil(value.length / width),
+			},
+			(_, index) => value.slice(index * width, (index + 1) * width),
+		);
+	}
+
+	return [`${value.slice(0, width - 1)}…`];
 }
 
 /**
@@ -120,9 +187,11 @@ function columnWidths(columns, rows) {
  */
 function renderTable(columns, rows, widths, options) {
 	const header = columns
-		.map((column, index) =>
-			renderHeader(padColumn(column.label, widths[index], index, columns.length), options),
-		)
+		.map((column, index) => {
+			const headerLine = columnLines(column.label, { overflow: "truncate" }, widths[index])[0];
+
+			return renderHeader(padColumn(headerLine, widths[index], index, columns.length), options);
+		})
 		.join(columnSeparator);
 
 	const ruleCharacter = options.unicode === false ? "-" : "─";
@@ -131,17 +200,29 @@ function renderTable(columns, rows, widths, options) {
 	const renderedRule =
 		options.colour === true ? foreground(rule, tableColours.border, options) : rule;
 
-	const body = rows.map((row) =>
-		columns
-			.map((column, index) =>
-				renderCell(
-					padColumn(cellValue(row[column.key]), widths[index], index, columns.length),
-					index,
-					options,
-				),
-			)
-			.join(columnSeparator),
-	);
+	const body = rows.flatMap((row) => {
+		const lines = columns.map((column, index) =>
+			columnLines(cellValue(row[column.key]), column, widths[index]),
+		);
+
+		const lineCount = Math.max(...lines.map((column) => column.length));
+
+		return Array.from(
+			{
+				length: lineCount,
+			},
+			(_, lineIndex) =>
+				columns
+					.map((column, index) =>
+						renderCell(
+							padColumn(lines[index][lineIndex] ?? "", widths[index], index, columns.length),
+							index,
+							options,
+						),
+					)
+					.join(columnSeparator),
+		);
+	});
 
 	return [header, renderedRule, ...body].join("\n");
 }

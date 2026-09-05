@@ -395,6 +395,30 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Python adapter table and row group functions render data", () => {
+		const result = spawnSync(
+			"python3",
+			[
+				"-c",
+				[
+					"from adapters.python.cli_style import row_group, table",
+					"kwargs = {'binary': './bin/cli-style.js', 'plain': True}",
+					"print(table([{'key': 'name', 'label': 'Name'}], [{'name': 'Build'}], unicode=False, width=80, **kwargs))",
+					"print(row_group([{'label': 'Name', 'value': 'cli-style'}, {'label': 'Version', 'value': '0.12.1'}], label_width=10, **kwargs))",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toBe(
+			["Name", "-----", "Build", "Name        cli-style", "Version     0.12.1"].join("\n"),
+		);
+		expect(result.stderr).toBe("");
+	});
+
 	test("Python adapter pattern convenience functions handle dynamic strings", () => {
 		const result = spawnSync(
 			"python3",
