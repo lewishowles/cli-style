@@ -69,7 +69,8 @@ function renderChecks(checks, options) {
 		status(check.result, formatLabel(check.name, check.detail, options), options),
 	);
 
-	return renderSection("Checks", lines, options);
+	// Status lines already start with a symbol, so only agent Markdown adds bullets.
+	return renderSection("Checks", lines, options, options.profile === profiles.AGENT);
 }
 
 /**
@@ -89,7 +90,8 @@ function renderFindings(findings, options) {
 
 	const lines = validFindings.map((finding) => status(finding.result, finding.message, options));
 
-	return renderSection("Findings", lines, options);
+	// Only agent Markdown adds bullets beside the status symbol.
+	return renderSection("Findings", lines, options, options.profile === profiles.AGENT);
 }
 
 /**
@@ -111,7 +113,8 @@ function renderSkippedChecks(skippedChecks, options) {
 		status(resultTypes.SKIPPED, formatLabel(check.name, check.reason, options), options),
 	);
 
-	return renderSection("Skipped checks", lines, options);
+	// Only agent Markdown adds bullets beside the status symbol.
+	return renderSection("Skipped checks", lines, options, options.profile === profiles.AGENT);
 }
 
 /**

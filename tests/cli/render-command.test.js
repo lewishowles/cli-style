@@ -96,8 +96,8 @@ describe("renderJsonInput", () => {
 		);
 
 		expect(output).toContain("Task summary");
-		expect(output).toContain("- Added render command");
-		expect(output).toContain("- Add adapters");
+		expect(output).toContain("• Added render command");
+		expect(output).toContain("• Add adapters");
 	});
 
 	test("Renders a structured diff block from caller JSON", () => {

@@ -29,8 +29,8 @@ describe("commandResult", () => {
 				"Duration   250 ms",
 				"",
 				"Details",
-				"- 111 tests passed",
-				"- Log saved to .agent/diagnostics/test-unit.log",
+				"• 111 tests passed",
+				"• Log saved to .agent/diagnostics/test-unit.log",
 			].join("\n"),
 		);
 	});

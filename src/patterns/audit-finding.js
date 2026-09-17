@@ -48,15 +48,15 @@ export function auditFinding(finding, options = {}) {
 
 	const title = isNonEmptyString(finding.title) ? finding.title : defaultTitle;
 	const summary = isNonEmptyString(finding.finding) ? finding.finding : "";
-	const evidence = normaliseStringList(finding.evidence).map((item) => `- ${item}`);
-	const references = normaliseStringList(finding.references).map((item) => `- ${item}`);
+	const evidence = normaliseStringList(finding.evidence);
+	const references = normaliseStringList(finding.references);
 
 	const sections = [
 		status(finding.result ?? resultTypes.UNKNOWN, summary, options),
 		renderLocation(finding.location, options),
-		renderSection("Evidence", evidence, options, false),
+		renderSection("Evidence", evidence, options, true),
 		renderTextSection("Recommendation", finding.recommendation, options),
-		renderSection("References", references, options, false),
+		renderSection("References", references, options, true),
 	].filter((section) => section !== "");
 
 	return [renderTitle(title, options), ...sections].join("\n\n");

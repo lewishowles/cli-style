@@ -30,7 +30,7 @@ describe("nextStepBlock", () => {
 				"$ bun run test:unit",
 				"",
 				"Alternatives",
-				"- Review the gallery first",
+				"• Review the gallery first",
 			].join("\n"),
 		);
 	});

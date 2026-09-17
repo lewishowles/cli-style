@@ -27,14 +27,14 @@ describe("auditFinding", () => {
 				"Location  src/components/StatusCard.vue:42",
 				"",
 				"Evidence",
-				"- Text contrast measures 3.2:1",
-				"- Body text requires at least 4.5:1",
+				"• Text contrast measures 3.2:1",
+				"• Body text requires at least 4.5:1",
 				"",
 				"Recommendation",
 				"Use the standard foreground token.",
 				"",
 				"References",
-				"- WCAG 2.2 SC 1.4.3",
+				"• WCAG 2.2 SC 1.4.3",
 			].join("\n"),
 		);
 	});

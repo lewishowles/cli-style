@@ -49,15 +49,13 @@ export function nextStepBlock(nextStep, options = {}) {
 
 	const commands = renderCommands(nextStep.commands, options);
 
-	const alternatives = normaliseStringList(nextStep.alternatives).map(
-		(alternative) => `- ${alternative}`,
-	);
+	const alternatives = normaliseStringList(nextStep.alternatives);
 
 	const sections = [
 		next,
 		reason,
 		commands,
-		renderSection("Alternatives", alternatives, options, false),
+		renderSection("Alternatives", alternatives, options, true),
 	].filter((section) => section !== "");
 
 	return [renderTitle(title, options), ...sections].join("\n\n");

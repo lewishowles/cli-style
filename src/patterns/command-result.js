@@ -48,13 +48,13 @@ export function commandResult(result, options = {}) {
 
 	const title = isNonEmptyString(result.title) ? result.title : defaultTitle;
 	const metadata = renderMetadata(result, options);
-	const details = normaliseStringList(result.details).map((detail) => `- ${detail}`);
+	const details = normaliseStringList(result.details);
 	const summary = isNonEmptyString(result.summary) ? result.summary : "";
 
 	const sections = [
 		status(result.result ?? resultTypes.UNKNOWN, summary, options),
 		metadata,
-		renderSection("Details", details, options, false),
+		renderSection("Details", details, options, true),
 	].filter((section) => section !== "");
 
 	return [renderTitle(title, options), ...sections].join("\n\n");

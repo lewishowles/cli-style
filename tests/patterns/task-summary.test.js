@@ -24,11 +24,63 @@ describe("taskSummary", () => {
 				"◐ Partial Add command result pattern — Implementation complete",
 				"",
 				"Completed",
-				"- Added renderer",
-				"- Added unit tests",
+				"• Added renderer",
+				"• Added unit tests",
 				"",
 				"Remaining",
-				"- Review gallery output",
+				"• Review gallery output",
+			].join("\n"),
+		);
+	});
+
+	test("Wraps completed items and aligns continuation lines", () => {
+		const output = taskSummary(
+			{
+				completed: ["Added render command"],
+				result: resultTypes.SUCCESS,
+				task: "Render task summary",
+			},
+			{
+				colour: false,
+				width: 20,
+			},
+		);
+
+		expect(output).toBe(
+			[
+				"Task summary",
+				"",
+				"✓ Success Render task summary",
+				"",
+				"Completed",
+				"• Added render",
+				"  command",
+			].join("\n"),
+		);
+	});
+
+	test("Uses ASCII bullets when Unicode is off", () => {
+		const output = taskSummary(
+			{
+				completed: ["Published package"],
+				result: resultTypes.SUCCESS,
+				task: "Release CLI style",
+			},
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: false,
+			},
+		);
+
+		expect(output).toBe(
+			[
+				"Task summary",
+				"",
+				"OK Success Release CLI style",
+				"",
+				"Completed",
+				"* Published package",
 			].join("\n"),
 		);
 	});
@@ -54,7 +106,7 @@ describe("taskSummary", () => {
 				"OK Success Release CLI style",
 				"",
 				"Completed",
-				"- Published package",
+				"* Published package",
 			].join("\n"),
 		);
 	});

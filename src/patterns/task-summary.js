@@ -47,13 +47,13 @@ export function taskSummary(summary, options = {}) {
 	const title = isNonEmptyString(summary.title) ? summary.title : defaultTitle;
 	const task = isNonEmptyString(summary.task) ? summary.task : "";
 	const detail = formatLabel(task, summary.summary, options);
-	const completed = normaliseStringList(summary.completed).map((item) => `- ${item}`);
-	const remaining = normaliseStringList(summary.remaining).map((item) => `- ${item}`);
+	const completed = normaliseStringList(summary.completed);
+	const remaining = normaliseStringList(summary.remaining);
 
 	const sections = [
 		status(summary.result ?? resultTypes.UNKNOWN, detail, options),
-		renderSection("Completed", completed, options, false),
-		renderSection("Remaining", remaining, options, false),
+		renderSection("Completed", completed, options, true),
+		renderSection("Remaining", remaining, options, true),
 	].filter((section) => section !== "");
 
 	return [renderTitle(title, options), ...sections].join("\n\n");

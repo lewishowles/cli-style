@@ -197,7 +197,7 @@ describe("Adapter smoke tests", () => {
 		expect(output).toContain("Audit finding");
 		expect(output).toContain('Found "Continue"');
 		expect(output).toContain("Task summary");
-		expect(output).toContain("- Updated adapter");
+		expect(output).toContain("* Updated adapter");
 		expect(output).toContain("Confirmation result");
 		expect(output).toContain("Tag push starts npm publish");
 		expect(output).toContain("Next step");
@@ -448,7 +448,7 @@ describe("Adapter smoke tests", () => {
 		expect(output).toContain("Audit finding");
 		expect(output).toContain('Found "Continue"');
 		expect(output).toContain("Task summary");
-		expect(output).toContain("- Updated adapter");
+		expect(output).toContain("* Updated adapter");
 		expect(output).toContain("Confirmation result");
 		expect(output).toContain("Tag push starts npm publish");
 		expect(output).toContain("Next step");
@@ -775,7 +775,7 @@ describe("Adapter smoke tests", () => {
 		expect(output).toContain("Audit finding");
 		expect(output).toContain('Found "Continue"');
 		expect(output).toContain("Task summary");
-		expect(output).toContain("- Updated adapter");
+		expect(output).toContain("* Updated adapter");
 		expect(output).toContain("Confirmation result");
 		expect(output).toContain("Tag push starts npm publish");
 		expect(output).toContain("Next step");

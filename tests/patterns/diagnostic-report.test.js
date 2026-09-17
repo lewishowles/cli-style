@@ -96,6 +96,18 @@ describe("diagnosticReport", () => {
 						result: resultTypes.SUCCESS,
 					},
 				],
+				findings: [
+					{
+						message: "Coverage below target",
+						result: resultTypes.WARNING,
+					},
+				],
+				skippedChecks: [
+					{
+						name: "e2e",
+						reason: "Browser unavailable",
+					},
+				],
 				title: "Project diagnostics",
 			},
 			{
@@ -104,7 +116,20 @@ describe("diagnosticReport", () => {
 			},
 		);
 
-		expect(output).toBe(["# Project diagnostics", "", "## Checks", "- ✓ Success unit"].join("\n"));
+		expect(output).toBe(
+			[
+				"# Project diagnostics",
+				"",
+				"## Checks",
+				"- ✓ Success unit",
+				"",
+				"## Findings",
+				"- ⚠ Warning Coverage below target",
+				"",
+				"## Skipped checks",
+				"- – Skipped e2e — Browser unavailable",
+			].join("\n"),
+		);
 	});
 
 	test("Keeps CI output plain and grep-friendly", () => {

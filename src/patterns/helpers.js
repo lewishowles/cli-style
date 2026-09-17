@@ -1,3 +1,4 @@
+import { bulletList } from "../primitives/bullet-list.js";
 import { profiles } from "../profiles/profiles.js";
 
 /**
@@ -72,7 +73,8 @@ export function normaliseStringList(values) {
  * @param  {object}  options
  *     Rendering options.
  * @param  {boolean}  listItems
- *     Whether agent output should use bullet items.
+ *     Whether to show each line as a bullet point, wrapped to the terminal
+ *     width. Pass false for single values, commands, or numbered lines.
  * @returns  {string}
  *     Rendered section.
  */
@@ -83,10 +85,15 @@ export function renderSection(title, lines, options, listItems = true) {
 
 	const heading = options.profile === profiles.AGENT ? `## ${title}` : title;
 
-	const content =
-		options.profile === profiles.AGENT && listItems ? lines.map((line) => `- ${line}`) : lines;
+	const content = listItems
+		? bulletList(lines, {
+				profile: options.profile,
+				unicode: options.unicode,
+				width: options.width,
+			})
+		: lines.join("\n");
 
-	return [heading, ...content].join("\n");
+	return [heading, content].join("\n");
 }
 
 /**
