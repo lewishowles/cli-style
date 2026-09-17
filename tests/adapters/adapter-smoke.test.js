@@ -1,4 +1,7 @@
 import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { describe, expect, test } from "bun:test";
 import { stripAnsi } from "../../src/index.js";
@@ -71,6 +74,25 @@ function normalisePseudoTerminalOutput(value) {
 		: value;
 
 	return output.replaceAll("\r", "");
+}
+
+/**
+ * Assert that a Swift adapter subprocess succeeded with useful failure details.
+ *
+ * @param  {object}  result
+ *     Spawned process result.
+ * @param  {string}  description
+ *     Command description for failure output.
+ * @returns  {void}
+ *     Nothing when the command succeeded; throws with the exit code and stderr when it failed, so
+ *     a failing Swift run can be diagnosed from the test log alone.
+ */
+function expectSwiftCommandSuccess(result, description) {
+	if (result.status !== 0) {
+		const stderr = result.stderr.trim() || "(no stderr output)";
+
+		throw new Error(`${description} failed with exit code ${result.status}: ${stderr}`);
+	}
 }
 
 describe("Adapter smoke tests", () => {
@@ -419,6 +441,30 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Python adapter bullet list function renders flat and nested items", () => {
+		const result = spawnSync(
+			"python3",
+			[
+				"-c",
+				[
+					"from adapters.python.cli_style import bullet_list",
+					"kwargs = {'binary': './bin/cli-style.js', 'plain': True}",
+					"print(bullet_list(['Install dependencies'], **kwargs))",
+					"print(bullet_list([{'text': 'Run checks', 'items': ['Review failures']}], **kwargs))",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toBe(
+			["* Install dependencies", "* Run checks", "  * Review failures"].join("\n"),
+		);
+		expect(result.stderr).toBe("");
+	});
+
 	test("Python adapter pattern convenience functions handle dynamic strings", () => {
 		const result = spawnSync(
 			"python3",
@@ -482,204 +528,228 @@ describe("Adapter smoke tests", () => {
 	});
 
 	test("Swift adapter renders through cli-style render", () => {
-		const result = spawnSync(
-			"bash",
-			[
-				"-c",
-				[
-					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
-					"@main",
-					"struct Runner {",
-					"  static func main() throws {",
-					'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true))',
-					"    print(output)",
-					"  }",
-					"}",
-					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
-				].join("\n"),
-			],
-			{
-				encoding: "utf8",
-			},
-		);
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
+		const swiftSourcePath = join(temporaryDirectory, "runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "runner");
 
-		expect(result.status).toBe(0);
-		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
-		expect(result.stderr).toBe("");
+		try {
+			const result = spawnSync(
+				"bash",
+				[
+					"-c",
+					[
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true))',
+						"    print(output)",
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
+				},
+			);
+
+			expectSwiftCommandSuccess(result, "Swift adapter render command");
+			expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
+			expect(result.stderr).toBe("");
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
+		}
 	}, 90000);
 
 	test("Swift adapter preserves TTY colour and explicit controls", () => {
-		const compileResult = spawnSync(
-			"bash",
-			[
-				"-c",
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
+		const swiftSourcePath = join(temporaryDirectory, "colour-runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "colour-bin");
+
+		try {
+			const compileResult = spawnSync(
+				"bash",
 				[
-					"cat > /tmp/cli-style-swift-colour-runner.swift <<'SWIFT'",
-					"import Foundation",
-					"@main",
-					"struct Runner {",
-					"  static func main() throws {",
-					'    var options = CliStyleOptions(binary: "./bin/cli-style.js")',
-					'    switch ProcessInfo.processInfo.environment["CLI_STYLE_TEST_MODE"] {',
-					'    case "plain":',
-					"      options.isPlain = true",
-					'    case "no-colour":',
-					"      options.isNoColour = true",
-					'    case "no-color":',
-					'      options.extraArgs = ["--no-color"]',
-					"    default:",
-					"      break",
-					"    }",
-					'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: options)',
-					"    print(output)",
-					"  }",
-					"}",
-					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-colour-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-colour-runner.swift",
-				].join("\n"),
-			],
-			{
-				encoding: "utf8",
-			},
-		);
-
-		expect(compileResult.status).toBe(0);
-
-		const cases = [
-			{
-				expectColour: true,
-				mode: "default",
-			},
-			{
-				environment: {
-					FORCE_COLOR: "1",
-					NO_COLOR: "1",
+					"-c",
+					[
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"import Foundation",
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						'    var options = CliStyleOptions(binary: "./bin/cli-style.js")',
+						'    switch ProcessInfo.processInfo.environment["CLI_STYLE_TEST_MODE"] {',
+						'    case "plain":',
+						"      options.isPlain = true",
+						'    case "no-colour":',
+						"      options.isNoColour = true",
+						'    case "no-color":',
+						'      options.extraArgs = ["--no-color"]',
+						"    default:",
+						"      break",
+						"    }",
+						'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: options)',
+						"    print(output)",
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
 				},
-				expectColour: false,
-				mode: "default",
-			},
-			{
-				environment: {
-					FORCE_COLOR: "1",
-				},
-				expectColour: false,
-				mode: "plain",
-			},
-			{
-				environment: {
-					FORCE_COLOR: "1",
-				},
-				expectColour: false,
-				mode: "no-colour",
-			},
-			{
-				environment: {
-					FORCE_COLOR: "1",
-				},
-				expectColour: false,
-				mode: "no-color",
-			},
-			{
-				environment: {
-					FORCE_COLOR: "1",
-					TERM: "dumb",
-				},
-				expectColour: false,
-				mode: "default",
-			},
-			{
-				environment: {
-					FORCE_COLOR: "0",
-				},
-				expectColour: false,
-				mode: "default",
-			},
-		];
+			);
 
-		for (const testCase of cases) {
-			const innerCommand = [
-				"env",
-				"-u",
-				"FORCE_COLOR",
-				"-u",
-				"NO_COLOR",
-				`TERM=${testCase.environment?.TERM ?? "xterm-256color"}`,
-				...(testCase.environment?.FORCE_COLOR === undefined
-					? []
-					: [`FORCE_COLOR=${testCase.environment.FORCE_COLOR}`]),
-				...(testCase.environment?.NO_COLOR === undefined
-					? []
-					: [`NO_COLOR=${testCase.environment.NO_COLOR}`]),
-				`CLI_STYLE_TEST_MODE=${testCase.mode}`,
-				"/tmp/cli-style-swift-colour-bin",
-			].join(" ");
+			expectSwiftCommandSuccess(compileResult, "Swift colour compile command");
 
-			const pseudoTerminalCommand =
-				process.platform === "darwin"
-					? `script -q /dev/null ${innerCommand}`
-					: `script -qc "${innerCommand}" /dev/null`;
+			const cases = [
+				{
+					expectColour: true,
+					mode: "default",
+				},
+				{
+					environment: {
+						FORCE_COLOR: "1",
+						NO_COLOR: "1",
+					},
+					expectColour: false,
+					mode: "default",
+				},
+				{
+					environment: {
+						FORCE_COLOR: "1",
+					},
+					expectColour: false,
+					mode: "plain",
+				},
+				{
+					environment: {
+						FORCE_COLOR: "1",
+					},
+					expectColour: false,
+					mode: "no-colour",
+				},
+				{
+					environment: {
+						FORCE_COLOR: "1",
+					},
+					expectColour: false,
+					mode: "no-color",
+				},
+				{
+					environment: {
+						FORCE_COLOR: "1",
+						TERM: "dumb",
+					},
+					expectColour: false,
+					mode: "default",
+				},
+				{
+					environment: {
+						FORCE_COLOR: "0",
+					},
+					expectColour: false,
+					mode: "default",
+				},
+			];
 
-			const result = spawnSync("bash", ["-c", pseudoTerminalCommand], {
-				encoding: "utf8",
-			});
+			for (const testCase of cases) {
+				const innerCommand = [
+					"env",
+					"-u",
+					"FORCE_COLOR",
+					"-u",
+					"NO_COLOR",
+					`TERM=${testCase.environment?.TERM ?? "xterm-256color"}`,
+					...(testCase.environment?.FORCE_COLOR === undefined
+						? []
+						: [`FORCE_COLOR=${testCase.environment.FORCE_COLOR}`]),
+					...(testCase.environment?.NO_COLOR === undefined
+						? []
+						: [`NO_COLOR=${testCase.environment.NO_COLOR}`]),
+					`CLI_STYLE_TEST_MODE=${testCase.mode}`,
+					`"${swiftBinaryPath}"`,
+				].join(" ");
 
-			const output = normalisePseudoTerminalOutput(result.stdout);
+				const pseudoTerminalCommand =
+					process.platform === "darwin"
+						? `script -q /dev/null ${innerCommand}`
+						: `script -qc '${innerCommand}' /dev/null`;
 
-			expect(result.status).toBe(0);
-			expect(output.includes("\u001b[")).toBe(testCase.expectColour);
-			expect(stripAnsi(output).trim()).toContain("Build passed 184 tests");
-			expect(result.stderr).toBe("");
+				const result = spawnSync("bash", ["-c", pseudoTerminalCommand], {
+					encoding: "utf8",
+				});
+
+				const output = normalisePseudoTerminalOutput(result.stdout);
+
+				expectSwiftCommandSuccess(result, `Swift colour ${testCase.mode} command`);
+				expect(output.includes("\u001b[")).toBe(testCase.expectColour);
+				expect(stripAnsi(output).trim()).toContain("Build passed 184 tests");
+				expect(result.stderr).toBe("");
+			}
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
 		}
 	}, 60000);
 
 	test("Swift adapter keeps non-TTY output plain unless explicitly forced", () => {
-		const compileResult = spawnSync(
-			"bash",
-			[
-				"-c",
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
+		const swiftSourcePath = join(temporaryDirectory, "non-tty-runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "non-tty-bin");
+
+		try {
+			const compileResult = spawnSync(
+				"bash",
 				[
-					"cat > /tmp/cli-style-swift-non-tty-runner.swift <<'SWIFT'",
-					"import Foundation",
-					"@main",
-					"struct Runner {",
-					"  static func main() throws {",
-					'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: CliStyleOptions(binary: "./bin/cli-style.js"))',
-					"    print(output)",
-					"  }",
-					"}",
-					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-non-tty-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-non-tty-runner.swift",
-				].join("\n"),
-			],
-			{
-				encoding: "utf8",
-			},
-		);
+					"-c",
+					[
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"import Foundation",
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						'    let output = try CliStyle.render("status", data: ["type": "success", "label": "Build passed", "detail": "184 tests"], options: CliStyleOptions(binary: "./bin/cli-style.js"))',
+						"    print(output)",
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
+				},
+			);
 
-		const plainResult = spawnSync(
-			"bash",
-			["-c", "env -u FORCE_COLOR -u NO_COLOR TERM=xterm-256color /tmp/cli-style-swift-non-tty-bin"],
-			{
-				encoding: "utf8",
-			},
-		);
+			const plainResult = spawnSync(
+				"bash",
+				["-c", `env -u FORCE_COLOR -u NO_COLOR TERM=xterm-256color "${swiftBinaryPath}"`],
+				{
+					encoding: "utf8",
+				},
+			);
 
-		const forcedResult = spawnSync(
-			"bash",
-			["-c", "env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 /tmp/cli-style-swift-non-tty-bin"],
-			{
-				encoding: "utf8",
-			},
-		);
+			const forcedResult = spawnSync(
+				"bash",
+				["-c", `env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 "${swiftBinaryPath}"`],
+				{
+					encoding: "utf8",
+				},
+			);
 
-		expect(compileResult.status).toBe(0);
-		expect(plainResult.status).toBe(0);
-		expect(plainResult.stdout).not.toContain("\u001b[");
-		expect(stripAnsi(plainResult.stdout).trim()).toContain("Build passed 184 tests");
-		expect(forcedResult.status).toBe(0);
-		expect(forcedResult.stdout).toContain("\u001b[");
-		expect(stripAnsi(forcedResult.stdout).trim()).toContain("Build passed 184 tests");
+			expectSwiftCommandSuccess(compileResult, "Swift non-TTY compile command");
+			expectSwiftCommandSuccess(plainResult, "Swift non-TTY plain command");
+			expect(plainResult.stdout).not.toContain("\u001b[");
+			expect(stripAnsi(plainResult.stdout).trim()).toContain("Build passed 184 tests");
+			expectSwiftCommandSuccess(forcedResult, "Swift non-TTY forced-colour command");
+			expect(forcedResult.stdout).toContain("\u001b[");
+			expect(stripAnsi(forcedResult.stdout).trim()).toContain("Build passed 184 tests");
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
+		}
 	}, 60000);
 
 	test("Swift adapter path is returned by cli-style adapter-path", () => {
@@ -693,125 +763,149 @@ describe("Adapter smoke tests", () => {
 	});
 
 	test("Swift adapter convenience functions handle dynamic strings", () => {
-		const result = spawnSync(
-			"bash",
-			[
-				"-c",
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
+		const swiftSourcePath = join(temporaryDirectory, "convenience-runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "convenience-bin");
+
+		try {
+			const result = spawnSync(
+				"bash",
 				[
-					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
-					"@main",
-					"struct Runner {",
-					"  static func main() throws {",
-					'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
-					'    let colourOptions = CliStyleOptions(binary: "./bin/cli-style.js")',
-					'    print(try CliStyle.status(type: "success", label: #"Saved "config""#, detail: #"C:\\repo\\setup.json"#, options: options))',
-					'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, options: options))',
-					'    print(try CliStyle.row(label: "Bundle", value: "over budget", result: "failed", options: options))',
-					'    let command = try CliStyle.span(value: "npm run docs:readme", tone: "info", options: options)',
-					'    print(try CliStyle.hint(message: "Run " + command + " before release", options: options))',
-					'    print(try CliStyle.divider(label: #"Saved "config""#, options: options))',
-					'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, labelWidth: 10, separator: " => ", options: options))',
-					'    print(try CliStyle.span(value: "Weighted", tone: "info", weight: "dim", options: colourOptions))',
-					'    print(try CliStyle.divider(label: "Saved", dividerWidth: 8, options: options))',
-					"  }",
-					"}",
-					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 /tmp/cli-style-swift-bin",
-				].join("\n"),
-			],
-			{
-				encoding: "utf8",
-			},
-		);
+					"-c",
+					[
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
+						'    let colourOptions = CliStyleOptions(binary: "./bin/cli-style.js")',
+						'    print(try CliStyle.status(type: "success", label: #"Saved "config""#, detail: #"C:\\repo\\setup.json"#, options: options))',
+						'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, options: options))',
+						'    print(try CliStyle.row(label: "Bundle", value: "over budget", result: "failed", options: options))',
+						'    let command = try CliStyle.span(value: "npm run docs:readme", tone: "info", options: options)',
+						'    print(try CliStyle.hint(message: "Run " + command + " before release", options: options))',
+						'    print(try CliStyle.divider(label: #"Saved "config""#, options: options))',
+						'    print(try CliStyle.row(label: "Config", value: #"C:\\repo\\setup.json"#, labelWidth: 10, separator: " => ", options: options))',
+						'    print(try CliStyle.span(value: "Weighted", tone: "info", weight: "dim", options: colourOptions))',
+						'    print(try CliStyle.divider(label: "Saved", dividerWidth: 8, options: options))',
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 "${swiftBinaryPath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
+				},
+			);
 
-		const lines = result.stdout.trim().split("\n");
+			const lines = result.stdout.trim().split("\n");
 
-		expect(result.status).toBe(0);
-		expect(lines[0]).toBe('OK Saved "config" C:\\repo\\setup.json');
-		expect(lines[1]).toBe("Config  C:\\repo\\setup.json");
-		expect(lines[2]).toBe("x Bundle  over budget");
-		expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
-		expect(lines[4].startsWith('Saved "config" ')).toBe(true);
-		expect(lines[5]).toBe("Config     => C:\\repo\\setup.json");
-		expect(lines[6]).toContain("\u001b[2m");
-		expect(stripAnsi(lines[6])).toBe("Weighted");
-		expect(lines[7]).toBe("Saved --");
-		expect(result.stderr).toBe("");
+			expectSwiftCommandSuccess(result, "Swift convenience command");
+			expect(lines[0]).toBe('OK Saved "config" C:\\repo\\setup.json');
+			expect(lines[1]).toBe("Config  C:\\repo\\setup.json");
+			expect(lines[2]).toBe("x Bundle  over budget");
+			expect(lines[3]).toBe("i Hint: Run npm run docs:readme before release");
+			expect(lines[4].startsWith('Saved "config" ')).toBe(true);
+			expect(lines[5]).toBe("Config     => C:\\repo\\setup.json");
+			expect(lines[6]).toContain("\u001b[2m");
+			expect(stripAnsi(lines[6])).toBe("Weighted");
+			expect(lines[7]).toBe("Saved --");
+			expect(result.stderr).toBe("");
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
+		}
 	}, 30000);
 
 	test("Swift adapter pattern convenience functions handle dynamic strings", () => {
-		const result = spawnSync(
-			"bash",
-			[
-				"-c",
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
+		const swiftSourcePath = join(temporaryDirectory, "pattern-runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "pattern-bin");
+
+		try {
+			const result = spawnSync(
+				"bash",
 				[
-					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
-					"@main",
-					"struct Runner {",
-					"  static func main() throws {",
-					'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
-					'    print(try CliStyle.commandResult(result: "success", summary: "Unit tests passed", command: #"bun run "test:unit""#, exitCode: 0, duration: "1.2s", detail: #"See C:\\repo\\logs\\unit.txt"#, options: options))',
-					'    print(try CliStyle.auditFinding(result: "warning", finding: "Button label is vague", location: "src/App.vue:42", recommendation: "Use a specific action label", evidence: #"Found "Continue""#, reference: "WCAG 2.4.6", options: options))',
-					'    print(try CliStyle.taskSummary(result: "partial", task: "Adopt cli-style", summary: "Bash wrappers added", completed: "Updated adapter", remaining: "Update downstream scripts", options: options))',
-					'    print(try CliStyle.confirmationResult(state: "confirmed", action: "Publish release", item: "v0.6.0", detail: "Tag push starts npm publish", options: options))',
-					'    print(try CliStyle.nextStepBlock(nextStep: "Update helpers scripts", reason: "Wrappers are now available", command: "scripts/setup.sh --check", alternative: "Keep literal JSON for aggregate reports", options: options))',
-					"  }",
-					"}",
-					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
-				].join("\n"),
-			],
-			{
-				encoding: "utf8",
-			},
-		);
+					"-c",
+					[
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						'    let options = CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true)',
+						'    print(try CliStyle.commandResult(result: "success", summary: "Unit tests passed", command: #"bun run "test:unit""#, exitCode: 0, duration: "1.2s", detail: #"See C:\\repo\\logs\\unit.txt"#, options: options))',
+						'    print(try CliStyle.auditFinding(result: "warning", finding: "Button label is vague", location: "src/App.vue:42", recommendation: "Use a specific action label", evidence: #"Found "Continue""#, reference: "WCAG 2.4.6", options: options))',
+						'    print(try CliStyle.taskSummary(result: "partial", task: "Adopt cli-style", summary: "Bash wrappers added", completed: "Updated adapter", remaining: "Update downstream scripts", options: options))',
+						'    print(try CliStyle.confirmationResult(state: "confirmed", action: "Publish release", item: "v0.6.0", detail: "Tag push starts npm publish", options: options))',
+						'    print(try CliStyle.nextStepBlock(nextStep: "Update helpers scripts", reason: "Wrappers are now available", command: "scripts/setup.sh --check", alternative: "Keep literal JSON for aggregate reports", options: options))',
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
+				},
+			);
 
-		const output = result.stdout;
+			const output = result.stdout;
 
-		expect(result.status).toBe(0);
-		expect(output).toContain("Command result");
-		expect(output).toContain('Command    bun run "test:unit"');
-		expect(output).toContain("See C:\\repo\\logs\\unit.txt");
-		expect(output).toContain("Audit finding");
-		expect(output).toContain('Found "Continue"');
-		expect(output).toContain("Task summary");
-		expect(output).toContain("* Updated adapter");
-		expect(output).toContain("Confirmation result");
-		expect(output).toContain("Tag push starts npm publish");
-		expect(output).toContain("Next step");
-		expect(output).toContain("$ scripts/setup.sh --check");
-		expect(result.stderr).toBe("");
+			expectSwiftCommandSuccess(result, "Swift pattern convenience command");
+			expect(output).toContain("Command result");
+			expect(output).toContain('Command    bun run "test:unit"');
+			expect(output).toContain("See C:\\repo\\logs\\unit.txt");
+			expect(output).toContain("Audit finding");
+			expect(output).toContain('Found "Continue"');
+			expect(output).toContain("Task summary");
+			expect(output).toContain("* Updated adapter");
+			expect(output).toContain("Confirmation result");
+			expect(output).toContain("Tag push starts npm publish");
+			expect(output).toContain("Next step");
+			expect(output).toContain("$ scripts/setup.sh --check");
+			expect(result.stderr).toBe("");
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
+		}
 	}, 30000);
 
 	test("Swift adapter fails clearly when cli-style is unavailable", () => {
-		const result = spawnSync(
-			"bash",
-			[
-				"-c",
-				[
-					"cat > /tmp/cli-style-swift-runner.swift <<'SWIFT'",
-					"@main",
-					"struct Runner {",
-					"  static func main() throws {",
-					"    do {",
-					'      _ = try CliStyle.render("status", data: [:], options: CliStyleOptions(binary: "/missing/cli-style"))',
-					'      throw CliStyleError.invalidInput("expected notFound but render succeeded")',
-					"    } catch CliStyleError.notFound(let message) {",
-					"      print(message)",
-					"    }",
-					"  }",
-					"}",
-					"SWIFT",
-					"swiftc -o /tmp/cli-style-swift-bin adapters/swift/CliStyle.swift /tmp/cli-style-swift-runner.swift && /tmp/cli-style-swift-bin",
-				].join("\n"),
-			],
-			{
-				encoding: "utf8",
-			},
-		);
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
+		const swiftSourcePath = join(temporaryDirectory, "unavailable-runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "unavailable-bin");
 
-		expect(result.status).toBe(0);
-		expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
-		expect(result.stderr).toBe("");
+		try {
+			const result = spawnSync(
+				"bash",
+				[
+					"-c",
+					[
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						"    do {",
+						'      _ = try CliStyle.render("status", data: [:], options: CliStyleOptions(binary: "/missing/cli-style"))',
+						'      throw CliStyleError.invalidInput("expected notFound but render succeeded")',
+						"    } catch CliStyleError.notFound(let message) {",
+						"      print(message)",
+						"    }",
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
+				},
+			);
+
+			expectSwiftCommandSuccess(result, "Swift unavailable-binary command");
+			expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
+			expect(result.stderr).toBe("");
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
+		}
 	}, 30000);
 });

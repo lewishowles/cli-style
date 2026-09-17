@@ -203,6 +203,17 @@ def row_group(
 	}, **kwargs)
 
 
+# Render a bullet list from Python values.
+#
+# @param  {list[str|dict[str, Any]]}  items
+#     List item strings or objects with nested item arrays.
+def bullet_list(
+	items: list[str | dict[str, Any]],
+	**kwargs: Any,
+) -> str:
+	return render("bullet-list", {"items": items}, **kwargs)
+
+
 # Render an inline span from Python values.
 #
 # @param  {str}  value
