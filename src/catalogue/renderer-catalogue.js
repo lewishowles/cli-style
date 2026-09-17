@@ -3,6 +3,7 @@ export const rendererCatalogue = [
 	["agent-transcript", "pattern", "agentTranscript", ["entries"], "agent-transcript"],
 	["audit-finding", "pattern", "auditFinding", ["finding", "result"], "audit-finding"],
 	["bar-chart", "primitive", "barChart", ["rows"], undefined],
+	["bullet-list", "primitive", "bulletList", ["items"], undefined],
 	["chip", "primitive", "chip", ["label", "tone"], undefined],
 	["command-result", "pattern", "commandResult", ["result", "summary"], "command-result"],
 	["compact-data-table", "pattern", "compactDataTable", ["columns", "rows"], "compact-data-table"],

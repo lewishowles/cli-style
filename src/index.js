@@ -40,6 +40,7 @@ export { diffBlock } from "./patterns/diff-block.js";
 export { nextStepBlock } from "./patterns/next-step-block.js";
 export { taskSummary } from "./patterns/task-summary.js";
 export { barChart } from "./primitives/bar-chart.js";
+export { bulletList } from "./primitives/bullet-list.js";
 export { chip } from "./primitives/chip.js";
 export { divider } from "./primitives/divider.js";
 export { emptyState, errorBlock, hint } from "./primitives/feedback.js";
@@ -61,6 +62,8 @@ export {
 	renderReporterStatus,
 	renderSection,
 } from "./reporters/create-reporter.js";
+
+export { bulletTokens, getBulletSymbol } from "./theme/bullets.js";
 
 export {
 	chartColours,

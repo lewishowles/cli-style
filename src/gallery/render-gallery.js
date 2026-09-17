@@ -10,6 +10,7 @@ import { taskSummary } from "../patterns/task-summary.js";
 import { stripAnsi } from "../formatters/ansi.js";
 import { renderSpinnerFrame } from "../interactive/spinner.js";
 import { barChart } from "../primitives/bar-chart.js";
+import { bulletList } from "../primitives/bullet-list.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
 import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
@@ -776,6 +777,9 @@ function renderPrimitives(options) {
 			width: 18,
 		}),
 		"",
+		"Bullet lists",
+		renderBulletListExamples(options),
+		"",
 		"Feedback",
 		hint(`Run ${span("npm run docs:readme", "info", options)}`, options),
 		labelledLine("Notice", "Reusable labelled output", {
@@ -868,6 +872,42 @@ function renderPrimitives(options) {
 					value: "This group value inherits the default wrapping used by each row in the group.",
 				},
 			],
+		}),
+	].join("\n");
+}
+
+/**
+ * Render representative flat, wrapped, nested, narrow, and plain bullet lists.
+ *
+ * @param  {object}  options
+ *     Rendering options.
+ * @returns  {string}
+ *     Bullet list examples.
+ */
+function renderBulletListExamples(options) {
+	return [
+		bulletList(["Install dependencies", "Run the unit tests", "Review the output"], options),
+		bulletList(["This item wraps so continuation lines stay aligned with the item text."], {
+			...options,
+			width: 40,
+		}),
+		bulletList(
+			[
+				{
+					items: ["Use the focused check", "Read the first failure"],
+					text: "Verification",
+				},
+				"Commit the completed chunk",
+			],
+			options,
+		),
+		bulletList(["Narrow output keeps the gutter readable."], {
+			...options,
+			width: 24,
+		}),
+		bulletList(["ASCII output remains easy to grep."], {
+			...options,
+			profile: "plain",
 		}),
 	].join("\n");
 }

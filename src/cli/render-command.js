@@ -8,6 +8,7 @@ import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
+import { bulletList } from "../primitives/bullet-list.js";
 import { chip } from "../primitives/chip.js";
 import { divider } from "../primitives/divider.js";
 import { emptyState, errorBlock, hint } from "../primitives/feedback.js";
@@ -30,6 +31,11 @@ const renderers = {
 	"audit-finding": (input, options) => auditFinding(input, options),
 	"bar-chart": (input, options) =>
 		barChart({
+			...input,
+			...options,
+		}),
+	"bullet-list": (input, options) =>
+		bulletList(input.items, {
 			...input,
 			...options,
 		}),

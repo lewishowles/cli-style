@@ -228,6 +228,7 @@ Renderer names are stable for `cli-style render`, `cli_style_render`, and Python
 | `status`              | `status(resultType, detail, options)` | `cli_style_status type label detail` | `status(type, label, detail)`      | `CliStyle.status(type, label, detail)` | Result line with symbol, label, and detail.                     |
 | `row`                 | `row(label, value, options)`          | `cli_style_row label value [result]` | `row(label, value, result)`        | `CliStyle.row(label, value, result)`   | Aligned label/value row, optionally marked with a result state. |
 | `row-group`           | `rowGroup(options)`                   | Use `cli_style_render`               | Use `render("row-group", ...)`     | Use `CliStyle.render`                  | Auto-aligned group of labelled value rows.                      |
+| `bullet-list`         | `bulletList(items, options)`          | Use `cli_style_render`               | Use `render("bullet-list", ...)`   | Use `CliStyle.render`                  | Wrapped flat or nested bullet items.                            |
 | `span`                | `span(value, tone, options)`          | `cli_style_span value [tone]`        | `span(value, tone)`                | `CliStyle.span(value, tone)`           | Inline colour or weight for a word, command, file, or value.    |
 | `hint`                | `hint(message, options)`              | `cli_style_hint message`             | `hint(message)`                    | `CliStyle.hint(message)`               | Informational hint line.                                        |
 | `divider`             | `divider(options)`                    | `cli_style_divider label`            | `divider(label)`                   | `CliStyle.divider(label)`              | Section divider with an optional label.                         |
@@ -305,6 +306,29 @@ Use these shapes with `cli-style render`, `cli_style_render`, or Python `render(
 - `rows`: labelled values to align and render
 - `labelWidth`: optional minimum width for every label
 - Per-row fields match `row`, including `label`, `value`, `result`, `labelColour`, `valueColour`, and `separator`
+
+### `bullet-list`
+
+Pass strings for flat lists, or objects with `text` and an optional nested `items` array. Text wraps to the available width and continuation lines align with the item text:
+
+```js
+bulletList(
+	[
+		"Install dependencies",
+		{
+			text: "Run checks",
+			items: ["Review failures", "Repeat the focused check"],
+		},
+	],
+	{ width: 48 },
+);
+// • Install dependencies
+// • Run checks
+//   ◦ Review failures
+//   ◦ Repeat the focused check
+```
+
+Use `profile: "agent"` for Markdown-compatible `-` bullets, or `unicode: false` for `*` bullets.
 
 ### `span`
 
