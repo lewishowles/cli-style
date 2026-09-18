@@ -48,7 +48,11 @@ export const renderOptions = [
 // from this list. Types are string, number, boolean, string[], number[], object,
 // or object[]. A parameter is required only when the renderer cannot produce
 // output without it. A renderer that normalises a missing value to an empty
-// list or string has a default, so that parameter is optional.
+// list or string has a default, so that parameter is optional. Parameters are
+// listed in the renderer's own argument order. When a parameter's name would clash
+// with a reserved word or an existing wrapper name in another language, its
+// languageNames entry gives the name to use there, for example nextStepBlock
+// takes next, which the Python wrapper calls next_step.
 const rendererDefinitions = [
 	{
 		name: "agent-transcript",
@@ -61,6 +65,12 @@ const rendererDefinitions = [
 				required: false,
 				default: [],
 			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: "agent-transcript",
 	},
@@ -70,16 +80,46 @@ const rendererDefinitions = [
 		api: "auditFinding",
 		params: [
 			{
+				name: "result",
+				type: "string",
+				required: false,
+				default: "unknown",
+			},
+			{
 				name: "finding",
 				type: "string",
 				required: false,
 				default: "",
 			},
 			{
-				name: "result",
+				name: "location",
 				type: "string",
 				required: false,
-				default: "unknown",
+				default: "",
+			},
+			{
+				name: "recommendation",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "evidence",
+				type: "string[]",
+				required: false,
+				default: [],
+			},
+			{
+				name: "references",
+				type: "string[]",
+				required: false,
+				default: [],
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
 			},
 		],
 		fixture: "audit-finding",
@@ -95,6 +135,12 @@ const rendererDefinitions = [
 				required: false,
 				default: [],
 			},
+			{
+				name: "barWidth",
+				type: "number",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: undefined,
 	},
@@ -108,6 +154,12 @@ const rendererDefinitions = [
 				type: "object[]",
 				required: false,
 				default: [],
+			},
+			{
+				name: "wrapWidth",
+				type: "number",
+				required: false,
+				default: null,
 			},
 		],
 		fixture: undefined,
@@ -149,6 +201,36 @@ const rendererDefinitions = [
 				required: false,
 				default: "",
 			},
+			{
+				name: "command",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "exitCode",
+				type: "number",
+				required: false,
+				default: null,
+			},
+			{
+				name: "duration",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "details",
+				type: "string[]",
+				required: false,
+				default: [],
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: "command-result",
 	},
@@ -169,6 +251,18 @@ const rendererDefinitions = [
 				required: true,
 				default: null,
 			},
+			{
+				name: "summary",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: "compact-data-table",
 	},
@@ -178,16 +272,34 @@ const rendererDefinitions = [
 		api: "confirmationResult",
 		params: [
 			{
+				name: "state",
+				type: "string",
+				required: false,
+				default: "unknown",
+			},
+			{
 				name: "action",
 				type: "string",
 				required: false,
 				default: "",
 			},
 			{
-				name: "state",
+				name: "item",
 				type: "string",
 				required: false,
-				default: "unknown",
+				default: "",
+			},
+			{
+				name: "detail",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
 			},
 		],
 		fixture: "confirmation-result",
@@ -198,17 +310,34 @@ const rendererDefinitions = [
 		api: "diagnosticReport",
 		params: [
 			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "checks",
+				type: "object[]",
+				required: false,
+				default: [],
+			},
+			{
 				name: "findings",
 				type: "object[]",
 				required: false,
 				default: [],
 			},
-			// Kept for CLI compatibility; the renderer does not read it.
 			{
-				name: "summary",
-				type: "string",
+				name: "skippedChecks",
+				type: "object[]",
 				required: false,
-				default: null,
+				default: [],
+			},
+			{
+				name: "nextActions",
+				type: "string[]",
+				required: false,
+				default: [],
 			},
 		],
 		fixture: "diagnostic-report",
@@ -221,6 +350,18 @@ const rendererDefinitions = [
 			{
 				name: "lines",
 				type: "object[]",
+				required: false,
+				default: null,
+			},
+			{
+				name: "path",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "title",
+				type: "string",
 				required: false,
 				default: null,
 			},
@@ -238,6 +379,30 @@ const rendererDefinitions = [
 				required: false,
 				default: "",
 			},
+			{
+				name: "dividerWidth",
+				type: "number",
+				required: false,
+				default: null,
+			},
+			{
+				name: "character",
+				type: "string",
+				required: false,
+				default: "-",
+			},
+			{
+				name: "dividerColour",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "labelColour",
+				type: "string",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: undefined,
 	},
@@ -247,16 +412,16 @@ const rendererDefinitions = [
 		api: "emptyState",
 		params: [
 			{
-				name: "detail",
-				type: "string",
-				required: false,
-				default: "",
-			},
-			{
 				name: "title",
 				type: "string",
 				required: false,
 				default: "No results",
+			},
+			{
+				name: "detail",
+				type: "string",
+				required: false,
+				default: "",
 			},
 		],
 		fixture: undefined,
@@ -267,16 +432,16 @@ const rendererDefinitions = [
 		api: "errorBlock",
 		params: [
 			{
-				name: "lines",
-				type: "string[]",
-				required: false,
-				default: [],
-			},
-			{
 				name: "title",
 				type: "string",
 				required: false,
 				default: "Failed",
+			},
+			{
+				name: "lines",
+				type: "string[]",
+				required: false,
+				default: [],
 			},
 		],
 		fixture: undefined,
@@ -301,12 +466,6 @@ const rendererDefinitions = [
 		api: "labelledLine",
 		params: [
 			{
-				name: "icon",
-				type: "string",
-				required: false,
-				default: "",
-			},
-			{
 				name: "label",
 				type: "string",
 				required: false,
@@ -317,6 +476,18 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+			},
+			{
+				name: "icon",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "tone",
+				type: "string",
+				required: false,
+				default: "info",
 			},
 			{
 				name: "wrap",
@@ -343,12 +514,34 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+				languageNames: {
+					python: "next_step",
+					swift: "nextStep",
+				},
 			},
 			{
 				name: "reason",
 				type: "string",
 				required: false,
 				default: "",
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "commands",
+				type: "string[]",
+				required: false,
+				default: [],
+			},
+			{
+				name: "alternatives",
+				type: "string[]",
+				required: false,
+				default: [],
 			},
 		],
 		fixture: "next-step-block",
@@ -376,6 +569,12 @@ const rendererDefinitions = [
 				required: false,
 				default: "info",
 			},
+			{
+				name: "panelWidth",
+				type: "number",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: undefined,
 	},
@@ -396,6 +595,18 @@ const rendererDefinitions = [
 				required: false,
 				default: 0,
 			},
+			{
+				name: "barWidth",
+				type: "number",
+				required: false,
+				default: null,
+			},
+			{
+				name: "tone",
+				type: "string",
+				required: false,
+				default: "success",
+			},
 		],
 		fixture: undefined,
 	},
@@ -415,6 +626,36 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+			},
+			{
+				name: "result",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "labelWidth",
+				type: "number",
+				required: false,
+				default: null,
+			},
+			{
+				name: "labelColour",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "valueColour",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "separator",
+				type: "string",
+				required: false,
+				default: null,
 			},
 			{
 				name: "wrap",
@@ -443,6 +684,12 @@ const rendererDefinitions = [
 				default: [],
 			},
 			{
+				name: "labelWidth",
+				type: "number",
+				required: false,
+				default: null,
+			},
+			{
 				name: "wrap",
 				type: "boolean",
 				required: false,
@@ -468,6 +715,24 @@ const rendererDefinitions = [
 				required: false,
 				default: [],
 			},
+			{
+				name: "width",
+				type: "number",
+				required: false,
+				default: null,
+			},
+			{
+				name: "label",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "tone",
+				type: "string",
+				required: false,
+				default: "success",
+			},
 		],
 		fixture: "sparkline",
 	},
@@ -477,16 +742,22 @@ const rendererDefinitions = [
 		api: "span",
 		params: [
 			{
+				name: "value",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
 				name: "tone",
 				type: "string",
 				required: false,
 				default: "info",
 			},
 			{
-				name: "value",
+				name: "weight",
 				type: "string",
 				required: false,
-				default: "",
+				default: null,
 			},
 		],
 		fixture: undefined,
@@ -497,10 +768,10 @@ const rendererDefinitions = [
 		api: "status",
 		params: [
 			{
-				name: "detail",
+				name: "type",
 				type: "string",
 				required: false,
-				default: "",
+				default: "unknown",
 			},
 			{
 				name: "label",
@@ -509,10 +780,10 @@ const rendererDefinitions = [
 				default: null,
 			},
 			{
-				name: "type",
+				name: "detail",
 				type: "string",
 				required: false,
-				default: "unknown",
+				default: "",
 			},
 		],
 		fixture: undefined,
@@ -574,6 +845,12 @@ const rendererDefinitions = [
 				required: false,
 				default: [],
 			},
+			{
+				name: "width",
+				type: "number",
+				required: false,
+				default: null,
+			},
 		],
 		fixture: undefined,
 	},
@@ -593,6 +870,30 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "summary",
+				type: "string",
+				required: false,
+				default: "",
+			},
+			{
+				name: "completed",
+				type: "string[]",
+				required: false,
+				default: [],
+			},
+			{
+				name: "remaining",
+				type: "string[]",
+				required: false,
+				default: [],
 			},
 		],
 		fixture: "task-summary",
