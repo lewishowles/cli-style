@@ -52,7 +52,10 @@ export const renderOptions = [
 // listed in the renderer's own argument order. When a parameter's name would clash
 // with a reserved word or an existing wrapper name in another language, its
 // languageNames entry gives the name to use there, for example nextStepBlock
-// takes next, which the Python wrapper calls next_step.
+// takes next, which the Python wrapper calls next_step. Adapter-specific hints
+// record stricter required inputs, singular list inputs (the Python parameter
+// name), or compatibility-only omissions without changing the JavaScript
+// renderer contract.
 const rendererDefinitions = [
 	{
 		name: "agent-transcript",
@@ -84,12 +87,14 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "unknown",
+				adapterRequired: true,
 			},
 			{
 				name: "finding",
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 			{
 				name: "location",
@@ -108,18 +113,21 @@ const rendererDefinitions = [
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "evidence",
 			},
 			{
 				name: "references",
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "reference",
 			},
 			{
 				name: "title",
 				type: "string",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 		],
 		fixture: "audit-finding",
@@ -154,12 +162,14 @@ const rendererDefinitions = [
 				type: "object[]",
 				required: false,
 				default: [],
+				adapterRequired: true,
 			},
 			{
 				name: "wrapWidth",
 				type: "number",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 		],
 		fixture: undefined,
@@ -194,12 +204,14 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "unknown",
+				adapterRequired: true,
 			},
 			{
 				name: "summary",
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 			{
 				name: "command",
@@ -224,12 +236,14 @@ const rendererDefinitions = [
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "detail",
 			},
 			{
 				name: "title",
 				type: "string",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 		],
 		fixture: "command-result",
@@ -244,12 +258,14 @@ const rendererDefinitions = [
 				type: "object[]",
 				required: true,
 				default: null,
+				adapterRequired: true,
 			},
 			{
 				name: "rows",
 				type: "object[]",
 				required: true,
 				default: null,
+				adapterRequired: true,
 			},
 			{
 				name: "summary",
@@ -276,12 +292,14 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "unknown",
+				adapterRequired: true,
 			},
 			{
 				name: "action",
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 			{
 				name: "item",
@@ -300,6 +318,7 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 		],
 		fixture: "confirmation-result",
@@ -390,6 +409,7 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "-",
+				adapterOmit: true,
 			},
 			{
 				name: "dividerColour",
@@ -456,6 +476,7 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 		],
 		fixture: undefined,
@@ -514,6 +535,7 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 				languageNames: {
 					python: "next_step",
 					swift: "nextStep",
@@ -530,18 +552,21 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 			{
 				name: "commands",
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "command",
 			},
 			{
 				name: "alternatives",
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "alternative",
 			},
 		],
 		fixture: "next-step-block",
@@ -620,12 +645,14 @@ const rendererDefinitions = [
 				type: "string",
 				required: true,
 				default: null,
+				adapterRequired: true,
 			},
 			{
 				name: "value",
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 			{
 				name: "result",
@@ -662,12 +689,14 @@ const rendererDefinitions = [
 				type: "boolean",
 				required: false,
 				default: true,
+				adapterOmit: true,
 			},
 			{
 				name: "wrapWidth",
 				type: "number",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 		],
 		fixture: undefined,
@@ -682,6 +711,7 @@ const rendererDefinitions = [
 				type: "object[]",
 				required: false,
 				default: [],
+				adapterRequired: true,
 			},
 			{
 				name: "labelWidth",
@@ -694,12 +724,14 @@ const rendererDefinitions = [
 				type: "boolean",
 				required: false,
 				default: true,
+				adapterOmit: true,
 			},
 			{
 				name: "wrapWidth",
 				type: "number",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 		],
 		fixture: undefined,
@@ -746,6 +778,7 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 			{
 				name: "tone",
@@ -772,12 +805,13 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "unknown",
+				adapterRequired: true,
 			},
 			{
 				name: "label",
 				type: "string",
 				required: false,
-				default: null,
+				default: "",
 			},
 			{
 				name: "detail",
@@ -838,12 +872,20 @@ const rendererDefinitions = [
 				type: "object[]",
 				required: false,
 				default: [],
+				adapterRequired: true,
 			},
 			{
 				name: "rows",
 				type: "object[]",
 				required: false,
 				default: [],
+				adapterRequired: true,
+			},
+			{
+				name: "unicode",
+				type: "boolean",
+				required: false,
+				default: null,
 			},
 			{
 				name: "width",
@@ -864,18 +906,21 @@ const rendererDefinitions = [
 				type: "string",
 				required: false,
 				default: "unknown",
+				adapterRequired: true,
 			},
 			{
 				name: "task",
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 			},
 			{
 				name: "title",
 				type: "string",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 			{
 				name: "summary",
@@ -888,12 +933,14 @@ const rendererDefinitions = [
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "completed",
 			},
 			{
 				name: "remaining",
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "remaining",
 			},
 		],
 		fixture: "task-summary",

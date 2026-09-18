@@ -31,6 +31,7 @@
 		"build:binary": "scripts/build-binary.sh",
 		"check": "vp check --fix",
 		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
+		"generate:adapters": "bun scripts/generate-adapters.js",
 		"package:binary": "scripts/package-binary.sh",
 		"prepare": "vp config --no-agent",
 		"smoke:binary": "./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json",

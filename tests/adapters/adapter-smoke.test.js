@@ -269,6 +269,29 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Python package re-exports generated renderer wrappers", () => {
+		const result = spawnSync(
+			"python3",
+			[
+				"-c",
+				[
+					"from adapters.python.cli_style import chip, compact_data_table",
+					"kwargs = {'binary': './bin/cli-style.js', 'plain': True}",
+					"print(chip('Build', **kwargs))",
+					"print(compact_data_table([{'key': 'name', 'label': 'Name'}], [{'name': 'Build'}], **kwargs))",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+			},
+		);
+
+		expect(result.status).toBe(0);
+		expect(result.stdout).toContain("[Build]");
+		expect(result.stdout).toContain("Data");
+		expect(result.stderr).toBe("");
+	});
+
 	test("Python adapter preserves colour for a TTY caller", () => {
 		const result = runPythonStatus({
 			isTty: true,
@@ -344,7 +367,7 @@ describe("Adapter smoke tests", () => {
 		expect(forcedResult.stdout).toContain("\u001b[");
 	});
 
-	test("Python adapter can be imported from cli-style adapter-path", () => {
+	test("Python package can be imported from cli-style adapter-path", () => {
 		const result = spawnSync(
 			"bash",
 			[
@@ -364,6 +387,17 @@ describe("Adapter smoke tests", () => {
 
 		expect(result.status).toBe(0);
 		expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
+		expect(result.stderr).toBe("");
+	});
+
+	test("Python adapter-path returns the package directory", () => {
+		const result = spawnSync("bun", ["./bin/cli-style.js", "adapter-path", "python"], {
+			encoding: "utf8",
+		});
+
+		expect(result.status).toBe(0);
+		expect(result.stdout.trim()).toContain("adapters/python");
+		expect(result.stdout.trim()).not.toContain("cli_style.py");
 		expect(result.stderr).toBe("");
 	});
 
@@ -473,8 +507,8 @@ describe("Adapter smoke tests", () => {
 				[
 					"from adapters.python.cli_style import command_result, audit_finding, task_summary, confirmation_result, next_step_block",
 					"kwargs = {'binary': './bin/cli-style.js', 'plain': True}",
-					"print(command_result('success', 'Unit tests passed', 'bun run \"test:unit\"', 0, '1.2s', 'See C:\\\\repo\\\\logs\\\\unit.txt', **kwargs))",
-					"print(audit_finding('warning', 'Button label is vague', 'src/App.vue:42', 'Use a specific action label', 'Found \"Continue\"', 'WCAG 2.4.6', **kwargs))",
+					"print(command_result('success', 'Unit tests passed', command='bun run \"test:unit\"', exit_code=0, duration='1.2s', detail='See C:\\\\repo\\\\logs\\\\unit.txt', **kwargs))",
+					"print(audit_finding('warning', 'Button label is vague', 'src/App.vue:42', 'Use a specific action label', 'Found \"Continue\"', reference='WCAG 2.4.6', **kwargs))",
 					"print(task_summary('partial', 'Adopt cli-style', 'Bash wrappers added', 'Updated adapter', 'Update downstream scripts', **kwargs))",
 					"print(confirmation_result('confirmed', 'Publish release', 'v0.6.0', 'Tag push starts npm publish', **kwargs))",
 					"print(next_step_block('Update helpers scripts', 'Wrappers are now available', 'scripts/setup.sh --check', 'Keep literal JSON for aggregate reports', **kwargs))",

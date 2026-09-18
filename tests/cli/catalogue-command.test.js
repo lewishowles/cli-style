@@ -35,12 +35,13 @@ describe("Catalogue commands", () => {
 				type: "string",
 				required: false,
 				default: "unknown",
+				adapterRequired: true,
 			},
 			{
 				name: "label",
 				type: "string",
 				required: false,
-				default: null,
+				default: "",
 			},
 			{
 				name: "detail",
@@ -62,6 +63,7 @@ describe("Catalogue commands", () => {
 				type: "string",
 				required: false,
 				default: "",
+				adapterRequired: true,
 				languageNames: {
 					python: "next_step",
 					swift: "nextStep",
@@ -78,18 +80,21 @@ describe("Catalogue commands", () => {
 				type: "string",
 				required: false,
 				default: null,
+				adapterOmit: true,
 			},
 			{
 				name: "commands",
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "command",
 			},
 			{
 				name: "alternatives",
 				type: "string[]",
 				required: false,
 				default: [],
+				singular: "alternative",
 			},
 		]);
 		expect(row.params.map((param) => param.name)).toEqual([
@@ -192,7 +197,7 @@ describe("Catalogue commands", () => {
 			["status", ["type", "label", "detail"]],
 			["step", ["label", "state"]],
 			["step-progress", ["current", "steps"]],
-			["table", ["columns", "rows", "width"]],
+			["table", ["columns", "rows", "unicode", "width"]],
 			["task-summary", ["result", "task", "title", "summary", "completed", "remaining"]],
 		]);
 	});
