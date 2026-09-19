@@ -4,7 +4,10 @@
 # Archive layout:
 #   bin/cli-style
 #   adapters/bash/cli-style.sh
-#   adapters/python/cli_style.py
+#   adapters/python/cli_style/
+#   adapters/python/pyproject.toml
+#   adapters/swift/Package.swift
+#   adapters/swift/Sources/
 
 set -euo pipefail
 
