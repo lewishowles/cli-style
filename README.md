@@ -17,7 +17,21 @@ JavaScript projects can install the package directly:
 bun add @lewishowles/cli-style
 ```
 
-Bash, Python, and Swift projects call the `cli-style` binary through thin adapters. If the project already has Node or Bun tooling, add this package as a dev dependency and use the package binary. Otherwise, install or vendor the standalone binary and put it on `PATH`:
+Python projects can install the adapter from a local path with `uv`:
+
+```bash
+uv add --editable ../cli-style/adapters/python
+```
+
+They can also install it from this repository:
+
+```bash
+uv add "cli-style @ git+https://github.com/lewishowles/cli-style.git#subdirectory=adapters/python"
+```
+
+Swift projects can add `adapters/swift` as a local package dependency and use its `CliStyle` product.
+
+The Bash, Python, and Swift adapters all call the `cli-style` binary. If your project already uses Node or Bun, add this package as a dev dependency and use its binary. Otherwise, put the standalone binary on `PATH`:
 
 ```bash
 export PATH="/path/to/cli-style/bin:$PATH"
@@ -139,11 +153,7 @@ JSON
 
 ### Python
 
-Add the adapter directory to `PYTHONPATH`, then import the generic `render()` helper or convenience functions:
-
-```bash
-export PYTHONPATH="$(cli-style adapter-path python):$PYTHONPATH"
-```
+Install the package as described in [Install](#install), then import the generic `render()` helper or convenience functions:
 
 ```python
 from cli_style import status, row, span, hint, divider
@@ -757,3 +767,13 @@ cli-style gallery --dark --section primitives
 ```
 
 Use `--interactive` to select a section or fixture with `fzf` when it is installed.
+
+## Generated adapter wrappers
+
+Named wrapper functions in the Python and Swift adapters are generated from `src/catalogue/renderer-catalogue.js` by `bun run generate:adapters`. Do not edit `adapters/python/cli_style/_wrappers.py` or `adapters/swift/Sources/CliStyle/Wrappers.swift` by hand. After changing the catalogue, run:
+
+```bash
+bun run generate:adapters
+```
+
+`bun run check` runs `check:adapters`, which fails when the committed wrappers are stale.
