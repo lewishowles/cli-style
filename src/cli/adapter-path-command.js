@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-// Adapter paths returned for shell and Python wrapper setup.
+// Adapter paths returned for consumer setup.
 const adapterPaths = {
 	bash: {
 		releasePath: "adapters/bash/cli-style.sh",
@@ -13,8 +13,8 @@ const adapterPaths = {
 		sourceUrl: new URL("../../adapters/python", import.meta.url),
 	},
 	swift: {
-		releasePath: "adapters/swift/CliStyle.swift",
-		sourceUrl: new URL("../../adapters/swift/CliStyle.swift", import.meta.url),
+		releasePath: "adapters/swift",
+		sourceUrl: new URL("../../adapters/swift", import.meta.url),
 	},
 };
 

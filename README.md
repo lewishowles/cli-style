@@ -179,11 +179,23 @@ print(output)
 
 ### Swift
 
-Add the adapter file to your Swift project, then use the `CliStyle` enum for convenience functions or the generic `render` method:
+Add `adapters/swift` as a local Swift package dependency, then add its `CliStyle` product to your target. Use the `CliStyle` enum for convenience functions or the generic `render` method:
 
 ```bash
 cli-style adapter-path swift
-# Returns the path to CliStyle.swift for inclusion in your project
+# Returns the path to the adapters/swift package directory
+```
+
+```swift
+dependencies: [
+    .package(path: "../cli-style/adapters/swift"),
+],
+targets: [
+    .target(
+        name: "YourTarget",
+        dependencies: [.product(name: "CliStyle", package: "CliStyle")]
+    ),
+]
 ```
 
 ```swift

@@ -581,7 +581,7 @@ describe("Adapter smoke tests", () => {
 						"  }",
 						"}",
 						"SWIFT",
-						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
 					].join("\n"),
 				],
 				{
@@ -591,6 +591,48 @@ describe("Adapter smoke tests", () => {
 
 			expectSwiftCommandSuccess(result, "Swift adapter render command");
 			expect(result.stdout.trim()).toBe("OK Build passed 184 tests");
+			expect(result.stderr).toBe("");
+		} finally {
+			rmSync(temporaryDirectory, { force: true, recursive: true });
+		}
+	}, 90000);
+
+	test("Swift package exposes a public module", () => {
+		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-module-"));
+		const swiftSourcePath = join(temporaryDirectory, "module-runner.swift");
+		const swiftBinaryPath = join(temporaryDirectory, "module-runner");
+		const libraryExtension = process.platform === "darwin" ? "dylib" : "so";
+		const libraryPath = join(temporaryDirectory, `libCliStyle.${libraryExtension}`);
+		const modulePath = join(temporaryDirectory, "CliStyle.swiftmodule");
+
+		try {
+			const result = spawnSync(
+				"bash",
+				[
+					"-c",
+					[
+						`swiftc -emit-library -emit-module -module-name CliStyle -emit-module-path "${modulePath}" -o "${libraryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift`,
+						`cat > "${swiftSourcePath}" <<'SWIFT'`,
+						"import CliStyle",
+						"@main",
+						"struct Runner {",
+						"  static func main() throws {",
+						'    let output = try CliStyle.status(type: "success", label: "Build passed", options: CliStyleOptions(binary: "./bin/cli-style.js", isPlain: true))',
+						"    print(output)",
+						"  }",
+						"}",
+						"SWIFT",
+						`swiftc -parse-as-library -I "${temporaryDirectory}" -L "${temporaryDirectory}" -lCliStyle -o "${swiftBinaryPath}" "${swiftSourcePath}"`,
+						`DYLD_LIBRARY_PATH="${temporaryDirectory}" LD_LIBRARY_PATH="${temporaryDirectory}" "${swiftBinaryPath}"`,
+					].join("\n"),
+				],
+				{
+					encoding: "utf8",
+				},
+			);
+
+			expectSwiftCommandSuccess(result, "Swift package module command");
+			expect(result.stdout.trim()).toBe("OK Build passed");
 			expect(result.stderr).toBe("");
 		} finally {
 			rmSync(temporaryDirectory, { force: true, recursive: true });
@@ -629,7 +671,7 @@ describe("Adapter smoke tests", () => {
 						"  }",
 						"}",
 						"SWIFT",
-						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}"`,
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift "${swiftSourcePath}"`,
 					].join("\n"),
 				],
 				{
@@ -750,7 +792,7 @@ describe("Adapter smoke tests", () => {
 						"  }",
 						"}",
 						"SWIFT",
-						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}"`,
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift "${swiftSourcePath}"`,
 					].join("\n"),
 				],
 				{
@@ -792,7 +834,7 @@ describe("Adapter smoke tests", () => {
 		});
 
 		expect(result.status).toBe(0);
-		expect(result.stdout.trim()).toContain("adapters/swift/CliStyle.swift");
+		expect(result.stdout.trim()).toContain("adapters/swift");
 		expect(result.stderr).toBe("");
 	});
 
@@ -825,7 +867,7 @@ describe("Adapter smoke tests", () => {
 						"  }",
 						"}",
 						"SWIFT",
-						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 "${swiftBinaryPath}"`,
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift "${swiftSourcePath}" && env -u NO_COLOR TERM=xterm-256color FORCE_COLOR=1 "${swiftBinaryPath}"`,
 					].join("\n"),
 				],
 				{
@@ -875,7 +917,7 @@ describe("Adapter smoke tests", () => {
 						"  }",
 						"}",
 						"SWIFT",
-						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
 					].join("\n"),
 				],
 				{
@@ -927,7 +969,7 @@ describe("Adapter smoke tests", () => {
 						"  }",
 						"}",
 						"SWIFT",
-						`swiftc -o "${swiftBinaryPath}" adapters/swift/CliStyle.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
+						`swiftc -o "${swiftBinaryPath}" adapters/swift/Sources/CliStyle/CliStyle.swift adapters/swift/Sources/CliStyle/Wrappers.swift "${swiftSourcePath}" && "${swiftBinaryPath}"`,
 					].join("\n"),
 				],
 				{
