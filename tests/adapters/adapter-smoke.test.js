@@ -536,19 +536,21 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
-	test("Python adapter fails clearly when cli-style is unavailable", () => {
+	test("Python adapter falls back to sorted key/value lines when cli-style is unavailable", () => {
 		const result = spawnSync(
 			"python3",
 			[
 				"-c",
 				[
 					"from adapters.python.cli_style import CliStyleNotFoundError, render",
+					"missing_binary = '/missing/cli-style'",
+					"print(render('status', {'status': 'ok', 'nested': {'count': 2}}, binary=missing_binary))",
 					"try:",
-					"\trender('status', {}, binary='/missing/cli-style')",
+					"\trender('status', {}, binary=missing_binary, raise_on_missing=True)",
 					"except CliStyleNotFoundError as error:",
 					"\tprint(error)",
-					"\traise SystemExit(0)",
-					"raise SystemExit(1)",
+					"else:",
+					"\traise SystemExit(1)",
 				].join("\n"),
 			],
 			{
@@ -557,7 +559,11 @@ describe("Adapter smoke tests", () => {
 		);
 
 		expect(result.status).toBe(0);
-		expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
+		expect(result.stdout.trim().split("\n")).toEqual([
+			"nested: {'count': 2}",
+			"status: ok",
+			"cli-style binary not found: /missing/cli-style",
+		]);
 		expect(result.stderr).toBe("");
 	});
 
@@ -945,7 +951,7 @@ describe("Adapter smoke tests", () => {
 		}
 	}, 30000);
 
-	test("Swift adapter fails clearly when cli-style is unavailable", () => {
+	test("Swift adapter falls back to sorted key/value lines when cli-style is unavailable", () => {
 		const temporaryDirectory = mkdtempSync(join(tmpdir(), "cli-style-swift-"));
 		const swiftSourcePath = join(temporaryDirectory, "unavailable-runner.swift");
 		const swiftBinaryPath = join(temporaryDirectory, "unavailable-bin");
@@ -960,8 +966,11 @@ describe("Adapter smoke tests", () => {
 						"@main",
 						"struct Runner {",
 						"  static func main() throws {",
+						'    let options = CliStyleOptions(binary: "/missing/cli-style")',
+						'    let dictionary: [String: Any] = ["status": "ok", "nested": ["count": 2]]',
+						'    print(try CliStyle.render("status", data: dictionary, options: options))',
 						"    do {",
-						'      _ = try CliStyle.render("status", data: [:], options: CliStyleOptions(binary: "/missing/cli-style"))',
+						'      _ = try CliStyle.render("status", data: dictionary, options: CliStyleOptions(binary: "/missing/cli-style", throwsWhenMissing: true))',
 						'      throw CliStyleError.invalidInput("expected notFound but render succeeded")',
 						"    } catch CliStyleError.notFound(let message) {",
 						"      print(message)",
@@ -978,7 +987,11 @@ describe("Adapter smoke tests", () => {
 			);
 
 			expectSwiftCommandSuccess(result, "Swift unavailable-binary command");
-			expect(result.stdout.trim()).toBe("cli-style binary not found: /missing/cli-style");
+			expect(result.stdout.trim().split("\n")).toEqual([
+				'nested: ["count": 2]',
+				"status: ok",
+				"cli-style binary not found: /missing/cli-style",
+			]);
 			expect(result.stderr).toBe("");
 		} finally {
 			rmSync(temporaryDirectory, { force: true, recursive: true });

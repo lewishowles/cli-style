@@ -48,8 +48,12 @@ def render(
 	no_colour: bool = False,
 	no_unicode: bool = False,
 	extra_args: Sequence[str] | None = None,
+	raise_on_missing: bool = False,
 ) -> str:
 	"""Render JSON-serialisable data through ``cli-style render``.
+
+	When the binary cannot be found, return a plain-text rendering of the data
+	instead, unless ``raise_on_missing`` is set.
 
 	:param renderer: Stable renderer name accepted by the cli-style binary.
 	:param data: JSON-serialisable renderer input.
@@ -60,6 +64,8 @@ def render(
 	:param no_colour: Disable terminal colour output.
 	:param no_unicode: Disable Unicode output.
 	:param extra_args: Additional flags passed to the binary.
+	:param raise_on_missing: Raise ``CliStyleNotFoundError`` when the binary
+		cannot be found, instead of returning plain text.
 	"""
 	if not isinstance(renderer, str) or renderer == "":
 		raise ValueError("renderer must be a non-empty string")
@@ -67,7 +73,15 @@ def render(
 	if not isinstance(data, dict):
 		raise TypeError("data must be a dict")
 
-	resolved_binary = resolve_binary(binary)
+	try:
+		resolved_binary = resolve_binary(binary)
+	except CliStyleNotFoundError:
+		if raise_on_missing:
+			raise
+
+		# Sort the keys so the lines match the Swift adapter, which has no key order to keep.
+		return "\n".join(f"{key}: {value}" for key, value in sorted(data.items(), key=lambda item: str(item[0])))
+
 	command = [resolved_binary, "render", renderer]
 
 	if profile is not None:

@@ -39,6 +39,9 @@ public struct CliStyleOptions {
 	// Additional arguments passed through to the binary.
 	public var extraArgs: [String] = []
 
+	// Throw when the cli-style binary cannot be found, instead of returning a plain-text rendering of the data.
+	public var throwsWhenMissing: Bool = false
+
 	/**
 	 * Create render options. Every argument has a default, so callers only pass what they change.
 	 */
@@ -49,7 +52,8 @@ public struct CliStyleOptions {
 		isPlain: Bool = false,
 		isNoColour: Bool = false,
 		isNoUnicode: Bool = false,
-		extraArgs: [String] = []
+		extraArgs: [String] = [],
+		throwsWhenMissing: Bool = false
 	) {
 		self.binary = binary
 		self.profile = profile
@@ -58,6 +62,7 @@ public struct CliStyleOptions {
 		self.isNoColour = isNoColour
 		self.isNoUnicode = isNoUnicode
 		self.extraArgs = extraArgs
+		self.throwsWhenMissing = throwsWhenMissing
 	}
 }
 
@@ -69,11 +74,13 @@ public enum CliStyle {
 	/**
 	 Render a dictionary through `cli-style render`.
 
+	 When the binary cannot be found, return a plain-text rendering of the data instead, unless `options.throwsWhenMissing` is set.
+
 	 - parameter renderer: Stable renderer name accepted by `cli-style render`.
 	 - parameter data: JSON-serialisable renderer input.
 	 - parameter options: Render options including binary path and output flags.
 	 - returns: Rendered string output from cli-style.
-	 - throws: `CliStyleError` if the binary is missing, input is invalid, or rendering fails.
+	 - throws: `CliStyleError` if the binary is missing and `options.throwsWhenMissing` is set, input is invalid, or rendering fails.
 	 */
 	public static func render(
 		_ renderer: String,
@@ -84,7 +91,21 @@ public enum CliStyle {
 			throw CliStyleError.invalidInput("renderer must be a non-empty string")
 		}
 
-		let resolvedBinary = try resolveBinary(options.binary)
+		let resolvedBinary: String
+
+		do {
+			resolvedBinary = try resolveBinary(options.binary)
+		} catch CliStyleError.notFound(let message) {
+			if options.throwsWhenMissing {
+				throw CliStyleError.notFound(message)
+			}
+
+			// Swift dictionaries have no order, so sort the keys to keep the output the same between runs.
+			return data
+				.sorted { $0.key < $1.key }
+				.map { "\($0.key): \(String(describing: $0.value))" }
+				.joined(separator: "\n")
+		}
 
 		let jsonData: Data
 
