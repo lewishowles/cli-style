@@ -29,7 +29,8 @@
 	},
 	"scripts": {
 		"build:binary": "scripts/build-binary.sh",
-		"check": "vp check --fix",
+		"check": "vp check --fix && bun run check:adapters",
+		"check:adapters": "bun scripts/generate-adapters.js --check",
 		"cli-style:gallery": "bun ./bin/cli-style.js gallery",
 		"generate:adapters": "bun scripts/generate-adapters.js",
 		"package:binary": "scripts/package-binary.sh",

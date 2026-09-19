@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -367,7 +367,47 @@ function renderSwiftWrappers() {
 const generatedPythonSource = renderWrappers();
 const generatedSwiftSource = renderSwiftWrappers();
 
-mkdirSync(dirname(pythonOutputPath), { recursive: true });
-mkdirSync(dirname(swiftOutputPath), { recursive: true });
-writeFileSync(pythonOutputPath, generatedPythonSource);
-writeFileSync(swiftOutputPath, generatedSwiftSource);
+// Each generated wrapper paired with the committed file it is written to, or checked against.
+const generatedFiles = [
+	{
+		path: pythonOutputPath,
+		source: generatedPythonSource,
+	},
+	{
+		path: swiftOutputPath,
+		source: generatedSwiftSource,
+	},
+];
+
+// `--check` reports committed wrappers that differ from the generated source and writes nothing.
+const checkOnly = process.argv.includes("--check");
+
+if (checkOnly) {
+	// A committed wrapper is stale when its contents differ from the generated source; a missing file counts as stale.
+	const staleFiles = generatedFiles.filter(({ path, source }) => {
+		try {
+			return readFileSync(path, "utf8") !== source;
+		} catch (error) {
+			if (error.code === "ENOENT") {
+				return true;
+			}
+
+			throw error;
+		}
+	});
+
+	if (staleFiles.length > 0) {
+		console.error("Generated adapters are stale:");
+
+		for (const { path } of staleFiles) {
+			console.error(`- ${path}`);
+		}
+
+		process.exitCode = 1;
+	}
+} else {
+	for (const { path, source } of generatedFiles) {
+		mkdirSync(dirname(path), { recursive: true });
+		writeFileSync(path, source);
+	}
+}
