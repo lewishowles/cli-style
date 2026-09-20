@@ -1,11 +1,28 @@
 [project]
-name = "cli-style"
+name = "lewishowles-cli-style"
 version = "0.14.0"
 description = "Python adapter for the shared cli-style binary."
 authors = [{ name = "Lewis Howles" }]
 license = { text = "MIT" }
+license-files = ["LICENSE"]
+readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
+classifiers = [
+	"License :: OSI Approved :: MIT License",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3 :: Only",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Programming Language :: Python :: 3.13",
+	"Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Repository = "https://github.com/lewishowles/cli-style"
+Issues = "https://github.com/lewishowles/cli-style/issues"
 
 [build-system]
 requires = ["hatchling"]

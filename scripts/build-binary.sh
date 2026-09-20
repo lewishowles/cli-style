@@ -6,6 +6,8 @@
 #   dist/adapters/bash/cli-style.sh
 #   dist/adapters/python/cli_style/
 #   dist/adapters/python/pyproject.toml
+#   dist/adapters/python/README.md
+#   dist/adapters/python/LICENSE
 #   dist/adapters/swift/Package.swift
 #   dist/adapters/swift/Sources/
 
@@ -29,6 +31,6 @@ cp adapters/bash/cli-style.sh dist/adapters/bash/cli-style.sh
 # Copy the Python package without the __pycache__ folders Python leaves behind.
 tar -C "adapters/python" \
 	--exclude="__pycache__" \
-	-cf - cli_style pyproject.toml | tar -C "dist/adapters/python" -xf -
+	-cf - cli_style pyproject.toml README.md LICENSE | tar -C "dist/adapters/python" -xf -
 
 cp -R adapters/swift/Package.swift adapters/swift/Sources dist/adapters/swift/

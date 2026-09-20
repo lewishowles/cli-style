@@ -6,6 +6,8 @@
 #   adapters/bash/cli-style.sh
 #   adapters/python/cli_style/
 #   adapters/python/pyproject.toml
+#   adapters/python/README.md
+#   adapters/python/LICENSE
 #   adapters/swift/Package.swift
 #   adapters/swift/Sources/
 

@@ -26,7 +26,7 @@ uv add --editable ../cli-style/adapters/python
 They can also install it from this repository:
 
 ```bash
-uv add "cli-style @ git+https://github.com/lewishowles/cli-style.git#subdirectory=adapters/python"
+uv add "lewishowles-cli-style @ git+https://github.com/lewishowles/cli-style.git#subdirectory=adapters/python"
 ```
 
 Swift projects can add `adapters/swift` as a local package dependency and use its `CliStyle` product.
