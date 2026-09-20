@@ -17,13 +17,19 @@ JavaScript projects can install the package directly:
 bun add @lewishowles/cli-style
 ```
 
-Python projects can install the adapter from a local path with `uv`:
+Python projects can install the published package from PyPI:
+
+```bash
+pip install lewishowles-cli-style
+```
+
+They can also install the adapter from a local path with `uv`:
 
 ```bash
 uv add --editable ../cli-style/adapters/python
 ```
 
-They can also install it from this repository:
+Or install it straight from this repository:
 
 ```bash
 uv add "lewishowles-cli-style @ git+https://github.com/lewishowles/cli-style.git#subdirectory=adapters/python"
