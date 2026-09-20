@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.15.0 - 2026-09-20
+
+### Added
+
+- The Python adapter is published to PyPI as `lewishowles-cli-style`, so Python projects can install it with `pip install lewishowles-cli-style` instead of from a local path or this repository. The name it is imported under is unchanged: `import cli_style`.
+- `bun run check:adapters` now fails when `package.json` and the Python package declare different versions, or when the Python package's copy of the licence differs from the one at the repository root.
+- Releasing a tag whose version does not match `package.json` now fails before anything is published.
+
 ## 0.14.0 - 2026-09-20
 
 ### Added
