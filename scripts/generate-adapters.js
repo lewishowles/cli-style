@@ -4,16 +4,19 @@ import { fileURLToPath } from "node:url";
 
 import { rendererCatalogue } from "../src/catalogue/renderer-catalogue.js";
 
-// Generated adapter modules are kept beside their hand-written language cores.
-const pythonOutputPath = join(
-	dirname(fileURLToPath(import.meta.url)),
-	"../adapters/python/cli_style/_wrappers.py",
-);
+const scriptsDirectoryPath = dirname(fileURLToPath(import.meta.url));
+const repositoryRootPath = join(scriptsDirectoryPath, "..");
 
-const swiftOutputPath = join(
-	dirname(fileURLToPath(import.meta.url)),
-	"../adapters/swift/Sources/CliStyle/Wrappers.swift",
-);
+// Generated adapter modules are kept beside their hand-written language cores.
+const pythonOutputPath = join(repositoryRootPath, "adapters/python/cli_style/_wrappers.py");
+
+const swiftOutputPath = join(repositoryRootPath, "adapters/swift/Sources/CliStyle/Wrappers.swift");
+
+// Package metadata and licence files checked alongside generated adapter modules.
+const packageJsonPath = join(repositoryRootPath, "package.json");
+const pythonProjectPath = join(repositoryRootPath, "adapters/python/pyproject.toml");
+const repositoryLicensePath = join(repositoryRootPath, "LICENSE");
+const pythonLicensePath = join(repositoryRootPath, "adapters/python/LICENSE");
 
 // Map catalogue types to the closest useful Python annotations.
 const pythonTypes = {
@@ -379,10 +382,59 @@ const generatedFiles = [
 	},
 ];
 
+/**
+ * Read a licence file, treating an absent file as a reportable state rather than a crash.
+ *
+ * @param  {string}  path
+ *     The licence file to read.
+ * @returns  {Buffer|null}
+ *     The file contents, or null when the file is not there.
+ */
+function readLicenseFile(path) {
+	try {
+		return readFileSync(path);
+	} catch (error) {
+		if (error.code === "ENOENT") {
+			return null;
+		}
+
+		throw error;
+	}
+}
+
 // `--check` reports committed wrappers that differ from the generated source and writes nothing.
 const checkOnly = process.argv.includes("--check");
 
 if (checkOnly) {
+	// Both packages are released from one tag, so a version edited in one file and
+	// forgotten in the other would publish a Python package claiming a version that
+	// was never released.
+	const packageManifest = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+	const packageVersion = packageManifest.version;
+
+	// The version is the only field read out of pyproject.toml, and the file is ours, so
+	// a pattern match avoids taking on a TOML parser for one line.
+	const pythonVersionMatch = readFileSync(pythonProjectPath, "utf8").match(
+		/^version\s*=\s*"([^"]+)"/m,
+	);
+
+	const pythonVersion = pythonVersionMatch?.[1];
+	const versionsMatch = packageVersion === pythonVersion;
+
+	// The Python package carries its own copy of the licence, because a wheel built from
+	// the published source archive cannot reach the one at the repository root.
+	const repositoryLicense = readLicenseFile(repositoryLicensePath);
+	const pythonLicense = readLicenseFile(pythonLicensePath);
+
+	const missingLicensePaths = [
+		["LICENSE", repositoryLicense],
+		["adapters/python/LICENSE", pythonLicense],
+	]
+		.filter(([, contents]) => contents === null)
+		.map(([path]) => path);
+
+	const licensesMatch = missingLicensePaths.length === 0 && repositoryLicense.equals(pythonLicense);
+
 	// A committed wrapper is stale when its contents differ from the generated source; a missing file counts as stale.
 	const staleFiles = generatedFiles.filter(({ path, source }) => {
 		try {
@@ -396,13 +448,33 @@ if (checkOnly) {
 		}
 	});
 
+	if (!versionsMatch) {
+		console.error("Package versions do not match:");
+		console.error(`- package.json: ${packageVersion ?? "missing"}`);
+		console.error(`- adapters/python/pyproject.toml: ${pythonVersion ?? "missing"}`);
+	}
+
+	if (missingLicensePaths.length > 0) {
+		console.error("Licence files are missing:");
+
+		for (const path of missingLicensePaths) {
+			console.error(`- ${path}`);
+		}
+	} else if (!licensesMatch) {
+		console.error("Licence files do not match:");
+		console.error("- LICENSE");
+		console.error("- adapters/python/LICENSE");
+	}
+
 	if (staleFiles.length > 0) {
 		console.error("Generated adapters are stale:");
 
 		for (const { path } of staleFiles) {
 			console.error(`- ${path}`);
 		}
+	}
 
+	if (staleFiles.length > 0 || !versionsMatch || !licensesMatch) {
 		process.exitCode = 1;
 	}
 } else {
