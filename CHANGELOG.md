@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.14.0 - 2026-09-20
+
+### Added
+
+- Added a `bulletList()` renderer (`bullet-list` for `cli-style render`) for simple bulleted lists. Section lists in the patterns layer now render through it, with unchanged output.
+- Added a `bullet_list` wrapper to the Python adapter.
+- The renderer catalogue now describes each renderer's parameters with their types, and the full input contract each renderer accepts, so adapters and agents can work out how to call a renderer without reading the source.
+- The Python adapter's wrappers are now generated from the renderer catalogue, so they stay in step with the renderers they wrap.
+- The Swift adapter now ships as a Swift package with generated wrappers, exposing a `CliStyle` product.
+- The Bash, Python, and Swift adapters now fall back to plain text when the `cli-style` binary is not on `PATH`, instead of failing.
+- `bun run check:adapters` now fails when the generated adapter wrappers are out of date with the renderer catalogue.
+
+### Fixed
+
+- The published package now includes the Python and Swift adapter packages, which were missing from the build.
+
 ## 0.13.0 - 2026-09-05
 
 ### Added

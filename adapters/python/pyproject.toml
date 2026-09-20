@@ -1,6 +1,6 @@
 [project]
 name = "cli-style"
-version = "0.13.0"
+version = "0.14.0"
 description = "Python adapter for the shared cli-style binary."
 authors = [{ name = "Lewis Howles" }]
 license = { text = "MIT" }
