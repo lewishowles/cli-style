@@ -42,6 +42,7 @@ Planned functionality:
 
 ## Gotchas
 
+- The Python adapter is published to PyPI as `lewishowles-cli-style` but imported as `cli_style`. PyPI rejected `cli-style` as too close to an existing project, so an agent that guesses the install name will install someone else's package.
 - Do not style machine-readable JSON.
 - Add every new renderer, pattern, reporter, token family, or visual state to `cli-style gallery` in the same chunk so output can be reviewed visually before adoption.
 - Do not rely on colour alone. Every severity needs text and a symbol.
