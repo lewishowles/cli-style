@@ -175,7 +175,7 @@ describe("Catalogue commands", () => {
 			["hint", ["message"]],
 			["labelled-line", ["label", "message", "icon", "tone", "wrap", "wrapWidth"]],
 			["next-step-block", ["next", "reason", "title", "commands", "alternatives"]],
-			["panel", ["lines", "title", "tone", "panelWidth"]],
+			["panel", ["lines", "title", "tone", "width"]],
 			["progress-bar", ["max", "value", "barWidth", "tone"]],
 			[
 				"row",

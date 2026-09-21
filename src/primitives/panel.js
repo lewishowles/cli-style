@@ -1,9 +1,13 @@
 import { background, foreground, style } from "../formatters/ansi.js";
+import { wrapText } from "../formatters/wrap.js";
 import { profiles } from "../profiles/profiles.js";
 import { panelColours } from "../theme/colours.js";
 
-// Panels use a stable width so grouped output aligns across a report.
+// The width used when no width is given, such as a direct library call outside a terminal.
 const defaultWidth = 40;
+
+// The narrowest panel that still leaves one column for content beside the accent and padding.
+const minimumWidth = 6;
 
 // Info is the neutral semantic accent for grouped explanatory content.
 const defaultTone = "info";
@@ -17,8 +21,9 @@ const defaultTone = "info";
  *     Whether ANSI colour should be applied.
  * @param  {string[]}  options.lines
  *     Content lines to render.
- * @param  {number}  options.panelWidth
- *     Total panel width.
+ * @param  {number}  options.width
+ *     Total panel width, including the accent and padding. Widths below 6 are raised to 6,
+ *     which leaves room for one character of content. Longer lines wrap to fit.
  * @param  {string}  options.profile
  *     Active output profile.
  * @param  {string}  options.title
@@ -37,18 +42,18 @@ export function panel(options = {}) {
 		return [...(options.title === undefined ? [] : [options.title]), ...lines].join("\n");
 	}
 
-	const width = Math.max(options.panelWidth ?? defaultWidth, 4);
+	const width = Math.max(options.width ?? defaultWidth, minimumWidth);
 	const panelLines = ["", ...(options.title === undefined ? [] : [options.title]), ...lines, ""];
 
 	return panelLines
-		.map((line, index) =>
+		.flatMap((line, index) =>
 			renderLine(line, width, index === 1 && options.title !== undefined, options),
 		)
 		.join("\n");
 }
 
 /**
- * Render one fixed-width panel line.
+ * Render one content line, wrapped across as many panel lines as it needs.
  *
  * @param  {string}  line
  *     Content line.
@@ -58,28 +63,30 @@ export function panel(options = {}) {
  *     Whether the line is the panel title.
  * @param  {object}  options
  *     Rendering options.
- * @returns  {string}
- *     Rendered content line.
+ * @returns  {string[]}
+ *     The panel lines, each exactly `width` columns wide.
  */
 function renderLine(line, width, isTitle, options) {
 	const accent = options.unicode === false ? "|" : "▌";
 	const contentWidth = width - 5;
-	const visibleLine = line.slice(0, contentWidth);
-	const content = `  ${visibleLine.padEnd(contentWidth, " ")}  `;
 
-	if (options.colour !== true) {
-		return `${accent}${content}`;
-	}
+	return wrapText(line, contentWidth).map((visibleLine) => {
+		const content = `  ${visibleLine.padEnd(contentWidth, " ")}  `;
 
-	const renderedAccent = renderPanelColour(accent, options);
+		if (options.colour !== true) {
+			return `${accent}${content}`;
+		}
 
-	const renderedContent = foreground(
-		background(content, panelColours.background, options),
-		panelColours.body,
-		options,
-	);
+		const renderedAccent = renderPanelColour(accent, options);
 
-	return `${renderedAccent}${isTitle ? style(renderedContent, "bold", options) : renderedContent}`;
+		const renderedContent = foreground(
+			background(content, panelColours.background, options),
+			panelColours.body,
+			options,
+		);
+
+		return `${renderedAccent}${isTitle ? style(renderedContent, "bold", options) : renderedContent}`;
+	});
 }
 
 /**

@@ -383,19 +383,19 @@ Pre-render a `span` when only part of the hint needs emphasis.
 
 ### Structured primitives
 
-| Renderer        | Main fields                            |
-| --------------- | -------------------------------------- |
-| `divider`       | `label`, `dividerWidth`, `character`   |
-| `chip`          | `label`, `tone`                        |
-| `panel`         | `title`, `lines`, `tone`, `panelWidth` |
-| `table`         | `columns`, `rows`, `width`             |
-| `progress-bar`  | `value`, `max`, `barWidth`, `tone`     |
-| `bar-chart`     | `rows`, `barWidth`                     |
-| `sparkline`     | `values`, `label`, `tone`, `width`     |
-| `step`          | `label`, `state`                       |
-| `step-progress` | `steps`, `current`                     |
-| `empty-state`   | `title`, `detail`                      |
-| `error-block`   | `title`, `lines`                       |
+| Renderer        | Main fields                          |
+| --------------- | ------------------------------------ |
+| `divider`       | `label`, `dividerWidth`, `character` |
+| `chip`          | `label`, `tone`                      |
+| `panel`         | `title`, `lines`, `tone`, `width`    |
+| `table`         | `columns`, `rows`, `width`           |
+| `progress-bar`  | `value`, `max`, `barWidth`, `tone`   |
+| `bar-chart`     | `rows`, `barWidth`                   |
+| `sparkline`     | `values`, `label`, `tone`, `width`   |
+| `step`          | `label`, `state`                     |
+| `step-progress` | `steps`, `current`                   |
+| `empty-state`   | `title`, `detail`                    |
+| `error-block`   | `title`, `lines`                     |
 
 For visual examples, run `cli-style gallery --section primitives`.
 

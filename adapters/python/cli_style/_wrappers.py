@@ -297,7 +297,7 @@ def panel(
 	lines: list[str] | None = None,
 	title: str | None = None,
 	tone: str = "info",
-	panel_width: int | float | None = None,
+	width: int | float | None = None,
 	**kwargs: Any,
 ) -> str:
 	"""Return panel output; extra keyword arguments go to render()."""
@@ -308,8 +308,8 @@ def panel(
 
 	if title is not None:
 		data["title"] = title
-	if panel_width is not None:
-		data["panelWidth"] = panel_width
+	if width is not None:
+		data["width"] = width
 
 	return render("panel", data, **kwargs)
 

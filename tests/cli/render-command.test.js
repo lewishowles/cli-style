@@ -100,6 +100,43 @@ describe("renderJsonInput", () => {
 		expect(output).toContain("• Add adapters");
 	});
 
+	test("Uses the panel width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				lines: ["A long line that must wrap"],
+				width: 20,
+			}),
+			parseRenderRequest(["panel"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 20)).toBe(true);
+	});
+
+	test("Uses the error-block width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				lines: ["A long line that must wrap"],
+				title: "Failure",
+				width: 20,
+			}),
+			parseRenderRequest(["error-block"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 20)).toBe(true);
+	});
+
 	test("Renders a structured diff block from caller JSON", () => {
 		const output = renderJsonInput(
 			JSON.stringify({

@@ -31,7 +31,7 @@ describe("Feedback primitives", () => {
 	test("Renders errors as danger panels", () => {
 		const output = errorBlock("Configuration invalid", ["Missing required field: package"], {
 			colour: false,
-			panelWidth: 40,
+			width: 40,
 		});
 
 		expect(output).toBe(

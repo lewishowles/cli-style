@@ -595,7 +595,7 @@ const rendererDefinitions = [
 				default: "info",
 			},
 			{
-				name: "panelWidth",
+				name: "width",
 				type: "number",
 				required: false,
 				default: null,

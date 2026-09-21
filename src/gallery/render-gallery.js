@@ -280,7 +280,6 @@ function galleryWidthOptions(width) {
 	return {
 		barWidth: Math.max(width - 18, 1),
 		dividerWidth: width,
-		panelWidth: width,
 	};
 }
 
@@ -790,7 +789,7 @@ function renderPrimitives(options) {
 		emptyState("No results", "tone: muted", options),
 		errorBlock("Failed", ["tone: danger"], {
 			...options,
-			panelWidth: 40,
+			width: 40,
 		}),
 		"",
 		"Steps",

@@ -341,7 +341,7 @@ extension CliStyle {
 		lines: [String]? = nil,
 		title: String? = nil,
 		tone: String = "info",
-		panelWidth: Int? = nil,
+		width: Int? = nil,
 		options: CliStyleOptions = .init()
 	) throws -> String {
 		var data: [String: Any] = [
@@ -352,8 +352,8 @@ extension CliStyle {
 		if let title = title {
 			data["title"] = title
 		}
-		if let panelWidth = panelWidth {
-			data["panelWidth"] = panelWidth
+		if let width = width {
+			data["width"] = width
 		}
 
 		return try render("panel", data: data, options: options)

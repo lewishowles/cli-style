@@ -113,7 +113,7 @@ describe("Render contracts", () => {
 			panel({
 				colour: false,
 				lines: ["Ready"],
-				panelWidth: 12,
+				width: 12,
 				title: "Status",
 			}),
 		).toBe("▌           \n▌  Status   \n▌  Ready    \n▌           ");

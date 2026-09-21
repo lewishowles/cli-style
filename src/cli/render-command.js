@@ -63,6 +63,7 @@ const renderers = {
 		errorBlock(input.title, input.lines, {
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	hint: (input, options) =>
 		hint(input.message, {
@@ -79,6 +80,7 @@ const renderers = {
 		panel({
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	"progress-bar": (input, options) =>
 		progressBar({
