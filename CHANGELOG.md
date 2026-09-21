@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 0.16.0 - 2026-09-21
+
+### Breaking changes
+
+- BREAKING: Removed the `panelWidth` option from `panel()` and the `panel` renderer. Use `width` instead.
+- BREAKING: Panels now honour the requested total `width`, raise widths below 6 to the minimum usable width, and wrap long lines to fit.
+
+### Fixed
+
+- An explicit JSON `width` now takes precedence over the terminal width for width-aware renderers, so piped output stays within the caller's requested bounds.
+
 ## 0.15.0 - 2026-09-20
 
 ### Added
