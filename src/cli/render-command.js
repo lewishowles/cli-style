@@ -38,6 +38,7 @@ const renderers = {
 		bulletList(input.items, {
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	chip: (input, options) =>
 		chip(input.label, input.tone, {
@@ -74,6 +75,7 @@ const renderers = {
 		labelledLine(input.label, input.message, {
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	"next-step-block": (input, options) => nextStepBlock(input, options),
 	panel: (input, options) =>
@@ -91,16 +93,19 @@ const renderers = {
 		row(input.label, input.value, {
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	"row-group": (input, options) =>
 		rowGroup({
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	sparkline: (input, options) =>
 		sparkline({
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	span: (input, options) =>
 		span(input.value, input.tone, {
@@ -126,6 +131,7 @@ const renderers = {
 		table({
 			...input,
 			...options,
+			width: input.width ?? options.width,
 		}),
 	"task-summary": (input, options) => taskSummary(input, options),
 };

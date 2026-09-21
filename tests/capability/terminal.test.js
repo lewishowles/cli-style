@@ -167,6 +167,41 @@ describe("Terminal capability detection", () => {
 		expect(capabilities.width).toBe(80);
 	});
 
+	test("Uses COLUMNS when the stream has no width", () => {
+		const capabilities = resolveTerminalCapabilities({
+			env: {
+				COLUMNS: "132",
+			},
+			stdout: {},
+		});
+
+		expect(capabilities.width).toBe(132);
+	});
+
+	test("Prefers stream width over COLUMNS", () => {
+		const capabilities = resolveTerminalCapabilities({
+			env: {
+				COLUMNS: "132",
+			},
+			stdout: {
+				columns: 120,
+			},
+		});
+
+		expect(capabilities.width).toBe(120);
+	});
+
+	test.each(["", "0", "-10", "1.5", "wide"])("Ignores invalid COLUMNS value %s", (columns) => {
+		const capabilities = resolveTerminalCapabilities({
+			env: {
+				COLUMNS: columns,
+			},
+			stdout: {},
+		});
+
+		expect(capabilities.width).toBe(80);
+	});
+
 	test("Resolves COLORFGBG background slots", () => {
 		expect(
 			resolveTerminalCapabilities({

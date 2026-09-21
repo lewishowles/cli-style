@@ -86,6 +86,10 @@ ui.print(output);
 
 Renderer methods return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
 
+For `render` commands, width follows this priority: JSON payload `width`, `--width`,
+`stdout.columns`, positive `COLUMNS`, then `80`, so piped output stays within the caller's requested
+size when the payload supplies a width.
+
 ### CLI render
 
 Use `cli-style render <renderer>` when a script needs rendered text from JSON input:

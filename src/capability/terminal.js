@@ -29,7 +29,7 @@ export function resolveTerminalCapabilities(options = {}) {
 	const isCi = env.CI === "true" || env.CI === "1";
 	const isDumb = env.TERM === "dumb";
 	const forceColour = env.FORCE_COLOR !== undefined && env.FORCE_COLOR !== "0";
-	const width = resolveWidth(stdout.columns);
+	const width = resolveWidth(stdout.columns, env.COLUMNS);
 	const usesPlain = argv.includes("--plain");
 
 	const colour = resolveColour({
@@ -189,16 +189,25 @@ function resolveUnicode(options) {
 }
 
 /**
- * Resolve terminal width with a stable fallback.
+ * Resolve the terminal width from the output stream, then `COLUMNS`, then a fixed fallback.
  *
- * @param  {number}  width
- *     Stream-reported column count.
+ * @param  {number}  streamWidth
+ *     The column count the output stream reports when it is a terminal.
+ * @param  {string}  columns
+ *     The `COLUMNS` environment value, used when the stream reports no width, such as when
+ *     output is piped. Anything other than a positive whole number is ignored.
  * @returns  {number}
  *     Usable terminal width.
  */
-function resolveWidth(width) {
-	if (Number.isInteger(width) && width > 0) {
-		return width;
+function resolveWidth(streamWidth, columns) {
+	if (Number.isInteger(streamWidth) && streamWidth > 0) {
+		return streamWidth;
+	}
+
+	const environmentWidth = Number(columns);
+
+	if (Number.isInteger(environmentWidth) && environmentWidth > 0) {
+		return environmentWidth;
 	}
 
 	return defaultWidth;

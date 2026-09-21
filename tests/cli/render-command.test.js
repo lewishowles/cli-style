@@ -137,6 +137,133 @@ describe("renderJsonInput", () => {
 		expect(output.split("\n").every((line) => line.length <= 20)).toBe(true);
 	});
 
+	test("Uses the bullet-list width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				items: ["A long bullet item that must wrap within the payload width"],
+				width: 24,
+			}),
+			parseRenderRequest(["bullet-list"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 24)).toBe(true);
+	});
+
+	test("Uses the labelled-line width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				label: "Status",
+				message: "A long labelled message that must wrap within the payload width",
+				width: 24,
+			}),
+			parseRenderRequest(["labelled-line"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 24)).toBe(true);
+	});
+
+	test("Uses the row width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				label: "Status",
+				value: "A long row value that must wrap within the payload width",
+				width: 24,
+			}),
+			parseRenderRequest(["row"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 24)).toBe(true);
+	});
+
+	test("Uses the row-group width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				rows: [
+					{
+						label: "Status",
+						value: "A long row-group value that must wrap within the payload width",
+					},
+				],
+				width: 24,
+			}),
+			parseRenderRequest(["row-group"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 24)).toBe(true);
+	});
+
+	test("Uses the table width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				columns: [
+					{ key: "name", label: "Name" },
+					{ key: "status", label: "Status" },
+					{ key: "detail", label: "Detail" },
+				],
+				rows: [
+					{
+						detail: "Requires manual review",
+						name: "Build",
+						status: "Passed with warning",
+					},
+				],
+				width: 40,
+			}),
+			parseRenderRequest(["table"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: true,
+				width: 80,
+			},
+		);
+
+		expect(output.split("\n").every((line) => line.length <= 40)).toBe(true);
+	});
+
+	test("Uses the sparkline width from caller JSON without a CLI width", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				label: "Latency",
+				values: [0, 1, 2, 3, 4, 5],
+				width: 3,
+			}),
+			parseRenderRequest(["sparkline"]),
+			{
+				colour: false,
+				profile: profiles.HUMAN,
+				unicode: false,
+				width: 80,
+			},
+		);
+
+		expect(output.split(" latest=")[0]).toBe("Latency: .=#");
+	});
+
 	test("Renders a structured diff block from caller JSON", () => {
 		const output = renderJsonInput(
 			JSON.stringify({
