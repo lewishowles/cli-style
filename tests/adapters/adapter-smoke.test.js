@@ -475,6 +475,51 @@ describe("Adapter smoke tests", () => {
 		expect(result.stderr).toBe("");
 	});
 
+	test("Python rows keep long values on one line and accept per-row Python options", () => {
+		const environment = {
+			...process.env,
+			FORCE_COLOR: "1",
+			TERM: "xterm-256color",
+		};
+
+		delete environment.NO_COLOR;
+
+		const result = spawnSync(
+			"python3",
+			[
+				"-c",
+				[
+					"from adapters.python.cli_style import row, row_group",
+					"kwargs = {'binary': './bin/cli-style.js'}",
+					"print(row('Single', 'a long value that stays together', wrap=False, wrap_width=8, **kwargs))",
+					"print(row_group([{'label': 'Group', 'value': 'another long value that stays together'}], wrap=False, wrap_width=8, label_colour='info', separator=' => ', **kwargs))",
+					"print(row_group([{'label': 'Python', 'value': 'a third long value that stays together', 'wrap': False, 'label_colour': 'muted'}, {'label': 'JavaScript', 'value': 'short', 'labelColour': 'muted'}], wrap=True, wrap_width=8, label_colour='info', **kwargs))",
+				].join("\n"),
+			],
+			{
+				encoding: "utf8",
+				env: environment,
+			},
+		);
+
+		expect(result.status).toBe(0);
+		expect(stripAnsi(result.stdout.trim())).toBe(
+			[
+				"Single  a long value that stays together",
+				"Group => another long value that stays together",
+				"Python      a third long value that stays together",
+				"JavaScript  short",
+			].join("\n"),
+		);
+		expect(result.stdout.trim().split("\n")).toEqual([
+			"\u001b[38;5;246mSingle\u001b[0m  a long value that stays together",
+			"\u001b[38;5;117mGroup\u001b[0m => another long value that stays together",
+			"\u001b[38;5;246mPython    \u001b[0m  a third long value that stays together",
+			"\u001b[38;5;246mJavaScript\u001b[0m  short",
+		]);
+		expect(result.stderr).toBe("");
+	});
+
 	test("Python adapter bullet list function renders flat and nested items", () => {
 		const result = spawnSync(
 			"python3",

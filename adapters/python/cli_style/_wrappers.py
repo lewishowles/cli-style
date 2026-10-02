@@ -6,6 +6,22 @@ from typing import Any
 
 from .core import render
 
+
+def _camel_case_row(row: Any) -> Any:
+	"""Return a copy of a row with Python option names, such as label_colour, renamed to the camelCase names the renderer reads. Keys already in camelCase are kept, and a value that is not a dictionary is returned unchanged for the renderer to filter."""
+	if not isinstance(row, dict):
+		return row
+
+	converted_row = {}
+
+	for key, value in row.items():
+		parts = key.split("_")
+		camel_case_key = parts[0] + "".join(part.capitalize() for part in parts[1:])
+		converted_row[camel_case_key] = value
+
+	return converted_row
+
+
 def agent_transcript(
 	entries: list[dict[str, Any]] | None = None,
 	title: str | None = None,
@@ -342,6 +358,8 @@ def row(
 	label_colour: str | None = None,
 	value_colour: str | None = None,
 	separator: str | None = None,
+	wrap: bool = True,
+	wrap_width: int | float | None = None,
 	**kwargs: Any,
 ) -> str:
 	"""Return row output; extra keyword arguments go to render()."""
@@ -349,6 +367,7 @@ def row(
 		"label": label,
 		"value": value,
 		"result": result,
+		"wrap": wrap,
 	}
 
 	if label_width is not None:
@@ -359,6 +378,8 @@ def row(
 		data["valueColour"] = value_colour
 	if separator is not None:
 		data["separator"] = separator
+	if wrap_width is not None:
+		data["wrapWidth"] = wrap_width
 
 	return render("row", data, **kwargs)
 
@@ -366,15 +387,29 @@ def row(
 def row_group(
 	rows: list[dict[str, Any]],
 	label_width: int | float | None = None,
+	label_colour: str | None = None,
+	value_colour: str | None = None,
+	separator: str | None = None,
+	wrap: bool = True,
+	wrap_width: int | float | None = None,
 	**kwargs: Any,
 ) -> str:
 	"""Return row-group output; extra keyword arguments go to render()."""
 	data = {
-		"rows": rows,
+		"rows": [_camel_case_row(row) for row in rows],
+		"wrap": wrap,
 	}
 
 	if label_width is not None:
 		data["labelWidth"] = label_width
+	if label_colour is not None:
+		data["labelColour"] = label_colour
+	if value_colour is not None:
+		data["valueColour"] = value_colour
+	if separator is not None:
+		data["separator"] = separator
+	if wrap_width is not None:
+		data["wrapWidth"] = wrap_width
 
 	return render("row-group", data, **kwargs)
 

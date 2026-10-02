@@ -22,6 +22,20 @@ print(render("status", {"type": "success", "label": "Build passed"}))
 
 If the `cli-style` binary is not available, `render()` returns sorted plain `key: value` text by default. Pass `raise_on_missing=True` to raise `CliStyleNotFoundError` instead.
 
+Use `row()` for one labelled value or `row_group()` to align several values. Both accept `wrap=False` to keep values on one line and `wrap_width` to set the width used when wrapping. `row_group()` also accepts `label_colour`, `value_colour`, and `separator` as defaults for its rows:
+
+```python
+from cli_style import row_group
+
+print(row_group(
+    [{"label": "Command", "value": "python -m pip install lewishowles-cli-style"}],
+    wrap=False,
+    label_colour="muted",
+))
+```
+
+Each row has `label`, `value`, and an optional `result`. It can override the group defaults with `label_colour`, `value_colour`, `separator`, `wrap`, or `wrap_width`. The JavaScript spellings, such as `labelColour` and `wrapWidth`, also work in row dictionaries. Callers add any blank lines around rendered blocks. Python `render()` removes trailing newlines from rendered strings.
+
 ## More information
 
 - [Repository](https://github.com/lewishowles/cli-style)

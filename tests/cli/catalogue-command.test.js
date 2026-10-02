@@ -191,7 +191,10 @@ describe("Catalogue commands", () => {
 					"wrapWidth",
 				],
 			],
-			["row-group", ["rows", "labelWidth", "wrap", "wrapWidth"]],
+			[
+				"row-group",
+				["rows", "labelWidth", "labelColour", "valueColour", "separator", "wrap", "wrapWidth"],
+			],
 			["sparkline", ["values", "width", "label", "tone"]],
 			["span", ["value", "tone", "weight"]],
 			["status", ["type", "label", "detail"]],

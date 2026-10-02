@@ -393,12 +393,15 @@ extension CliStyle {
 		labelColour: String? = nil,
 		valueColour: String? = nil,
 		separator: String? = nil,
+		wrap: Bool = true,
+		wrapWidth: Int? = nil,
 		options: CliStyleOptions = .init()
 	) throws -> String {
 		var data: [String: Any] = [
 			"label": label,
 			"value": value,
 			"result": result,
+			"wrap": wrap,
 		]
 
 		if let labelWidth = labelWidth {
@@ -413,6 +416,9 @@ extension CliStyle {
 		if let separator = separator {
 			data["separator"] = separator
 		}
+		if let wrapWidth = wrapWidth {
+			data["wrapWidth"] = wrapWidth
+		}
 
 		return try render("row", data: data, options: options)
 	}
@@ -423,14 +429,32 @@ extension CliStyle {
 	public static func rowGroup(
 		rows: [[String: Any]],
 		labelWidth: Int? = nil,
+		labelColour: String? = nil,
+		valueColour: String? = nil,
+		separator: String? = nil,
+		wrap: Bool = true,
+		wrapWidth: Int? = nil,
 		options: CliStyleOptions = .init()
 	) throws -> String {
 		var data: [String: Any] = [
 			"rows": rows,
+			"wrap": wrap,
 		]
 
 		if let labelWidth = labelWidth {
 			data["labelWidth"] = labelWidth
+		}
+		if let labelColour = labelColour {
+			data["labelColour"] = labelColour
+		}
+		if let valueColour = valueColour {
+			data["valueColour"] = valueColour
+		}
+		if let separator = separator {
+			data["separator"] = separator
+		}
+		if let wrapWidth = wrapWidth {
+			data["wrapWidth"] = wrapWidth
 		}
 
 		return try render("row-group", data: data, options: options)

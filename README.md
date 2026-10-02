@@ -63,6 +63,8 @@ The package contains `bin/cli-style` and `adapters/`.
 
 All renderers return text. JavaScript imports functions directly. CLI, Bash, Python, and Swift integrations pass JSON-compatible data to a named renderer.
 
+Callers add any blank lines around rendered blocks. Renderers return strings without a trailing newline, and the CLI ends its output with one newline.
+
 ### JavaScript
 
 Create the `ui` instance at the CLI entrypoint, then pass `ui.options` to renderers. That keeps flag, environment, stream, colour, Unicode, and width detection in one place.
@@ -317,6 +319,8 @@ Use these shapes with `cli-style render`, `cli_style_render`, or Python `render(
 - `result`: optional result type for a symbol and tone
 - `labelWidth`: optional minimum label width
 - `labelColour`, `valueColour`, `separator`: optional presentation overrides
+- `wrap`: set to `false` to keep the value on one line
+- `wrapWidth`: optional value width when wrapping is enabled
 
 ### `row-group`
 
@@ -337,7 +341,10 @@ Use these shapes with `cli-style render`, `cli_style_render`, or Python `render(
 
 - `rows`: labelled values to align and render
 - `labelWidth`: optional minimum width for every label
-- Per-row fields match `row`, including `label`, `value`, `result`, `labelColour`, `valueColour`, and `separator`
+- `labelColour`, `valueColour`, `separator`: optional defaults for every row
+- `wrap`: set to `false` to keep every value on one line
+- `wrapWidth`: optional value width when wrapping is enabled
+- Each row takes the same fields as `row`. Row options other than `labelWidth` override the group defaults
 
 ### `bullet-list`
 

@@ -235,10 +235,15 @@ function renderWrapper(renderer) {
 		(parameter) => !isRequiredParameter(parameter) && parameter.default === null,
 	);
 
-	const payloadLines = payloadParameters.map(
-		(parameter) =>
-			`\t\t${JSON.stringify(parameter.name)}: ${renderPayloadValue(parameter, descriptor)},`,
-	);
+	const payloadLines = payloadParameters.map((parameter) => {
+		const isRowGroupRows = renderer.name === "row-group" && parameter.name === "rows";
+
+		const payloadValue = isRowGroupRows
+			? "[_camel_case_row(row) for row in rows]"
+			: renderPayloadValue(parameter, descriptor);
+
+		return `\t\t${JSON.stringify(parameter.name)}: ${payloadValue},`;
+	});
 
 	const nullablePayloadLines = nullableParameters.flatMap((parameter) => {
 		const name = descriptor.parameterName(parameter);
@@ -278,6 +283,22 @@ function renderWrappers() {
 		"from typing import Any",
 		"",
 		"from .core import render",
+		"",
+		"",
+		"def _camel_case_row(row: Any) -> Any:",
+		'\t"""Return a copy of a row with Python option names, such as label_colour, renamed to the camelCase names the renderer reads. Keys already in camelCase are kept, and a value that is not a dictionary is returned unchanged for the renderer to filter."""',
+		"\tif not isinstance(row, dict):",
+		"\t\treturn row",
+		"",
+		"\tconverted_row = {}",
+		"",
+		"\tfor key, value in row.items():",
+		'\t\tparts = key.split("_")',
+		'\t\tcamel_case_key = parts[0] + "".join(part.capitalize() for part in parts[1:])',
+		"\t\tconverted_row[camel_case_key] = value",
+		"",
+		"\treturn converted_row",
+		"",
 		"",
 		wrappers,
 		"",
