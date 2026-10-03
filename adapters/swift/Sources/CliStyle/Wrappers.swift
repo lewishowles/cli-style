@@ -383,6 +383,29 @@ extension CliStyle {
 	}
 
 	/**
+	 * Return quote-block output from the cli-style binary; `options` sets the profile, width, and binary.
+	 */
+	public static func quoteBlock(
+		lines: [String]? = nil,
+		title: String? = nil,
+		width: Int? = nil,
+		options: CliStyleOptions = .init()
+	) throws -> String {
+		var data: [String: Any] = [
+			"lines": lines ?? [],
+		]
+
+		if let title = title {
+			data["title"] = title
+		}
+		if let width = width {
+			data["width"] = width
+		}
+
+		return try render("quote-block", data: data, options: options)
+	}
+
+	/**
 	 * Return row output from the cli-style binary; `options` sets the profile, width, and binary.
 	 */
 	public static func row(

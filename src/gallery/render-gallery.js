@@ -6,6 +6,7 @@ import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
+import { quoteBlock } from "../patterns/quote-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { stripAnsi } from "../formatters/ansi.js";
 import { renderSpinnerFrame } from "../interactive/spinner.js";
@@ -133,6 +134,7 @@ export const galleryFixtures = [
 	"confirmation-result",
 	"next-step-block",
 	"diff-block",
+	"quote-block",
 	"sparkline",
 	"spinner",
 ];
@@ -600,6 +602,19 @@ function renderPatterns(options, fixture) {
 		"diagnostic-report": ["Diagnostic report", report],
 		"diff-block": ["Diff block", diff],
 		"next-step-block": ["Next-step block", nextStep],
+		"quote-block": [
+			"Quote block",
+			quoteBlock(
+				{
+					lines: [
+						"A command can return a long explanation that wraps while the marker stays beside each continuation line.",
+						"A second line keeps the same marker.",
+					],
+					title: "Command output",
+				},
+				options,
+			),
+		],
 		reporter: ["Reporter", reporterOutput],
 		"task-summary": ["Task summary", summary],
 	};
@@ -634,6 +649,9 @@ function renderPatterns(options, fixture) {
 		"",
 		"Diff block",
 		frameExample(diff, options),
+		"",
+		"Quote block",
+		frameExample(fixtures["quote-block"][1], options),
 		"",
 		"Compact data table",
 		frameExample(compactTable, options),

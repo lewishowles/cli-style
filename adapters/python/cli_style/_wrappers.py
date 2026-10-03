@@ -350,6 +350,25 @@ def progress_bar(
 	return render("progress-bar", data, **kwargs)
 
 
+def quote_block(
+	lines: list[str] | None = None,
+	title: str | None = None,
+	width: int | float | None = None,
+	**kwargs: Any,
+) -> str:
+	"""Return quote-block output; extra keyword arguments go to render()."""
+	data = {
+		"lines": [] if lines is None else lines,
+	}
+
+	if title is not None:
+		data["title"] = title
+	if width is not None:
+		data["width"] = width
+
+	return render("quote-block", data, **kwargs)
+
+
 def row(
 	label: str,
 	value: str,

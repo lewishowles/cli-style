@@ -38,6 +38,7 @@ export { confirmationResult } from "./patterns/confirmation-result.js";
 export { diagnosticReport } from "./patterns/diagnostic-report.js";
 export { diffBlock } from "./patterns/diff-block.js";
 export { nextStepBlock } from "./patterns/next-step-block.js";
+export { quoteBlock } from "./patterns/quote-block.js";
 export { taskSummary } from "./patterns/task-summary.js";
 export { barChart } from "./primitives/bar-chart.js";
 export { bulletList } from "./primitives/bullet-list.js";

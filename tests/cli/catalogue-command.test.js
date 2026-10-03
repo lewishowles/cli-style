@@ -177,6 +177,7 @@ describe("Catalogue commands", () => {
 			["next-step-block", ["next", "reason", "title", "commands", "alternatives"]],
 			["panel", ["lines", "title", "tone", "width"]],
 			["progress-bar", ["max", "value", "barWidth", "tone"]],
+			["quote-block", ["lines", "title", "width"]],
 			[
 				"row",
 				[

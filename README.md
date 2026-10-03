@@ -282,6 +282,7 @@ Renderer names are stable for `cli-style render`, `cli_style_render`, and Python
 | `empty-state`         | `emptyState(title, detail, options)`  | Use `cli_style_render`               | Use `render("empty-state", ...)`   | Use `CliStyle.render`                  | Empty result message.                                           |
 | `error-block`         | `errorBlock(title, lines, options)`   | Use `cli_style_render`               | Use `render("error-block", ...)`   | Use `CliStyle.render`                  | Structured error block.                                         |
 | `diff-block`          | `diffBlock(diff, options)`            | Use `cli_style_render`               | Use `render("diff-block", ...)`    | Use `CliStyle.render`                  | Structured added, removed, context, and header lines.           |
+| `quote-block`         | `quoteBlock(quote, options)`          | Use `cli_style_render`               | `quote_block(lines, title, width)` | `CliStyle.quoteBlock(...)`             | Output lines with a left marker and optional heading.           |
 
 Use `render("<renderer>", data, ...)` (Python) or `CliStyle.render(_:data:options:)` (Swift) for aggregate patterns (`diagnostic-report`, `agent-transcript`, `compact-data-table`) or any renderer with multi-item fields.
 
@@ -454,6 +455,19 @@ Patterns are built-in composite renderers for common report shapes. They use the
 | `next-step-block`     | `nextStepBlock(nextStep, options)`          | Next-step guidance.                   | `title`, `next`, `reason`, `commands`, `alternatives`                                |
 | `compact-data-table`  | `compactDataTable(data, options)`           | Titled compact data table.            | `title`, `summary`, `columns`, `rows`                                                |
 | `diff-block`          | `diffBlock(diff, options)`                  | Structured diff presentation.         | `title`, `path`, `lines`                                                             |
+| `quote-block`         | `quoteBlock(quote, options)`                | Quoted output with a visible marker.  | `lines`, `title`, `width`                                                            |
+
+### `quote-block`
+
+Pass output lines with an optional title and total width. Long lines wrap with a marker beside every continuation line, and empty lines are kept. The marker is `│`, or `|` when Unicode is off, and it is muted when colour is enabled. Plain and CI output always use an uncoloured `|`. ANSI colour codes in the title and lines are removed. The `json` profile returns the input unchanged.
+
+```js
+quoteBlock({
+	lines: ["The command returned this explanation.", "A second output line."],
+	title: "Command output",
+	width: 48,
+});
+```
 
 ### `diff-block`
 

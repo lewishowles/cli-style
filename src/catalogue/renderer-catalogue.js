@@ -636,6 +636,32 @@ const rendererDefinitions = [
 		fixture: undefined,
 	},
 	{
+		name: "quote-block",
+		category: "pattern",
+		api: "quoteBlock",
+		params: [
+			{
+				name: "lines",
+				type: "string[]",
+				required: false,
+				default: [],
+			},
+			{
+				name: "title",
+				type: "string",
+				required: false,
+				default: null,
+			},
+			{
+				name: "width",
+				type: "number",
+				required: false,
+				default: null,
+			},
+		],
+		fixture: "quote-block",
+	},
+	{
 		name: "row",
 		category: "primitive",
 		api: "row",

@@ -6,6 +6,7 @@ import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
+import { quoteBlock } from "../patterns/quote-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { bulletList } from "../primitives/bullet-list.js";
@@ -78,6 +79,7 @@ const renderers = {
 			width: input.width ?? options.width,
 		}),
 	"next-step-block": (input, options) => nextStepBlock(input, options),
+	"quote-block": (input, options) => quoteBlock(input, options),
 	panel: (input, options) =>
 		panel({
 			...input,

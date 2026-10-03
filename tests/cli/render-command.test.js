@@ -289,6 +289,27 @@ describe("renderJsonInput", () => {
 		expect(output).toBe(["@@ next()", "+ return next;"].join("\n"));
 	});
 
+	test("Renders a quoted block from caller JSON", () => {
+		const output = renderJsonInput(
+			JSON.stringify({
+				lines: ["The command returned more text than fits", "Done"],
+				title: "Command output",
+			}),
+			parseRenderRequest(["quote-block", "--width", "20"]),
+			{
+				colour: false,
+				profile: profiles.CI,
+				unicode: false,
+			},
+		);
+
+		expect(output).toBe(
+			["Command output", "| The command", "| returned more text", "| than fits", "| Done"].join(
+				"\n",
+			),
+		);
+	});
+
 	test("Rejects invalid input and json profile", () => {
 		expect(() => renderJsonInput("{", parseRenderRequest(["status"]))).toThrow(
 			"Render input must be valid JSON",
@@ -309,6 +330,7 @@ describe("renderJsonInput", () => {
 		expect(rendererNames).toContain("task-summary");
 		expect(rendererNames).toContain("diagnostic-report");
 		expect(rendererNames).toContain("diff-block");
+		expect(rendererNames).toContain("quote-block");
 		expect(rendererNames).toContain("sparkline");
 	});
 });

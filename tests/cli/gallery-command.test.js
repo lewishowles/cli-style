@@ -37,6 +37,7 @@ describe("parseGalleryRequest", () => {
 		);
 		expect(parseGalleryRequest(["--fixture", "next-step-block"]).fixture).toBe("next-step-block");
 		expect(parseGalleryRequest(["--fixture", "diff-block"]).fixture).toBe("diff-block");
+		expect(parseGalleryRequest(["--fixture", "quote-block"]).fixture).toBe("quote-block");
 		expect(parseGalleryRequest(["--fixture", "reporter"]).fixture).toBe("reporter");
 		expect(parseGalleryRequest(["--fixture", "sparkline"]).fixture).toBe("sparkline");
 		expect(parseGalleryRequest(["--variants"])).toEqual({
@@ -95,6 +96,24 @@ describe("parseGalleryRequest", () => {
 		expect(output).toContain("102 + return nextStep;");
 		expect(output).toContain("101     - return currentStep;");
 		expect(output).toContain("100       const currentStep = getStep();");
+	});
+
+	test("Renders the quote-block fixture across all variants", () => {
+		const output = renderGallery(
+			{
+				colour: false,
+				unicode: true,
+			},
+			{
+				fixture: "quote-block",
+				variants: true,
+				width: 72,
+			},
+		);
+
+		expect(output.match(/Command output/g)).toHaveLength(4);
+		expect(output).toContain("│ A command can return");
+		expect(output).toContain("| A command can return");
 	});
 
 	test("Fills diff rows only in colour-enabled gallery variants", () => {
