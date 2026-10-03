@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.17.0 - 2026-10-03
+
+### Added
+
+- Added `quoteBlock()` (`quote-block` for `cli-style render`, `quote_block()` in Python, and `CliStyle.quoteBlock` in Swift) to show another program's output with a visible marker and optional heading.
+- Python `row()` and `row_group()`, and Swift `CliStyle.row` and `CliStyle.rowGroup`, can now wrap long values with the `wrap` and `wrap_width` options (`wrapWidth` in Swift). The row group functions also accept colour and separator defaults, which each row can override.
+
 ## 0.16.0 - 2026-09-21
 
 ### Breaking changes
