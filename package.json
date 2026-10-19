@@ -38,6 +38,9 @@
 		"smoke:binary": "./dist/bin/cli-style render status --plain < tests/fixtures/render/status-success.json",
 		"test:unit": "bun test"
 	},
+	"dependencies": {
+		"get-east-asian-width": "^1.7.0"
+	},
 	"devDependencies": {
 		"@stylistic/eslint-plugin": "^5.10.0",
 		"vite": "npm:@voidzero-dev/vite-plus-core@0.2.8",

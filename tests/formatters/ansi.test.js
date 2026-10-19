@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { background, foreground, stripAnsi, style } from "../../src/index.js";
+import { visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("ANSI foreground colour", () => {
 	test("Applies dark semantic foreground colour when enabled", () => {
@@ -90,5 +91,32 @@ describe("ANSI stripping", () => {
 		});
 
 		expect(stripAnsi(output)).toBe("Passed");
+	});
+
+	test("Removes terminal hyperlinks while keeping their link text", () => {
+		expect(stripAnsi("\u001b]8;;https://example.com\u0007link\u001b]8;;\u0007")).toBe("link");
+		expect(stripAnsi("\u001b]8;;https://example.com\u001b\\link\u001b]8;;\u001b\\")).toBe("link");
+	});
+});
+
+describe("Visible width", () => {
+	test("Ignores ANSI CSI and OSC sequences", () => {
+		expect(visibleWidth("\u001b[31mred\u001b[0m")).toBe(3);
+		expect(visibleWidth("\u001b]8;;https://example.com\u0007link\u001b]8;;\u0007")).toBe(4);
+	});
+
+	test("Counts wide characters and joined emoji as two columns", () => {
+		expect(visibleWidth("A界Ｂ")).toBe(5);
+		expect(visibleWidth("👍🏽👩‍💻")).toBe(4);
+	});
+
+	test("Counts text symbols as one column unless emoji presentation is requested", () => {
+		expect(visibleWidth("©™")).toBe(2);
+		expect(visibleWidth("❤️")).toBe(2);
+		expect(visibleWidth("1️⃣🇬🇧")).toBe(4);
+	});
+
+	test("Counts standalone marks and joiners as zero columns", () => {
+		expect(visibleWidth("\u0301\u200d")).toBe(0);
 	});
 });

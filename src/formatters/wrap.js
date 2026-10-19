@@ -1,11 +1,21 @@
+import { visibleWidth } from "./ansi.js";
+
 // Width used when a caller doesn't provide one.
 const defaultWrapWidth = 64;
+
+// Splits text into the characters people see, so wrapping never breaks a joined emoji apart.
+const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
+// Line breaks end the current wrapped line and take no columns. Windows CR+LF arrives from the
+// segmenter as one character.
+const lineBreaks = new Set(["\n", "\r\n"]);
+
 const escapeCharacter = String.fromCharCode(27);
 const bellCharacter = String.fromCharCode(7);
 
 // Matches ANSI CSI and OSC escape sequences so they can be measured as zero-width.
 const ansiEscapePattern = new RegExp(
-	`${escapeCharacter}(?:\\[[0-?]*[ -/]*[@-~]|\\][^${bellCharacter}]*(?:${bellCharacter}|${escapeCharacter}\\\\))`,
+	`${escapeCharacter}(?:\\[[0-?]*[ -/]*[@-~]|\\][^${bellCharacter}${escapeCharacter}]*(?:${bellCharacter}|${escapeCharacter}\\\\))`,
 	"gu",
 );
 
@@ -27,7 +37,7 @@ export function wrapText(text, width = defaultWrapWidth) {
 	let line = [];
 
 	for (const token of tokens) {
-		if (token.value === "\n") {
+		if (lineBreaks.has(token.value)) {
 			lines.push(renderTokens(line));
 			line = [];
 			continue;
@@ -35,7 +45,7 @@ export function wrapText(text, width = defaultWrapWidth) {
 
 		line.push(token);
 
-		while (visibleWidth(line) > wrapWidth) {
+		while (tokensWidth(line) > wrapWidth) {
 			const whitespaceIndex = findLastWhitespace(line);
 
 			if (whitespaceIndex > 0) {
@@ -77,7 +87,7 @@ function resolveWrapWidth(width) {
 }
 
 /**
- * Split text into visible characters and ANSI escape sequences.
+ * Split text into the characters people see and ANSI escape sequences.
  *
  * @param  {string}  text
  *     Text to tokenise.
@@ -104,7 +114,9 @@ function tokenise(text) {
 }
 
 /**
- * Append one token per character of plain text to a token list.
+ * Append one token per visible character of plain text to a token list, keeping
+ * joined emoji and accented letters whole. Line breaks, including Windows CR+LF,
+ * take no columns.
  *
  * @param  {object[]}  tokens
  *     Token list to append to.
@@ -113,10 +125,10 @@ function tokenise(text) {
  * @returns  {void}
  */
 function appendTextTokens(tokens, text) {
-	for (const value of text) {
+	for (const { segment: value } of graphemeSegmenter.segment(text)) {
 		tokens.push({
 			value,
-			visibleWidth: value === "\n" ? 0 : 1,
+			visibleWidth: lineBreaks.has(value) ? 0 : visibleWidth(value),
 		});
 	}
 }
@@ -129,7 +141,7 @@ function appendTextTokens(tokens, text) {
  * @returns  {number}
  *     Total visible width.
  */
-function visibleWidth(tokens) {
+function tokensWidth(tokens) {
 	return tokens.reduce((width, token) => width + token.visibleWidth, 0);
 }
 
@@ -155,6 +167,7 @@ function findLastWhitespace(tokens) {
 
 /**
  * Find the index to split at when a line has no whitespace to break on.
+ * A single character wider than the limit stays whole on its own line.
  *
  * @param  {object[]}  tokens
  *     Tokens to search.
@@ -167,11 +180,13 @@ function findHardSplitIndex(tokens, width) {
 	let currentWidth = 0;
 
 	for (let index = 0; index < tokens.length; index += 1) {
-		currentWidth += tokens[index].visibleWidth;
+		const nextWidth = currentWidth + tokens[index].visibleWidth;
 
-		if (currentWidth >= width) {
-			return index + 1;
+		if (nextWidth > width && currentWidth > 0) {
+			return index;
 		}
+
+		currentWidth = nextWidth;
 	}
 
 	return tokens.length;

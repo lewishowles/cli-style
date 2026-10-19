@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fixed
+
+- Text wrapping now measures coloured text, wide characters, and joined emoji by the columns they fill. It keeps joined emoji and accented letters whole, and wraps before a wide character would pass the limit.
+- `stripAnsi()` now removes terminal hyperlinks and other terminal control sequences as well as colours.
+
 ## 0.17.0 - 2026-10-03
 
 ### Added

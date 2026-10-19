@@ -1,11 +1,30 @@
+import { eastAsianWidth } from "get-east-asian-width";
+
 import { resolveColourValue } from "../theme/colours.js";
 
 // ANSI reset sequence used after coloured output.
 const reset = "\u001b[0m";
 
-// Matches simple SGR ANSI sequences used by this package.
+// The escape character that starts every ANSI sequence.
 const escapeCharacter = String.fromCharCode(27);
-const ansiPattern = new RegExp(`${escapeCharacter}\\[[\\d;]*m`, "gu");
+
+// The bell character that can end an OSC sequence, such as a terminal hyperlink.
+const bellCharacter = String.fromCharCode(7);
+
+// Matches ANSI CSI sequences, such as colours, and OSC sequences, such as hyperlinks, which take up no columns on screen.
+const ansiPattern = new RegExp(
+	`${escapeCharacter}(?:\\[[0-?]*[ -/]*[@-~]|\\][^${bellCharacter}${escapeCharacter}]*(?:${bellCharacter}|${escapeCharacter}\\\\))`,
+	"gu",
+);
+
+// Splits text into the characters people see, so a joined emoji or an accented letter counts as one.
+const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
+// Matches emoji presentation characters or the selector that requests emoji presentation.
+const emojiPattern = /[\p{Emoji_Presentation}\uFE0F]/u;
+
+// Matches a cluster made only of combining marks or invisible characters, such as a lone joiner, which take no columns.
+const zeroWidthPattern = /^[\p{Mark}\p{Default_Ignorable_Code_Point}]+$/u;
 
 // ANSI style sequences supported before primitive renderers exist.
 const styleCodes = {
@@ -83,6 +102,34 @@ export function style(value, style, options = {}) {
  */
 export function stripAnsi(value) {
 	return value.replace(ansiPattern, "");
+}
+
+/**
+ * Count the terminal columns that text fills on screen. ANSI sequences take no
+ * columns, and East Asian wide characters and emoji take two.
+ *
+ * @param  {string}  value
+ *     The text to measure, which may contain ANSI sequences.
+ * @returns  {number}
+ *     The number of columns the text fills.
+ */
+export function visibleWidth(value) {
+	let width = 0;
+
+	for (const { segment } of graphemeSegmenter.segment(stripAnsi(value))) {
+		if (zeroWidthPattern.test(segment)) {
+			continue;
+		}
+
+		if (eastAsianWidth(segment.codePointAt(0)) === 2 || emojiPattern.test(segment)) {
+			width += 2;
+			continue;
+		}
+
+		width += 1;
+	}
+
+	return width;
 }
 
 /**
