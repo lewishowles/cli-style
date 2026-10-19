@@ -105,6 +105,47 @@ describe("panel", () => {
 		expect(stripAnsi(output)).toContain("▌  Checks  unit");
 	});
 
+	test("Switches the panel background, text colour and title bold back on after coloured text inside a line", () => {
+		const statusLine = status(resultTypes.SUCCESS, "Done", { colour: true });
+
+		const rows = rowGroup({
+			colour: true,
+			rows: [
+				{ label: "Source", value: "main", valueColour: "success" },
+				{ label: "Checks", value: "unit", valueColour: "success" },
+			],
+		});
+
+		const options = { colour: true, lines: [statusLine, rows], title: statusLine, width: 32 };
+		const output = panel(options);
+		const outputLines = output.split("\n");
+		const fullReset = "\u001b[0m";
+		const bodyStyle = "\u001b[48;5;234m\u001b[38;5;252m";
+
+		// The title and the first body line both hold the status line; only the title line
+		// switches bold back on as well.
+		for (const [index, sourceLine] of [statusLine, statusLine, ...rows.split("\n")].entries()) {
+			const panelLine = outputLines[index + 1];
+			const restoredStyle = `${fullReset}${bodyStyle}${index === 0 ? "\u001b[1m" : ""}`;
+			const innerResetCount = sourceLine.split(fullReset).length - 1;
+
+			expect(panelLine.split(restoredStyle).length - 1).toBe(innerResetCount);
+
+			if (index > 0) {
+				expect(panelLine).not.toContain(`${fullReset}${bodyStyle}\u001b[1m`);
+			}
+		}
+
+		expect(stripAnsi(output)).toBe(
+			panel({
+				...options,
+				colour: false,
+				lines: [stripAnsi(statusLine), stripAnsi(rows)],
+				title: stripAnsi(statusLine),
+			}),
+		);
+	});
+
 	test("Pads wide characters by the columns they fill", () => {
 		const width = 12;
 		const output = panel({ colour: false, lines: ["漢字"], width });

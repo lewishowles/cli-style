@@ -12,6 +12,10 @@ const minimumWidth = 6;
 // Info is the neutral semantic accent for grouped explanatory content.
 const defaultTone = "info";
 
+// The code that switches every terminal style off. Coloured text inside a panel ends with
+// one, which also turns off the panel's own colours.
+const fullReset = "\u001b[0m";
+
 /**
  * Render a grouped block with a semantic left accent.
  *
@@ -70,6 +74,23 @@ export function panel(options = {}) {
 function renderLine(line, width, isTitle, options) {
 	const accent = options.unicode === false ? "|" : "▌";
 	const contentWidth = width - 5;
+	// Whether this line is drawn with ANSI colour.
+	const useColour = options.colour === true;
+
+	// The code that turns the panel background on. Styling an empty string and cutting off
+	// its closing reset leaves only the opening code.
+	const backgroundCode = useColour
+		? background("", panelColours.background, options).slice(0, -fullReset.length)
+		: "";
+
+	// The code that turns the panel body colour on.
+	const bodyCode = useColour
+		? foreground("", panelColours.body, options).slice(0, -fullReset.length)
+		: "";
+
+	// The code that turns bold on for the title line, and nothing for other lines.
+	const titleCode =
+		useColour && isTitle ? style("", "bold", options).slice(0, -fullReset.length) : "";
 
 	return wrapText(line, contentWidth).map((visibleLine) => {
 		// Spaces that fill the line to the content width on screen. A wide character can
@@ -78,14 +99,21 @@ function renderLine(line, width, isTitle, options) {
 		// The line with its inner margins, ready for the panel colours.
 		const content = `  ${visibleLine}${padding}  `;
 
-		if (options.colour !== true) {
+		if (!useColour) {
 			return `${accent}${content}`;
 		}
 
 		const renderedAccent = renderPanelColour(accent, options);
 
+		// The content with the panel colours switched back on after each reset inside it, so
+		// the panel background carries on to the right edge.
+		const restoredContent = content.replaceAll(
+			fullReset,
+			`${fullReset}${backgroundCode}${bodyCode}${titleCode}`,
+		);
+
 		const renderedContent = foreground(
-			background(content, panelColours.background, options),
+			background(restoredContent, panelColours.background, options),
 			panelColours.body,
 			options,
 		);

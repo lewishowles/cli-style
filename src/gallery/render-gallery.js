@@ -1115,7 +1115,7 @@ function renderProgressExamples(options) {
 }
 
 /**
- * Render all panel tone examples.
+ * Render one panel for each tone, then a panel holding coloured output.
  *
  * @param  {object}  options
  *     Rendering options.
@@ -1123,7 +1123,8 @@ function renderProgressExamples(options) {
  *     Panel examples.
  */
 function renderPanelExamples(options) {
-	return panelToneExamples.map((tone) =>
+	// One panel for each tone.
+	const toneExamples = panelToneExamples.map((tone) =>
 		panel({
 			...options,
 			lines: [`tone: ${tone}`],
@@ -1131,6 +1132,25 @@ function renderPanelExamples(options) {
 			tone,
 		}),
 	);
+
+	// A panel holding a coloured status line and coloured values, to show the panel
+	// background carrying on after them.
+	const nestedStylesExample = panel({
+		...options,
+		lines: [
+			status(resultTypes.SUCCESS, "Checks passed", options),
+			rowGroup({
+				...options,
+				rows: [
+					{ label: "Source", value: "main", valueColour: "success" },
+					{ label: "Checks", value: "unit", valueColour: "success" },
+				],
+			}),
+		],
+		title: "Nested styles",
+	});
+
+	return [...toneExamples, nestedStylesExample];
 }
 
 /**
