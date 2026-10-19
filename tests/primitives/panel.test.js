@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { panel, stripAnsi } from "../../src/index.js";
+import { panel, resultTypes, rowGroup, status, stripAnsi } from "../../src/index.js";
+import { visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("panel", () => {
 	test("Renders a fixed-width panel with a title and padded content", () => {
@@ -82,6 +83,34 @@ describe("panel", () => {
 				"▌                               ",
 			].join("\n"),
 		);
+	});
+
+	test("Pads coloured status and row group lines to the panel width", () => {
+		const width = 24;
+		const statusLine = status(resultTypes.SUCCESS, "Done", { colour: true });
+
+		const rows = rowGroup({
+			colour: true,
+			rows: [
+				{ label: "Source", value: "main" },
+				{ label: "Checks", value: "unit" },
+			],
+		});
+
+		const output = panel({ colour: true, lines: [statusLine, rows], width });
+
+		expect(output.split("\n").map(visibleWidth)).toEqual([width, width, width, width, width]);
+		expect(stripAnsi(output)).toContain("▌  ✓ Success Done");
+		expect(stripAnsi(output)).toContain("▌  Source  main");
+		expect(stripAnsi(output)).toContain("▌  Checks  unit");
+	});
+
+	test("Pads wide characters by the columns they fill", () => {
+		const width = 12;
+		const output = panel({ colour: false, lines: ["漢字"], width });
+
+		expect(stripAnsi(output).split("\n")[1]).toBe("▌  漢字     ");
+		expect(output.split("\n").map(visibleWidth)).toEqual([width, width, width]);
 	});
 
 	test("Uses a dark body foreground on a light panel surface", () => {

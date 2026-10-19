@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Panels now fill every line to the panel width when it holds coloured text or wide characters.
 - Text wrapping now measures coloured text, wide characters, and joined emoji by the columns they fill. It keeps joined emoji and accented letters whole, and wraps before a wide character would pass the limit.
 - `stripAnsi()` now removes terminal hyperlinks and other terminal control sequences as well as colours.
 

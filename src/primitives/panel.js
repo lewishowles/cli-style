@@ -1,4 +1,4 @@
-import { background, foreground, style } from "../formatters/ansi.js";
+import { background, foreground, style, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 import { profiles } from "../profiles/profiles.js";
 import { panelColours } from "../theme/colours.js";
@@ -64,14 +64,19 @@ export function panel(options = {}) {
  * @param  {object}  options
  *     Rendering options.
  * @returns  {string[]}
- *     The panel lines, each exactly `width` columns wide.
+ *     The panel lines, each exactly `width` columns wide, unless a wide character
+ *     does not fit in a panel at its minimum width.
  */
 function renderLine(line, width, isTitle, options) {
 	const accent = options.unicode === false ? "|" : "▌";
 	const contentWidth = width - 5;
 
 	return wrapText(line, contentWidth).map((visibleLine) => {
-		const content = `  ${visibleLine.padEnd(contentWidth, " ")}  `;
+		// Spaces that fill the line to the content width on screen. A wide character can
+		// overflow a very narrow panel, so the count never drops below zero.
+		const padding = " ".repeat(Math.max(0, contentWidth - visibleWidth(visibleLine)));
+		// The line with its inner margins, ready for the panel colours.
+		const content = `  ${visibleLine}${padding}  `;
 
 		if (options.colour !== true) {
 			return `${accent}${content}`;
