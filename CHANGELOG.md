@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.17.1 - 2026-10-20
+
+### Changed
+
+- The package now depends on `get-east-asian-width` to measure wide characters.
 
 ### Fixed
 
@@ -10,6 +14,10 @@
 - Panels now fill every line to the panel width when it holds coloured text or wide characters.
 - Text wrapping now measures coloured text, wide characters, and joined emoji by the columns they fill. It keeps joined emoji and accented letters whole, and wraps before a wide character would pass the limit.
 - `stripAnsi()` now removes terminal hyperlinks and other terminal control sequences as well as colours.
+- Tables now line up columns when values contain coloured or wide text.
+- Tables now cut overflowing cells by visible columns while keeping colours and terminal links.
+- Rows, row groups and labelled lines now line up when labels contain coloured or wide text.
+- Dividers and bar charts now line up when labels contain coloured or wide text.
 
 ## 0.17.0 - 2026-10-03
 
