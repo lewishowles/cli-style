@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.18.0 - 2026-10-20
+
+### Breaking changes
+
+- BREAKING: Panels without a `width` are now 80 columns wide instead of 40. Pass `width: 40` to keep the narrower panel.
 
 ### Fixed
 
