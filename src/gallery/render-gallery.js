@@ -8,7 +8,7 @@ import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { quoteBlock } from "../patterns/quote-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
-import { foreground, stripAnsi, visibleWidth } from "../formatters/ansi.js";
+import { foreground, sliceVisible, visibleWidth } from "../formatters/ansi.js";
 import { renderSpinnerFrame } from "../interactive/spinner.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { bulletList } from "../primitives/bullet-list.js";
@@ -303,27 +303,26 @@ function clampGalleryOutput(output, width) {
 }
 
 /**
- * Truncate one line to a visible width.
+ * Cut one gallery line to the gallery width, measured in screen columns.
  *
  * @param  {string}  line
- *     Output line.
+ *     The output line, which may contain colour codes and wide characters.
  * @param  {number}  width
- *     Requested visible width.
+ *     The most columns the line may fill.
  * @returns  {string}
- *     Truncated line.
+ *     The line unchanged when it fits, or cut with a trailing `~` that marks
+ *     the cut. Colour codes and links stay whole and are closed before the `~`.
  */
 function clampLine(line, width) {
 	if (visibleWidth(line) <= width) {
 		return line;
 	}
 
-	const plainLine = stripAnsi(line);
-
 	if (width <= 1) {
-		return plainLine.slice(0, width);
+		return sliceVisible(line, width).head;
 	}
 
-	return `${plainLine.slice(0, width - 1)}~`;
+	return `${sliceVisible(line, width - 1).head}~`;
 }
 
 /**
@@ -994,7 +993,7 @@ function renderOverflowTableExample(options, overflow) {
 		],
 		rows: [
 			{
-				detail: "packages/cli-style/src/primitives/table.js",
+				detail: foreground("界面/packages/cli-style/src/primitives/table.js", "success", options),
 				source: "Table",
 			},
 		],

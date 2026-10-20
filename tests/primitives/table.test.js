@@ -285,4 +285,46 @@ describe("table", () => {
 
 		expect(stripAnsi(output).replace("界", "AB")).toBe(plainOutput);
 	});
+
+	test("Truncates a coloured cell with wide characters to the column width", () => {
+		const value = foreground("A界BC", "success", { colour: true });
+
+		const output = table({
+			colour: false,
+			columns: [{ key: "detail", label: "Detail", maxWidth: 3 }],
+			rows: [{ detail: value }],
+			width: 20,
+		});
+
+		expect(output).toBe("De…\n───\n\u001b[38;5;114mA\u001b[0m…");
+	});
+
+	test("Wraps coloured wide cells without splitting characters or losing colour", () => {
+		const value = foreground("AB界C", "success", { colour: true });
+
+		const output = table({
+			colour: false,
+			columns: [
+				{ key: "detail", label: "Detail", maxWidth: 3, overflow: "wrap" },
+				{ key: "state", label: "State" },
+			],
+			rows: [{ detail: value, state: "Ready" }],
+			width: 20,
+		});
+
+		expect(stripAnsi(output)).toBe("De…  State\n───  ─────\nAB   Ready\n界C  ");
+		expect(output).toContain("\u001b[38;5;114mAB\u001b[0m   Ready");
+		expect(output).toContain("\u001b[38;5;114m界C\u001b[0m");
+	});
+
+	test("Places a too-wide character on its own line in a one-column cell", () => {
+		const output = table({
+			colour: false,
+			columns: [{ key: "detail", label: "D", maxWidth: 1, overflow: "wrap" }],
+			rows: [{ detail: "界A" }],
+			width: 20,
+		});
+
+		expect(output).toBe("D\n─\n界\nA");
+	});
 });

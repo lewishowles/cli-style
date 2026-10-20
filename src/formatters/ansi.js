@@ -17,6 +17,18 @@ const ansiPattern = new RegExp(
 	"gu",
 );
 
+// Matches the same sequences as a captured group, so splitting text on it keeps each sequence as its own piece.
+const ansiSplitPattern = new RegExp(`(${ansiPattern.source})`, "u");
+
+// Matches a terminal link sequence and captures its address, which is empty when the sequence ends a link.
+const hyperlinkPattern = new RegExp(
+	`^${escapeCharacter}\\]8;[^;]*;([^${bellCharacter}${escapeCharacter}]*)`,
+	"u",
+);
+
+// The sequences that clear every colour and text style at once.
+const clearStyleCodes = [reset, "\u001b[m"];
+
 // Splits text into the characters people see, so a joined emoji or an accented letter counts as one.
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 
@@ -146,6 +158,86 @@ export function visibleWidth(value) {
  */
 export function padVisible(value, width) {
 	return value + " ".repeat(Math.max(0, width - visibleWidth(value)));
+}
+
+/**
+ * Split text at a terminal column without breaking a colour code, a link or a
+ * character. A character that would cross the column, such as a two-column 界
+ * at the edge, starts the remaining text instead.
+ *
+ * When the cut falls inside coloured or linked text, the first piece ends by
+ * closing the colour and the link, and the remaining text starts by reopening
+ * them, so each piece can be printed on a line of its own.
+ *
+ * @param  {string}  value
+ *     The text to split, which may contain ANSI colour codes and terminal links.
+ * @param  {number}  width
+ *     The most columns the first piece may fill.
+ * @returns  {{ head: string, tail: string }}
+ *     The first piece and the remaining text, which is empty when the whole
+ *     value fits.
+ */
+export function sliceVisible(value, width) {
+	// Splitting on a captured pattern puts plain text at even indexes and ANSI sequences at odd ones.
+	const parts = value.split(ansiSplitPattern);
+
+	// The link open at the current position, with the sequences that close and reopen it.
+	let activeLink = null;
+	// The colour and style codes in effect at the current position, in the order they were set.
+	let activeStyles = [];
+	// The columns filled so far.
+	let columns = 0;
+	// The position in the original value reached so far.
+	let cursor = 0;
+
+	for (const [index, part] of parts.entries()) {
+		if (index % 2 === 0) {
+			for (const { segment } of graphemeSegmenter.segment(part)) {
+				const segmentWidth = visibleWidth(segment);
+
+				if (columns + segmentWidth > width) {
+					const head =
+						value.slice(0, cursor) +
+						(activeLink?.closer ?? "") +
+						(activeStyles.length > 0 ? reset : "");
+
+					const tail = activeStyles.join("") + (activeLink?.opener ?? "") + value.slice(cursor);
+
+					return { head, tail };
+				}
+
+				columns += segmentWidth;
+				cursor += segment.length;
+			}
+
+			continue;
+		}
+
+		if (clearStyleCodes.includes(part)) {
+			activeStyles = [];
+		} else if (part.startsWith(`${escapeCharacter}[`) && part.endsWith("m")) {
+			activeStyles.push(part);
+		}
+
+		const hyperlink = part.match(hyperlinkPattern);
+
+		if (hyperlink !== null) {
+			// The closing sequence ends the same way as the opening one, with a bell or an escape and backslash.
+			const terminator = part.endsWith(bellCharacter) ? bellCharacter : `${escapeCharacter}\\`;
+
+			activeLink =
+				hyperlink[1] === ""
+					? null
+					: {
+							closer: `${escapeCharacter}]8;;${terminator}`,
+							opener: part,
+						};
+		}
+
+		cursor += part.length;
+	}
+
+	return { head: value, tail: "" };
 }
 
 /**

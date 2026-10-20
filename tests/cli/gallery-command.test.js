@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { parseGalleryRequest } from "../../src/cli/gallery-command.js";
+import { visibleWidth } from "../../src/formatters/ansi.js";
 import { renderGallery } from "../../src/gallery/render-gallery.js";
 
 describe("parseGalleryRequest", () => {
@@ -77,6 +78,15 @@ describe("parseGalleryRequest", () => {
 		expect(output).toContain("Flat");
 		expect(output).toContain("Negative");
 		expect(output).toContain("Narrow mixed");
+	});
+
+	test("Clamps coloured gallery lines by visible columns", () => {
+		const width = 24;
+		const output = renderGallery({ colour: true, unicode: true }, { section: "primitives", width });
+		const lines = output.split("\n");
+
+		expect(lines.every((line) => visibleWidth(line) <= width)).toBe(true);
+		expect(lines.some((line) => line.endsWith("\u001b[0m~"))).toBe(true);
 	});
 
 	test("Renders the diff-block fixture across all variants", () => {

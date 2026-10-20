@@ -1,4 +1,4 @@
-import { foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
+import { foreground, padVisible, sliceVisible, visibleWidth } from "../formatters/ansi.js";
 import { defaultWidth, minimumWidth, normaliseWidth } from "../formatters/width.js";
 import { tableColours } from "../theme/colours.js";
 
@@ -151,8 +151,11 @@ function columnMaxWidth(column) {
  * @param  {number}  width
  *     Column width.
  * @returns  {string[]}
- *     Lines the cell renders as; truncated to one line with a trailing
- *     ellipsis unless the column's overflow is 'wrap'.
+ *     Lines the cell renders as, each no wider on screen than the column
+ *     unless one character is wider than the whole column. A value that does
+ *     not fit is cut to one line with a trailing ellipsis, or split across
+ *     lines when the column's overflow is 'wrap'. Coloured text keeps its
+ *     colour on every line.
  */
 function columnLines(value, column, width) {
 	if (visibleWidth(value) <= width) {
@@ -160,15 +163,26 @@ function columnLines(value, column, width) {
 	}
 
 	if (column.overflow === "wrap") {
-		return Array.from(
-			{
-				length: Math.ceil(value.length / width),
-			},
-			(_, index) => value.slice(index * width, (index + 1) * width),
-		);
+		const lines = [];
+
+		let remaining = value;
+
+		while (remaining !== "") {
+			let { head, tail } = sliceVisible(remaining, width);
+
+			if (visibleWidth(head) === 0 && tail !== "") {
+				// In a one-column cell, a two-column character gets a line of its own so wrapping always moves forward.
+				({ head, tail } = sliceVisible(remaining, 2));
+			}
+
+			lines.push(head);
+			remaining = tail;
+		}
+
+		return lines;
 	}
 
-	return [`${value.slice(0, width - 1)}…`];
+	return [`${sliceVisible(value, width - 1).head}…`];
 }
 
 /**

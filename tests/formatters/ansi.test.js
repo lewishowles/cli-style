@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { background, foreground, stripAnsi, style } from "../../src/index.js";
-import { padVisible, visibleWidth } from "../../src/formatters/ansi.js";
+import { padVisible, sliceVisible, visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("ANSI foreground colour", () => {
 	test("Applies dark semantic foreground colour when enabled", () => {
@@ -131,5 +131,48 @@ describe("Visible padding", () => {
 
 	test("Leaves text unchanged when it already fills the requested width", () => {
 		expect(padVisible("👍🏽", 1)).toBe("👍🏽");
+	});
+});
+
+describe("Visible slicing", () => {
+	test("Stops before a wide character that crosses the edge", () => {
+		expect(sliceVisible("A界B", 2)).toEqual({ head: "A", tail: "界B" });
+		expect(sliceVisible("👍🏽B", 2)).toEqual({ head: "👍🏽", tail: "B" });
+	});
+
+	test("Closes and reopens colour across a split", () => {
+		const value = "\u001b[31mA界B\u001b[0m";
+
+		expect(sliceVisible(value, 2)).toEqual({
+			head: "\u001b[31mA\u001b[0m",
+			tail: "\u001b[31m界B\u001b[0m",
+		});
+	});
+
+	test("Closes and reopens a terminal hyperlink at the cut", () => {
+		const value = "\u001b]8;;https://example.com\u0007link\u001b]8;;\u0007";
+
+		expect(sliceVisible(value, 2)).toEqual({
+			head: "\u001b]8;;https://example.com\u0007li\u001b]8;;\u0007",
+			tail: "\u001b]8;;https://example.com\u0007nk\u001b]8;;\u0007",
+		});
+	});
+
+	test("Closes and reopens coloured link text that ends with a string terminator", () => {
+		const value = "\u001b[31m\u001b]8;;https://example.com\u001b\\link\u001b]8;;\u001b\\\u001b[0m";
+
+		expect(sliceVisible(value, 2)).toEqual({
+			head: "\u001b[31m\u001b]8;;https://example.com\u001b\\li\u001b]8;;\u001b\\\u001b[0m",
+			tail: "\u001b[31m\u001b]8;;https://example.com\u001b\\nk\u001b]8;;\u001b\\\u001b[0m",
+		});
+	});
+
+	test("Closes and reopens a terminal hyperlink with ID parameters", () => {
+		const value = "\u001b]8;id=x;https://example.com\u0007link\u001b]8;;\u0007";
+
+		expect(sliceVisible(value, 2)).toEqual({
+			head: "\u001b]8;id=x;https://example.com\u0007li\u001b]8;;\u0007",
+			tail: "\u001b]8;id=x;https://example.com\u0007nk\u001b]8;;\u0007",
+		});
 	});
 });
