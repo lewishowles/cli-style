@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check tag matches package version
+      - name: Check tag matches package versions
         env:
           TAG_NAME: ${{ github.ref_name }}
         run: |
@@ -31,6 +31,19 @@ jobs:
 
           if [[ "$tag_version" != "$package_version" ]]; then
             echo "Release tag '$TAG_NAME' has version '$tag_version', but package.json declares '$package_version'. Create a v$package_version tag before publishing."
+            exit 1
+          fi
+
+          # The Python package publishes from the same tag, so its version must match too.
+          # This reads the version line from the [project] table of pyproject.toml.
+          pyproject_version="$(awk -F '"' '
+            /^\[project\]$/ { in_project = 1; next }
+            /^\[/ { in_project = 0 }
+            in_project && /^version = "/ { print $2; exit }
+          ' adapters/python/pyproject.toml)"
+
+          if [[ "$tag_version" != "$pyproject_version" ]]; then
+            echo "Release tag '$TAG_NAME' matches package.json, but adapters/python/pyproject.toml declares '$pyproject_version'. Set its version to '$tag_version' and tag the updated commit before publishing."
             exit 1
           fi
 
