@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Panels, chips, statuses, spans, feedback and labelled lines now keep their background, text colour and bold or dim text after text coloured by chalk, picocolors or `util.styleText`, which switches off one style at a time instead of resetting everything.
+
 ## 0.17.1 - 2026-10-20
 
 ### Changed

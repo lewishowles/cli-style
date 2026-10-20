@@ -29,6 +29,18 @@ const hyperlinkPattern = new RegExp(
 // The sequences that clear every colour and text style at once.
 const clearStyleCodes = [reset, "\u001b[m"];
 
+// The sequence that switches the text colour back to the terminal default.
+const foregroundClose = "\u001b[39m";
+
+// The sequence that switches the background colour back to the terminal default.
+const backgroundClose = "\u001b[49m";
+
+// The sequence that switches off both bold and dim text.
+const weightClose = "\u001b[22m";
+
+// Matches a full reset or a sequence that switches off only the text colour, background or bold and dim.
+const closingStylePattern = new RegExp(`${escapeCharacter}\\[(?:0|22|39|49)?m`, "gu");
+
 // Splits text into the characters people see, so a joined emoji or an accented letter counts as one.
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 
@@ -105,10 +117,12 @@ export function style(value, style, options = {}) {
 }
 
 /**
- * Switch the given styles back on after every full reset inside text, so an outer style
- * carries on past coloured text placed inside it. Coloured text ends with a full reset,
- * written as `\u001b[0m` or the shorter `\u001b[m`, which would otherwise turn the outer
- * style off as well.
+ * Switch the given styles back on wherever coloured text inside switches them off, so an
+ * outer style carries on past text coloured by this package, chalk, picocolors or
+ * `util.styleText`. After a full reset, written as `\u001b[0m` or `\u001b[m`, every given
+ * style comes back on. After a sequence that ends only the text colour, the background,
+ * or bold and dim, only the given styles of that kind come back on, so other colours the
+ * inner text left on stay on.
  *
  * @param  {string}  value
  *     Text that may hold coloured parts.
@@ -116,22 +130,57 @@ export function style(value, style, options = {}) {
  *     The styles to switch back on, each rendered on an empty string, such as
  *     `style("", "bold", options)`. An empty entry adds nothing.
  * @returns  {string}
- *     The text with the styles switched back on after each full reset.
+ *     The text with each switched-off style turned back on.
  */
 export function restoreStyles(value, stylesToRestore) {
-	// The codes that turn the styles on, with each closing reset cut off.
-	const openingCodes = stylesToRestore
-		.map((styleToRestore) => styleToRestore.slice(0, -reset.length))
-		.join("");
+	// The codes that turn each style on, with its closing reset cut off.
+	const openingCodes = stylesToRestore.map((styleToRestore) =>
+		styleToRestore.slice(0, -reset.length),
+	);
 
-	// The text with the styles switched back on after each reset form handled so far.
-	let restoredValue = value;
+	// Every style, switched back on together after a full reset.
+	const allOpeningCodes = openingCodes.join("");
 
-	for (const clearStyleCode of clearStyleCodes) {
-		restoredValue = restoredValue.replaceAll(clearStyleCode, `${clearStyleCode}${openingCodes}`);
+	// The text colour styles, switched back on after a text colour close.
+	let foregroundCodes = "";
+	// The background styles, switched back on after a background close.
+	let backgroundCodes = "";
+	// The bold and dim styles, switched back on after a bold and dim close.
+	let weightCodes = "";
+
+	// Sorts each style by the number at the start of its code. The text colour and
+	// background ranges include 39 and 49 because the default colour opens with them.
+	for (const openingCode of openingCodes) {
+		// The first number after the escape and bracket, such as 31 for red text.
+		const styleNumber = Number.parseInt(openingCode.slice(2), 10);
+
+		if ((styleNumber >= 30 && styleNumber <= 39) || (styleNumber >= 90 && styleNumber <= 97)) {
+			foregroundCodes += openingCode;
+		} else if (
+			(styleNumber >= 40 && styleNumber <= 49) ||
+			(styleNumber >= 100 && styleNumber <= 107)
+		) {
+			backgroundCodes += openingCode;
+		} else if (styleNumber === 1 || styleNumber === 2) {
+			weightCodes += openingCode;
+		}
 	}
 
-	return restoredValue;
+	return value.replace(closingStylePattern, (closingCode) => {
+		if (closingCode === foregroundClose) {
+			return `${closingCode}${foregroundCodes}`;
+		}
+
+		if (closingCode === backgroundClose) {
+			return `${closingCode}${backgroundCodes}`;
+		}
+
+		if (closingCode === weightClose) {
+			return `${closingCode}${weightCodes}`;
+		}
+
+		return `${closingCode}${allOpeningCodes}`;
+	});
 }
 
 /**

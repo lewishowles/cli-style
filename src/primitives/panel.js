@@ -85,8 +85,8 @@ function renderLine(line, width, isTitle, options) {
 
 		const renderedAccent = renderPanelColour(accent, options);
 
-		// The content with the panel colours switched back on after each reset inside it, so
-		// the panel background carries on to the right edge.
+		// The content with the panel colours switched back on wherever coloured text inside
+		// switches them off, so the panel background carries on to the right edge.
 		const restoredContent = restoreStyles(content, [
 			background("", panelColours.background, options),
 			foreground("", panelColours.body, options),

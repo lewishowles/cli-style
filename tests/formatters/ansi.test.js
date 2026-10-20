@@ -112,6 +112,38 @@ describe("ANSI style restoration", () => {
 			"A\u001b[31mB",
 		);
 	});
+
+	test("Restores only the outer style switched off by each targeted close", () => {
+		const stylesToRestore = [
+			background("", "#123456", { colour: true }),
+			style("", "bold", { colour: true }),
+			style("", "dim", { colour: true }),
+			foreground("", "#abcdef", { colour: true }),
+		];
+
+		expect(restoreStyles("A\u001b[49mB\u001b[22mC\u001b[39mD", stylesToRestore)).toBe(
+			"A\u001b[49m\u001b[48;2;18;52;86mB\u001b[22m\u001b[1m\u001b[2mC\u001b[39m\u001b[38;2;171;205;239mD",
+		);
+	});
+
+	test("Leaves a foreign foreground active after a background close", () => {
+		const stylesToRestore = [
+			background("", "#123456", { colour: true }),
+			foreground("", "#abcdef", { colour: true }),
+		];
+
+		expect(restoreStyles("\u001b[31m\u001b[44mX\u001b[49mY\u001b[39mZ", stylesToRestore)).toBe(
+			"\u001b[31m\u001b[44mX\u001b[49m\u001b[48;2;18;52;86mY\u001b[39m\u001b[38;2;171;205;239mZ",
+		);
+	});
+
+	test("Restores basic and bright ANSI colours after their matching closes", () => {
+		const stylesToRestore = ["\u001b[31m\u001b[0m", "\u001b[104m\u001b[0m"];
+
+		expect(restoreStyles("A\u001b[39mB\u001b[49mC", stylesToRestore)).toBe(
+			"A\u001b[39m\u001b[31mB\u001b[49m\u001b[104mC",
+		);
+	});
 });
 
 describe("ANSI stripping", () => {

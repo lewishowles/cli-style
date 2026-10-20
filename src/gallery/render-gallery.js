@@ -1179,12 +1179,15 @@ function renderPanelExamples(options) {
 		}),
 	);
 
-	// A panel holding a coloured status line and coloured values, to show the panel
-	// background carrying on after them.
+	// A panel holding a coloured status line, coloured values and a word coloured the way
+	// chalk colours it, to show the panel background carrying on after them. The word is
+	// written out by hand because chalk ends a colour by switching off only the text
+	// colour, while this package's own colours end with a full reset.
 	const nestedStylesExample = panel({
 		...options,
 		lines: [
 			status(resultTypes.SUCCESS, "Checks passed", options),
+			options.colour === true ? "A \u001b[31mred\u001b[39m word" : "A red word",
 			rowGroup({
 				...options,
 				rows: [

@@ -160,6 +160,27 @@ describe("panel", () => {
 		expect(output).toContain(`${shortReset}${bodyStyle} text`);
 	});
 
+	test("Restores only the panel background after foreign text closes its background", () => {
+		const output = panel({
+			colour: true,
+			lines: ["\u001b[31m\u001b[44mX\u001b[49mY\u001b[39m rest"],
+			width: 32,
+		});
+
+		expect(output).toContain("X\u001b[49m\u001b[48;5;234mY\u001b[39m\u001b[38;5;252m rest");
+	});
+
+	test("Restores the panel title weight after foreign text closes bold", () => {
+		const output = panel({
+			colour: true,
+			lines: ["Body"],
+			title: "\u001b[1mTitle\u001b[22m rest",
+			width: 32,
+		});
+
+		expect(output.split("\n")[1]).toContain("Title\u001b[22m\u001b[1m rest");
+	});
+
 	test("Pads wide characters by the columns they fill", () => {
 		const width = 12;
 		const output = panel({ colour: false, lines: ["漢字"], width });
