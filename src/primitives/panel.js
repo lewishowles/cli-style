@@ -1,4 +1,4 @@
-import { background, foreground, style, visibleWidth } from "../formatters/ansi.js";
+import { background, foreground, restoreStyles, style, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 import { profiles } from "../profiles/profiles.js";
 import { panelColours } from "../theme/colours.js";
@@ -11,10 +11,6 @@ const minimumWidth = 6;
 
 // Info is the neutral semantic accent for grouped explanatory content.
 const defaultTone = "info";
-
-// The code that switches every terminal style off. Coloured text inside a panel ends with
-// one, which also turns off the panel's own colours.
-const fullReset = "\u001b[0m";
 
 /**
  * Render a grouped block with a semantic left accent.
@@ -77,21 +73,6 @@ function renderLine(line, width, isTitle, options) {
 	// Whether this line is drawn with ANSI colour.
 	const useColour = options.colour === true;
 
-	// The code that turns the panel background on. Styling an empty string and cutting off
-	// its closing reset leaves only the opening code.
-	const backgroundCode = useColour
-		? background("", panelColours.background, options).slice(0, -fullReset.length)
-		: "";
-
-	// The code that turns the panel body colour on.
-	const bodyCode = useColour
-		? foreground("", panelColours.body, options).slice(0, -fullReset.length)
-		: "";
-
-	// The code that turns bold on for the title line, and nothing for other lines.
-	const titleCode =
-		useColour && isTitle ? style("", "bold", options).slice(0, -fullReset.length) : "";
-
 	return wrapText(line, contentWidth).map((visibleLine) => {
 		// Spaces that fill the line to the content width on screen. A wide character can
 		// overflow a very narrow panel, so the count never drops below zero.
@@ -107,10 +88,11 @@ function renderLine(line, width, isTitle, options) {
 
 		// The content with the panel colours switched back on after each reset inside it, so
 		// the panel background carries on to the right edge.
-		const restoredContent = content.replaceAll(
-			fullReset,
-			`${fullReset}${backgroundCode}${bodyCode}${titleCode}`,
-		);
+		const restoredContent = restoreStyles(content, [
+			background("", panelColours.background, options),
+			foreground("", panelColours.body, options),
+			isTitle ? style("", "bold", options) : "",
+		]);
 
 		const renderedContent = foreground(
 			background(restoredContent, panelColours.background, options),

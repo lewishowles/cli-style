@@ -146,6 +146,14 @@ describe("panel", () => {
 		);
 	});
 
+	test("Switches the panel colours back on after coloured text that ends with the short reset", () => {
+		const shortReset = "\u001b[m";
+		const bodyStyle = "\u001b[48;5;234m\u001b[38;5;252m";
+		const output = panel({ colour: true, lines: [`\u001b[31mred${shortReset} text`], width: 32 });
+
+		expect(output).toContain(`${shortReset}${bodyStyle} text`);
+	});
+
 	test("Pads wide characters by the columns they fill", () => {
 		const width = 12;
 		const output = panel({ colour: false, lines: ["漢字"], width });
