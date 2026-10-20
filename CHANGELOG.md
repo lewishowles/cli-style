@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Spans, chips, status lines and empty states now keep their own colour, weight and chip background after caller-coloured text.
 - Labelled lines now keep their bold prefix and tone colour after a caller-coloured icon or label.
 - Panels now keep their background, text colour and bold title to the end of a line that holds coloured text.
 - Panels now fill every line to the panel width when it holds coloured text or wide characters.

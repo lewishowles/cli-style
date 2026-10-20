@@ -1,4 +1,4 @@
-import { foreground, style } from "../formatters/ansi.js";
+import { foreground, restoreStyles, style } from "../formatters/ansi.js";
 import { getResultSymbol, resultTypes } from "../theme/results.js";
 import { labelledLine } from "./labelled-line.js";
 import { panel } from "./panel.js";
@@ -48,7 +48,13 @@ export function emptyState(title = "No results", detail = "", options = {}) {
 		return `${prefix}${detailText}`;
 	}
 
-	const renderedPrefix = style(foreground(prefix, "muted", options), "bold", options);
+	// The prefix with its bold and muted tone switched back on after a coloured title.
+	const restoredPrefix = restoreStyles(prefix, [
+		style("", "bold", options),
+		foreground("", "muted", options),
+	]);
+
+	const renderedPrefix = style(foreground(restoredPrefix, "muted", options), "bold", options);
 
 	return `${renderedPrefix}${detailText}`;
 }

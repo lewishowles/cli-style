@@ -1,4 +1,4 @@
-import { foreground, style } from "../formatters/ansi.js";
+import { foreground, restoreStyles, style } from "../formatters/ansi.js";
 import { getResultSymbol, getResultToken, resultTypes } from "../theme/results.js";
 
 /**
@@ -33,7 +33,13 @@ export function status(resultType = resultTypes.UNKNOWN, detail = "", options = 
 		return `${prefix}${detailText}`;
 	}
 
-	const colouredPrefix = foreground(prefix, token.tone, options);
+	// The prefix with its bold and tone switched back on after a coloured label.
+	const restoredPrefix = restoreStyles(prefix, [
+		style("", "bold", options),
+		foreground("", token.tone, options),
+	]);
+
+	const colouredPrefix = foreground(restoredPrefix, token.tone, options);
 	const boldPrefix = style(colouredPrefix, "bold", options);
 
 	return `${boldPrefix}${detailText}`;

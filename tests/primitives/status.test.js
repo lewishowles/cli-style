@@ -77,4 +77,15 @@ describe("status", () => {
 		expect(output).toBe("\u001b[1m\u001b[38;5;210mx Failed\u001b[0m\u001b[0m Secrets scan");
 		expect(stripAnsi(output)).toBe("x Failed Secrets scan");
 	});
+
+	test("Restores the prefix weight and tone after caller-coloured label text", () => {
+		const output = status(resultTypes.FAILED, "Details", {
+			colour: true,
+			label: "\u001b[31mBroken\u001b[0m again",
+			unicode: false,
+		});
+
+		expect(output).toContain("\u001b[31mBroken\u001b[0m\u001b[1m\u001b[38;5;210m again");
+		expect(stripAnsi(output)).toBe("x Broken again Details");
+	});
 });

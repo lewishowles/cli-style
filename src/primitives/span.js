@@ -1,4 +1,4 @@
-import { foreground, style } from "../formatters/ansi.js";
+import { foreground, restoreStyles, style } from "../formatters/ansi.js";
 
 // Inline spans use the same informational tone as hints by default.
 const defaultTone = "info";
@@ -27,7 +27,16 @@ export function span(value = "", tone = defaultTone, options = {}) {
 		return value;
 	}
 
-	const renderedValue = foreground(value, tone, options);
+	// The text weight, bold unless the options ask for another.
+	const weight = options.weight ?? defaultWeight;
 
-	return style(renderedValue, options.weight ?? defaultWeight, options);
+	// The text with the span's weight and tone switched back on after any coloured text.
+	const restoredValue = restoreStyles(value, [
+		style("", weight, options),
+		foreground("", tone, options),
+	]);
+
+	const renderedValue = foreground(restoredValue, tone, options);
+
+	return style(renderedValue, weight, options);
 }

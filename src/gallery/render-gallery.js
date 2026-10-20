@@ -759,9 +759,14 @@ function renderPrimitives(options) {
 		"",
 		"Chips",
 		renderChipExamples(options),
+		chip(`${foreground("coloured", "danger", options)} label`, "success", options),
 		"",
 		"Statuses",
 		...renderStatusExamples(options),
+		status(resultTypes.SUCCESS, "caller-coloured label", {
+			...options,
+			label: `${foreground("Coloured", "danger", options)} status`,
+		}),
 		"",
 		"Dividers",
 		divider({

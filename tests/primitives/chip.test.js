@@ -20,6 +20,15 @@ describe("chip", () => {
 		expect(stripAnsi(output)).toBe(" You ");
 	});
 
+	test("Restores the chip fill, weight and tone after caller-coloured text", () => {
+		const output = chip("\u001b[31mred\u001b[0m rest", "user", { colour: true });
+
+		expect(output).toContain(
+			"\u001b[31mred\u001b[0m\u001b[48;5;22m\u001b[1m\u001b[38;5;114m rest ",
+		);
+		expect(stripAnsi(output)).toBe(" red rest ");
+	});
+
 	test("Falls back to neutral tone for unsupported tones", () => {
 		const output = chip("Unknown", "missing", {
 			colour: false,

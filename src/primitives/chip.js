@@ -1,4 +1,4 @@
-import { background, foreground, style } from "../formatters/ansi.js";
+import { background, foreground, restoreStyles, style } from "../formatters/ansi.js";
 import { chipColours } from "../theme/colours.js";
 
 // Chip style used when the requested tone is not configured.
@@ -25,7 +25,15 @@ export function chip(label, tone = fallbackTone, options = {}) {
 		return `[${label}]`;
 	}
 
-	const paddedLabel = ` ${label} `;
+	// The label with the chip's fill, bold and tone switched back on after any coloured text,
+	// so the rest of the chip keeps its look.
+	const restoredLabel = restoreStyles(label, [
+		background("", token.background, options),
+		style("", "bold", options),
+		foreground("", token.foreground, options),
+	]);
+
+	const paddedLabel = ` ${restoredLabel} `;
 	const colouredLabel = foreground(paddedLabel, token.foreground, options);
 	const boldLabel = style(colouredLabel, "bold", options);
 

@@ -89,4 +89,14 @@ describe("Feedback primitives", () => {
 		expect(stripAnsi(emptyOutput)).toBe("– No results");
 		expect(stripAnsi(errorOutput)).toContain("× Error: Build failed");
 	});
+
+	test("Restores the empty-state prefix weight and tone after caller-coloured title text", () => {
+		const output = emptyState("\u001b[31mGone\u001b[0m again", "Try later.", {
+			colour: true,
+			unicode: false,
+		});
+
+		expect(output).toContain("\u001b[31mGone\u001b[0m\u001b[1m\u001b[38;5;246m again");
+		expect(stripAnsi(output)).toBe("- Gone again Try later.");
+	});
 });
