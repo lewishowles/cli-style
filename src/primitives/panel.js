@@ -1,10 +1,8 @@
 import { background, foreground, restoreStyles, style, visibleWidth } from "../formatters/ansi.js";
+import { defaultWidth } from "../formatters/width.js";
 import { wrapText } from "../formatters/wrap.js";
 import { profiles } from "../profiles/profiles.js";
 import { panelColours } from "../theme/colours.js";
-
-// The width used when no width is given, such as a direct library call outside a terminal.
-const defaultWidth = 40;
 
 // The narrowest panel that still leaves one column for content beside the accent and padding.
 const minimumWidth = 6;
@@ -22,8 +20,9 @@ const defaultTone = "info";
  * @param  {string[]}  options.lines
  *     Content lines to render.
  * @param  {number}  options.width
- *     Total panel width, including the accent and padding. Widths below 6 are raised to 6,
- *     which leaves room for one character of content. Longer lines wrap to fit.
+ *     Total panel width, including the accent and padding. Defaults to 80 columns.
+ *     Widths below 6 are raised to 6, which leaves room for one character of content.
+ *     Longer lines wrap to fit.
  * @param  {string}  options.profile
  *     Active output profile.
  * @param  {string}  options.title

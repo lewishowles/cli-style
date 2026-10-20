@@ -23,6 +23,12 @@ describe("panel", () => {
 		);
 	});
 
+	test("Renders 80 columns wide when no width is given", () => {
+		const output = panel({ colour: false, lines: ["Short"], title: "Info" });
+
+		expect(output.split("\n").map(visibleWidth)).toEqual([80, 80, 80, 80]);
+	});
+
 	test("Renders an ASCII accent when Unicode is disabled", () => {
 		const output = panel({
 			colour: false,
