@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { bulletList, getBulletSymbol } from "../../src/index.js";
+import { bulletList, getBulletSymbol, stripAnsi } from "../../src/index.js";
 
 describe("bulletList", () => {
 	test("Renders flat items with Unicode bullets", () => {
@@ -20,6 +20,26 @@ describe("bulletList", () => {
 		});
 
 		expect(output).toBe("• one two\n  three four");
+	});
+
+	test("Wraps coloured wide items beside their bullets at each nesting level", () => {
+		const options = { colour: false, unicode: true, width: 12 };
+
+		const plain = bulletList([{ text: "ABCD one two three", items: ["Go more words"] }], options);
+
+		const styled = bulletList(
+			[
+				{
+					text: "\u001b[31m界面\u001b[0m one two three",
+					items: ["\u001b[34m界\u001b[0m more words"],
+				},
+			],
+			options,
+		);
+
+		expect(stripAnsi(styled).replace("界面", "ABCD").replace("界", "Go")).toBe(plain);
+		expect(plain).toContain("\n  two three");
+		expect(plain).toContain("\n    words");
 	});
 
 	test("Uses nested symbols and parent gutter indentation", () => {

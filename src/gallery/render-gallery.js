@@ -763,6 +763,13 @@ function renderPrimitives(options) {
 		"Statuses",
 		...renderStatusExamples(options),
 		"",
+		"Dividers",
+		divider({
+			...options,
+			dividerWidth: 32,
+			label: foreground("界面", "info", options),
+		}),
+		"",
 		"Panels",
 		...renderPanelExamples(options),
 		"",
@@ -926,6 +933,10 @@ function renderPrimitives(options) {
 function renderBulletListExamples(options) {
 	return [
 		bulletList(["Install dependencies", "Run the unit tests", "Review the output"], options),
+		bulletList([foreground("界面 item wraps beside its bullet", "info", options)], {
+			...options,
+			width: 18,
+		}),
 		bulletList(["This item wraps so continuation lines stay aligned with the item text."], {
 			...options,
 			width: 40,
@@ -1035,6 +1046,10 @@ function renderBarChartExample(options) {
 	return barChart({
 		...options,
 		rows: [
+			{
+				label: foreground("界面", "info", options),
+				value: 8,
+			},
 			{
 				label: "positive",
 				value: 10,

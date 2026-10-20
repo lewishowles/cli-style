@@ -1,4 +1,4 @@
-import { foreground } from "../formatters/ansi.js";
+import { foreground, visibleWidth } from "../formatters/ansi.js";
 
 // Dividers use enough width to read as a section break in compact output.
 const defaultWidth = 40;
@@ -33,7 +33,7 @@ export function divider(options = {}) {
 	const character = options.character ?? defaultCharacter;
 	const label = options.label ?? "";
 	const width = options.dividerWidth ?? defaultWidth;
-	const lineWidth = Math.max(width - label.length - labelGap(label), 0);
+	const lineWidth = Math.max(width - visibleWidth(label) - labelGap(label), 0);
 	const line = character.repeat(lineWidth);
 	const output = label === "" ? line : `${label} ${line}`;
 

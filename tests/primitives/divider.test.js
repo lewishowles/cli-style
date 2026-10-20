@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { divider, stripAnsi } from "../../src/index.js";
+import { visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("divider", () => {
 	test("Renders a plain divider", () => {
@@ -38,6 +39,14 @@ describe("divider", () => {
 		});
 
 		expect(output).toBe("Primitives ---------");
+	});
+
+	test("Keeps a coloured wide label within the requested width", () => {
+		const plain = divider({ colour: false, dividerWidth: 12, label: "Label" });
+		const styled = divider({ colour: false, dividerWidth: 12, label: "\u001b[31m界面X\u001b[0m" });
+
+		expect(stripAnsi(styled).replace("界面X", "Label")).toBe(plain);
+		expect(visibleWidth(styled)).toBe(12);
 	});
 
 	test("Colours the divider when colour is enabled", () => {

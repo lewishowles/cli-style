@@ -22,6 +22,28 @@ describe("barChart", () => {
 		expect(output).toBe(["Passed    ██████████ 10", "Warnings  ████       4"].join("\n"));
 	});
 
+	test("Aligns coloured wide labels with plain chart labels", () => {
+		const options = { barWidth: 4, colour: false, unicode: false };
+
+		const plain = barChart({
+			...options,
+			rows: [
+				{ label: "Label", value: 4 },
+				{ label: "Go", value: 2 },
+			],
+		});
+
+		const styled = barChart({
+			...options,
+			rows: [
+				{ label: "\u001b[31m界面X\u001b[0m", value: 4 },
+				{ label: "\u001b[34m界\u001b[0m", value: 2 },
+			],
+		});
+
+		expect(stripAnsi(styled).replace("界面X", "Label").replace("界", "Go")).toBe(plain);
+	});
+
 	test("Renders ASCII bars when Unicode is disabled", () => {
 		const output = barChart({
 			barWidth: 5,

@@ -1,4 +1,4 @@
-import { foreground } from "../formatters/ansi.js";
+import { foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
 import { chartColours } from "../theme/colours.js";
 
 // Chart bars use the same compact default width as progress bars.
@@ -27,7 +27,7 @@ export function barChart(options = {}) {
 		return "";
 	}
 
-	const labelWidth = Math.max(...rows.map((row) => row.label.length));
+	const labelWidth = Math.max(...rows.map((row) => visibleWidth(row.label)));
 	const maximum = Math.max(...rows.map((row) => Math.abs(row.value)), 1);
 	const width = normaliseWidth(options.barWidth);
 
@@ -93,7 +93,7 @@ function renderRow(row, labelWidth, maximum, width, options) {
 	const barWidth = Math.round((Math.abs(row.value) / maximum) * width);
 	const symbol = options.unicode === false ? "#" : "█";
 	const bar = symbol.repeat(barWidth).padEnd(width, " ");
-	const label = row.label.padEnd(labelWidth, " ");
+	const label = padVisible(row.label, labelWidth);
 
 	if (options.colour !== true) {
 		return `${label}  ${bar} ${row.value}`;
