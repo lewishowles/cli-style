@@ -803,6 +803,15 @@ function renderPrimitives(options) {
 			icon: "!",
 			tone: "warning",
 		}),
+		labelledLine(
+			foreground("界面", "info", options),
+			"Coloured wide labels keep wrapped text aligned.",
+			{
+				...options,
+				icon: foreground("界", "warning", options),
+				width: 32,
+			},
+		),
 		emptyState("No results", "tone: muted", options),
 		errorBlock("Failed", ["tone: danger"], {
 			...options,
@@ -835,6 +844,16 @@ function renderPrimitives(options) {
 			...options,
 			labelWidth: 8,
 		}),
+		row(
+			foreground("界面", "info", options),
+			"Coloured wide labels and separators align wrapped text.",
+			{
+				...options,
+				labelWidth: 8,
+				separator: foreground(" => ", "warning", options),
+				width: 36,
+			},
+		),
 		row("Bundle", "is 22.3 KB, above the 12.0 KB budget", {
 			...options,
 			labelWidth: 8,
@@ -877,6 +896,10 @@ function renderPrimitives(options) {
 				{
 					label: "Checks",
 					value: "type-check, unit, build",
+				},
+				{
+					label: foreground("界面", "info", options),
+					value: "Coloured wide labels share the value column",
 				},
 				{
 					label: "Bundle",

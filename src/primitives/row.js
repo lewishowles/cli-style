@@ -1,4 +1,4 @@
-import { foreground } from "../formatters/ansi.js";
+import { foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 import { getResultSymbol, getResultToken } from "../theme/results.js";
 
@@ -49,8 +49,8 @@ const minimumWrapWidth = 10;
 export function row(label, value = "", options = {}) {
 	const resultToken = resolveResultToken(options);
 	const displayLabel = renderDisplayLabel(label, resultToken, options);
-	const labelWidth = Math.max(displayLabel.length, options.labelWidth ?? 0);
-	const labelText = displayLabel.padEnd(labelWidth, " ");
+	const labelWidth = Math.max(visibleWidth(displayLabel), options.labelWidth ?? 0);
+	const labelText = padVisible(displayLabel, labelWidth);
 	const renderedLabel = renderLabel(labelText, options);
 
 	if (value === "") {
@@ -66,7 +66,7 @@ export function row(label, value = "", options = {}) {
 	}
 
 	const availableWrapWidth = Number.isFinite(options.width)
-		? options.width - labelWidth - separator.length
+		? options.width - labelWidth - visibleWidth(separator)
 		: defaultWrapWidth;
 
 	const hasExplicitWrapWidth = options.wrapWidth !== undefined && options.wrapWidth !== null;
@@ -78,7 +78,7 @@ export function row(label, value = "", options = {}) {
 	const wrapWidth = options.wrapWidth ?? availableWrapWidth;
 
 	const valueLines = wrapText(value, wrapWidth);
-	const continuationIndent = " ".repeat(labelWidth + separator.length);
+	const continuationIndent = " ".repeat(labelWidth + visibleWidth(separator));
 	const renderedValueLines = valueLines.map((line) => renderValue(line, options));
 	const wrappedValue = renderedValueLines.join(`\n${continuationIndent}`);
 

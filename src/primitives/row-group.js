@@ -1,3 +1,4 @@
+import { visibleWidth } from "../formatters/ansi.js";
 import { getResultSymbol } from "../theme/results.js";
 import { row } from "./row.js";
 
@@ -21,7 +22,7 @@ export function rowGroup(options = {}) {
 	}
 
 	const labelWidth = Math.max(
-		...rows.map((entry) => displayedLabelLength(entry, options)),
+		...rows.map((entry) => displayedLabelWidth(entry, options)),
 		options.labelWidth ?? 0,
 	);
 
@@ -59,18 +60,19 @@ function normaliseRows(rows) {
 }
 
 /**
- * Return the visible width of a row label.
+ * Count the columns a row's label fills, including its result symbol when it
+ * has one.
  *
  * @param  {object}  entry
  *     Row entry.
  * @param  {object}  options
  *     Group rendering options.
  * @returns  {number}
- *     Displayed label length.
+ *     The number of terminal columns the label takes up.
  */
-function displayedLabelLength(entry, options) {
+function displayedLabelWidth(entry, options) {
 	if (typeof entry.result !== "string" || entry.result === "") {
-		return entry.label.length;
+		return visibleWidth(entry.label);
 	}
 
 	const entryOptions = {
@@ -80,5 +82,5 @@ function displayedLabelLength(entry, options) {
 
 	const symbol = getResultSymbol(entry.result, entryOptions);
 
-	return [symbol, entry.label].join(" ").length;
+	return visibleWidth([symbol, entry.label].join(" "));
 }

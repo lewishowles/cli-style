@@ -1,4 +1,4 @@
-import { foreground, style } from "../formatters/ansi.js";
+import { foreground, style, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 
 // Falls back to the informational tone when no colour token is given.
@@ -44,17 +44,16 @@ export function labelledLine(label = "", message = "", options = {}) {
 		return `${prefix}${messageSeparator}${messageText}`;
 	}
 
-	const wrapWidth = resolveWrapWidth(prefixText, options);
+	const wrapWidth = resolveWrapWidth(prefix, options);
 	const messageLines = wrapText(messageText, wrapWidth);
-	const continuationIndent = " ".repeat(prefixText.length + messageSeparator.length);
+	const continuationIndent = " ".repeat(visibleWidth(prefix) + visibleWidth(messageSeparator));
 	const wrappedMessage = messageLines.join(`\n${continuationIndent}`);
 
 	return `${prefix}${messageSeparator}${wrappedMessage}`;
 }
 
 /**
- * Colour the icon/label prefix, sized from its plain-text length so the
- * continuation indent lines up whether or not colour is applied.
+ * Colour the icon and label prefix in the line's tone when colour is on.
  *
  * @param  {string}  prefix
  *     Plain-text icon and label prefix.
@@ -115,7 +114,7 @@ function resolveColour(options) {
  * Work out how wide the message can be before it wraps.
  *
  * @param  {string}  prefix
- *     Plain-text icon and label prefix, used to size the continuation indent.
+ *     The icon and label prefix as it will be printed, including any colour.
  * @param  {object}  options
  *     Rendering options.
  * @returns  {number|undefined}
@@ -127,7 +126,7 @@ function resolveWrapWidth(prefix, options) {
 	}
 
 	if (Number.isFinite(options.width)) {
-		return Math.max(1, options.width - prefix.length - messageSeparator.length);
+		return Math.max(1, options.width - visibleWidth(prefix) - visibleWidth(messageSeparator));
 	}
 
 	return undefined;

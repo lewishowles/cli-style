@@ -69,6 +69,28 @@ describe("rowGroup", () => {
 		expect(output).toBe(expected);
 	});
 
+	test("Aligns coloured wide labels with and without result symbols", () => {
+		const plain = rowGroup({
+			colour: false,
+			rows: [
+				{ label: "Label", value: "one" },
+				{ label: "Go", result: "failed", value: "two" },
+			],
+			unicode: false,
+		});
+
+		const styled = rowGroup({
+			colour: false,
+			rows: [
+				{ label: "\u001b[31m界面X\u001b[0m", value: "one" },
+				{ label: "\u001b[34m界\u001b[0m", result: "failed", value: "two" },
+			],
+			unicode: false,
+		});
+
+		expect(stripAnsi(styled).replace("界面X", "Label").replace("界", "Go")).toBe(plain);
+	});
+
 	test("Returns an empty string for an empty rows array", () => {
 		expect(rowGroup({ rows: [] })).toBe("");
 	});

@@ -47,6 +47,25 @@ describe("labelledLine", () => {
 		);
 	});
 
+	test("Aligns a coloured wide icon and label with a plain prefix", () => {
+		const message = "one two three four";
+
+		const plain = labelledLine("CD", message, {
+			colour: false,
+			icon: "AB",
+			width: 16,
+		});
+
+		const styled = labelledLine("\u001b[32m面\u001b[0m", message, {
+			colour: true,
+			icon: "\u001b[31m界\u001b[0m",
+			width: 16,
+		});
+
+		expect(stripAnsi(styled).replace("界 面", "AB CD")).toBe(plain);
+		expect(styled.split("\n")).toHaveLength(3);
+	});
+
 	test("Preserves the message when wrapping is disabled", () => {
 		const output = labelledLine("Output", "first\nsecond", {
 			colour: false,

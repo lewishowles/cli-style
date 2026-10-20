@@ -100,6 +100,26 @@ describe("row", () => {
 		expect(output).toBe("Details  one two three\n         four");
 	});
 
+	test("Aligns a coloured wide label and separator with a plain row", () => {
+		const value = "one two three four";
+
+		const plain = row("Label", value, {
+			colour: false,
+			separator: "=>",
+			width: 17,
+		});
+
+		const styled = row("\u001b[31m界面X\u001b[0m", value, {
+			colour: false,
+			separator: "\u001b[34m=>\u001b[0m",
+			width: 17,
+		});
+
+		expect(stripAnsi(styled).replace("界面X", "Label")).toBe(plain);
+
+		expect(styled.split("\n")).toHaveLength(2);
+	});
+
 	test("Uses an explicit wrapping width when a long label leaves no automatic width", () => {
 		const label = "A".repeat(100);
 
