@@ -1,4 +1,4 @@
-import { foreground, style, visibleWidth } from "../formatters/ansi.js";
+import { foreground, restoreStyles, style, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 
 // Falls back to the informational tone when no colour token is given.
@@ -56,7 +56,7 @@ export function labelledLine(label = "", message = "", options = {}) {
  * Colour the icon and label prefix in the line's tone when colour is on.
  *
  * @param  {string}  prefix
- *     Plain-text icon and label prefix.
+ *     Icon and label prefix. The icon or label may already hold colour.
  * @param  {object}  options
  *     Rendering options.
  * @returns  {string}
@@ -71,13 +71,24 @@ function renderPrefix(prefix, options) {
 		return prefix;
 	}
 
-	const colouredPrefix = foreground(prefix, resolveColour(options), options);
+	// The caller's tone, or "info" when none is given.
+	const tone = resolveColour(options);
+
+	// The prefix with bold and the line's colour switched back on after a coloured icon or
+	// label, so the rest of the prefix keeps them.
+	const restoredPrefix = restoreStyles(prefix, [
+		style("", "bold", options),
+		foreground("", tone, options),
+	]);
+
+	// The whole prefix in the line's colour, ready to be made bold.
+	const colouredPrefix = foreground(restoredPrefix, tone, options);
 
 	return style(colouredPrefix, "bold", options);
 }
 
 /**
- * Build the plain-text icon and label prefix.
+ * Build the icon and label prefix. The icon or label may already hold colour.
  *
  * @param  {string}  label
  *     Label text.

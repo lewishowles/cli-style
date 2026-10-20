@@ -105,6 +105,36 @@ export function style(value, style, options = {}) {
 }
 
 /**
+ * Switch the given styles back on after every full reset inside text, so an outer style
+ * carries on past coloured text placed inside it. Coloured text ends with a full reset,
+ * written as `\u001b[0m` or the shorter `\u001b[m`, which would otherwise turn the outer
+ * style off as well.
+ *
+ * @param  {string}  value
+ *     Text that may hold coloured parts.
+ * @param  {string[]}  stylesToRestore
+ *     The styles to switch back on, each rendered on an empty string, such as
+ *     `style("", "bold", options)`. An empty entry adds nothing.
+ * @returns  {string}
+ *     The text with the styles switched back on after each full reset.
+ */
+export function restoreStyles(value, stylesToRestore) {
+	// The codes that turn the styles on, with each closing reset cut off.
+	const openingCodes = stylesToRestore
+		.map((styleToRestore) => styleToRestore.slice(0, -reset.length))
+		.join("");
+
+	// The text with the styles switched back on after each reset form handled so far.
+	let restoredValue = value;
+
+	for (const clearStyleCode of clearStyleCodes) {
+		restoredValue = restoredValue.replaceAll(clearStyleCode, `${clearStyleCode}${openingCodes}`);
+	}
+
+	return restoredValue;
+}
+
+/**
  * Remove ANSI escape sequences from text.
  *
  * @param  {string}  value

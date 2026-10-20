@@ -85,4 +85,28 @@ describe("labelledLine", () => {
 		expect(output).toContain("\u001b[38;5;215m");
 		expect(stripAnsi(output)).toBe("! Warning: Review the output.");
 	});
+
+	test("Restores bold and the line tone after a caller-coloured icon", () => {
+		const output = labelledLine("Warning", "Review the output.", {
+			colour: true,
+			icon: "\u001b[31m!\u001b[0m",
+			tone: "warning",
+		});
+
+		expect(output).toBe(
+			"\u001b[1m\u001b[38;5;215m\u001b[31m!\u001b[0m\u001b[1m\u001b[38;5;215m Warning:\u001b[0m\u001b[0m Review the output.",
+		);
+	});
+
+	test("Restores bold and the line tone after a caller-coloured label", () => {
+		const output = labelledLine("\u001b[32mWarning\u001b[0m", "Review the output.", {
+			colour: true,
+			icon: "!",
+			tone: "warning",
+		});
+
+		expect(output).toBe(
+			"\u001b[1m\u001b[38;5;215m! \u001b[32mWarning\u001b[0m\u001b[1m\u001b[38;5;215m:\u001b[0m\u001b[0m Review the output.",
+		);
+	});
 });

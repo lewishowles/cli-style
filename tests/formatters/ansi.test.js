@@ -1,7 +1,12 @@
 import { describe, expect, test } from "bun:test";
 
 import { background, foreground, stripAnsi, style } from "../../src/index.js";
-import { padVisible, sliceVisible, visibleWidth } from "../../src/formatters/ansi.js";
+import {
+	padVisible,
+	restoreStyles,
+	sliceVisible,
+	visibleWidth,
+} from "../../src/formatters/ansi.js";
 
 describe("ANSI foreground colour", () => {
 	test("Applies dark semantic foreground colour when enabled", () => {
@@ -81,6 +86,31 @@ describe("ANSI styles", () => {
 		});
 
 		expect(output).toBe("Heading");
+	});
+});
+
+describe("ANSI style restoration", () => {
+	test("Restores every given style after each full reset", () => {
+		const stylesToRestore = [
+			style("", "bold", { colour: true }),
+			foreground("", "warning", { colour: true }),
+		];
+
+		expect(restoreStyles("A\u001b[0mB\u001b[0mC", stylesToRestore)).toBe(
+			"A\u001b[0m\u001b[1m\u001b[38;5;215mB\u001b[0m\u001b[1m\u001b[38;5;215mC",
+		);
+	});
+
+	test("Restores styles after a full reset without an explicit zero", () => {
+		expect(restoreStyles("A\u001b[mB", [style("", "bold", { colour: true })])).toBe(
+			"A\u001b[m\u001b[1mB",
+		);
+	});
+
+	test("Leaves text without a full reset unchanged", () => {
+		expect(restoreStyles("A\u001b[31mB", [style("", "bold", { colour: true })])).toBe(
+			"A\u001b[31mB",
+		);
 	});
 });
 

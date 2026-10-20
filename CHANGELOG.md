@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Labelled lines now keep their bold prefix and tone colour after a caller-coloured icon or label.
 - Panels now keep their background, text colour and bold title to the end of a line that holds coloured text.
 - Panels now fill every line to the panel width when it holds coloured text or wide characters.
 - Text wrapping now measures coloured text, wide characters, and joined emoji by the columns they fill. It keeps joined emoji and accented letters whole, and wraps before a wide character would pass the limit.
