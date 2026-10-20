@@ -8,7 +8,7 @@ import { diffBlock } from "../patterns/diff-block.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { quoteBlock } from "../patterns/quote-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
-import { stripAnsi } from "../formatters/ansi.js";
+import { foreground, stripAnsi, visibleWidth } from "../formatters/ansi.js";
 import { renderSpinnerFrame } from "../interactive/spinner.js";
 import { barChart } from "../primitives/bar-chart.js";
 import { bulletList } from "../primitives/bullet-list.js";
@@ -313,11 +313,11 @@ function clampGalleryOutput(output, width) {
  *     Truncated line.
  */
 function clampLine(line, width) {
-	const plainLine = stripAnsi(line);
-
-	if (plainLine.length <= width) {
+	if (visibleWidth(line) <= width) {
 		return line;
 	}
+
+	const plainLine = stripAnsi(line);
 
 	if (width <= 1) {
 		return plainLine.slice(0, width);
@@ -958,6 +958,10 @@ function renderTableExample(options) {
 			{
 				check: "unit",
 				result: "warning",
+			},
+			{
+				check: "界面",
+				result: foreground("passed", "success", options),
 			},
 		],
 	});

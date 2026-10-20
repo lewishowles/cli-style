@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { stripAnsi, table } from "../../src/index.js";
+import { foreground, stripAnsi, table } from "../../src/index.js";
 
 describe("table", () => {
 	test("Renders aligned columns with a header rule", () => {
@@ -213,5 +213,76 @@ describe("table", () => {
 		expect(output).toContain("\u001b[38;5;239m");
 		expect(output).toContain("\u001b[39mBuild");
 		expect(stripAnsi(output)).toBe(["Name   Status", "─────  ──────", "Build  Passed"].join("\n"));
+	});
+
+	test("Aligns coloured headers and values like plain text", () => {
+		const colour = { colour: true };
+
+		const columns = [
+			{ key: "name", label: foreground("ID", "success", colour) },
+			{ key: "status", label: "Status" },
+		];
+
+		const rows = [
+			{ name: foreground("Go", "success", colour), status: "Passed" },
+			{ name: "Long", status: "Waiting" },
+		];
+
+		const output = table({ colour: false, columns, rows, width: 40 });
+
+		const plainOutput = table({
+			colour: false,
+			columns: [{ key: "name", label: "ID" }, columns[1]],
+			rows: [{ name: "Go", status: "Passed" }, rows[1]],
+			width: 40,
+		});
+
+		expect(stripAnsi(output)).toBe(plainOutput);
+		expect(output).toContain(foreground("Go", "success", colour));
+	});
+
+	test("Aligns wide headers and values like two-column plain text", () => {
+		const columns = [
+			{ key: "name", label: "界" },
+			{ key: "status", label: "Status" },
+		];
+
+		const rows = [
+			{ name: "👍🏽", status: "Passed" },
+			{ name: "A", status: "Waiting" },
+		];
+
+		const output = table({ colour: false, columns, rows, width: 40 });
+
+		const plainOutput = table({
+			colour: false,
+			columns: [{ key: "name", label: "AB" }, columns[1]],
+			rows: [{ name: "CD", status: "Passed" }, rows[1]],
+			width: 40,
+		});
+
+		expect(output.replace("界", "AB").replace("👍🏽", "CD")).toBe(plainOutput);
+	});
+
+	test("Pads coloured and wide labels in narrow key/value blocks", () => {
+		const label = foreground("界", "success", { colour: true });
+
+		const columns = [
+			{ key: "name", label },
+			{ key: "status", label: "State" },
+		];
+
+		const rows = [{ name: "Go", status: "Ready" }];
+
+		const output = table({ colour: false, columns, rows, width: 7 });
+
+		const plainOutput = table({
+			colour: false,
+			columns: [{ key: "name", label: "AB" }, columns[1]],
+			rows,
+			width: 7,
+		});
+
+		expect(stripAnsi(output).replace("界", "AB")).toBe(plainOutput);
 	});
 });

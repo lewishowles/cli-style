@@ -1,4 +1,4 @@
-import { foreground } from "../formatters/ansi.js";
+import { foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
 import { defaultWidth, minimumWidth, normaliseWidth } from "../formatters/width.js";
 import { tableColours } from "../theme/colours.js";
 
@@ -112,8 +112,8 @@ function normaliseRows(rows) {
 function columnWidths(columns, rows) {
 	return columns.map((column) => {
 		const naturalWidth = Math.max(
-			column.label.length,
-			...rows.map((row) => cellValue(row[column.key]).length),
+			visibleWidth(column.label),
+			...rows.map((row) => visibleWidth(cellValue(row[column.key]))),
 		);
 
 		const maxWidth = columnMaxWidth(column);
@@ -155,7 +155,7 @@ function columnMaxWidth(column) {
  *     ellipsis unless the column's overflow is 'wrap'.
  */
 function columnLines(value, column, width) {
-	if (value.length <= width) {
+	if (visibleWidth(value) <= width) {
 		return [value];
 	}
 
@@ -242,7 +242,7 @@ function renderTable(columns, rows, widths, options) {
  *     Padded column text.
  */
 function padColumn(value, width, index, columnCount) {
-	return index === columnCount - 1 ? value : value.padEnd(width, " ");
+	return index === columnCount - 1 ? value : padVisible(value, width);
 }
 
 /**
@@ -258,13 +258,13 @@ function padColumn(value, width, index, columnCount) {
  *     Rendered key/value blocks.
  */
 function renderBlocks(columns, rows, options) {
-	const labelWidth = Math.max(...columns.map((column) => column.label.length));
+	const labelWidth = Math.max(...columns.map((column) => visibleWidth(column.label)));
 
 	return rows
 		.map((row) =>
 			columns
 				.map((column) => {
-					const label = renderHeader(column.label.padEnd(labelWidth, " "), options);
+					const label = renderHeader(padVisible(column.label, labelWidth), options);
 					const value = renderCell(cellValue(row[column.key]), 0, options);
 
 					return `${label}${columnSeparator}${value}`;

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
 import { background, foreground, stripAnsi, style } from "../../src/index.js";
-import { visibleWidth } from "../../src/formatters/ansi.js";
+import { padVisible, visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("ANSI foreground colour", () => {
 	test("Applies dark semantic foreground colour when enabled", () => {
@@ -118,5 +118,18 @@ describe("Visible width", () => {
 
 	test("Counts standalone marks and joiners as zero columns", () => {
 		expect(visibleWidth("\u0301\u200d")).toBe(0);
+	});
+});
+
+describe("Visible padding", () => {
+	test("Pads coloured and wide text to the requested terminal width", () => {
+		const value = "\u001b[31m界\u001b[0m";
+
+		expect(padVisible(value, 4)).toBe(`${value}  `);
+		expect(visibleWidth(padVisible(value, 4))).toBe(4);
+	});
+
+	test("Leaves text unchanged when it already fills the requested width", () => {
+		expect(padVisible("👍🏽", 1)).toBe("👍🏽");
 	});
 });

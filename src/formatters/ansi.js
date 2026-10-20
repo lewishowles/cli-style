@@ -133,6 +133,22 @@ export function visibleWidth(value) {
 }
 
 /**
+ * Add trailing spaces until text fills a number of terminal columns. Colour
+ * codes take no space and wide characters take two, so coloured and wide text
+ * pads to the same width as plain text.
+ *
+ * @param  {string}  value
+ *     The text to pad, which may contain ANSI colour codes.
+ * @param  {number}  width
+ *     The number of columns the text should fill.
+ * @returns  {string}
+ *     The padded text, or the text unchanged when it already fills the width.
+ */
+export function padVisible(value, width) {
+	return value + " ".repeat(Math.max(0, width - visibleWidth(value)));
+}
+
+/**
  * Wrap text in ANSI colour codes.
  *
  * @param  {string}  value
