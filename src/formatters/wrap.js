@@ -1,4 +1,4 @@
-import { visibleWidth } from "./ansi.js";
+import { ansiPattern, visibleWidth } from "./ansi.js";
 
 // Width used when a caller doesn't provide one.
 const defaultWrapWidth = 64;
@@ -9,15 +9,6 @@ const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme
 // Line breaks end the current wrapped line and take no columns. Windows CR+LF arrives from the
 // segmenter as one character.
 const lineBreaks = new Set(["\n", "\r\n"]);
-
-const escapeCharacter = String.fromCharCode(27);
-const bellCharacter = String.fromCharCode(7);
-
-// Matches ANSI CSI and OSC escape sequences so they can be measured as zero-width.
-const ansiEscapePattern = new RegExp(
-	`${escapeCharacter}(?:\\[[0-?]*[ -/]*[@-~]|\\][^${bellCharacter}${escapeCharacter}]*(?:${bellCharacter}|${escapeCharacter}\\\\))`,
-	"gu",
-);
 
 /**
  * Wrap text to a maximum visible width, treating ANSI escape sequences as zero-width.
@@ -99,7 +90,7 @@ function tokenise(text) {
 
 	let textStart = 0;
 
-	for (const match of text.matchAll(ansiEscapePattern)) {
+	for (const match of text.matchAll(ansiPattern)) {
 		appendTextTokens(tokens, text.slice(textStart, match.index));
 		tokens.push({
 			value: match[0],

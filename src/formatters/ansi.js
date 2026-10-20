@@ -12,7 +12,7 @@ const escapeCharacter = String.fromCharCode(27);
 const bellCharacter = String.fromCharCode(7);
 
 // Matches ANSI CSI sequences, such as colours, and OSC sequences, such as hyperlinks, which take up no columns on screen.
-const ansiPattern = new RegExp(
+export const ansiPattern = new RegExp(
 	`${escapeCharacter}(?:\\[[0-?]*[ -/]*[@-~]|\\][^${bellCharacter}${escapeCharacter}]*(?:${bellCharacter}|${escapeCharacter}\\\\))`,
 	"gu",
 );
