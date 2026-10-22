@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.18.1 - 2026-10-22
+
+### Fixed
+
+- Text with tab characters now lines up in panels, rows, row groups, tables, labelled lines, dividers and bar charts. Each tab becomes spaces up to the next four-column stop before the text is measured or wrapped, so widths match what the terminal shows.
+
 ## 0.18.0 - 2026-10-20
 
 ### Breaking changes
