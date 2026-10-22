@@ -1,4 +1,11 @@
-import { background, foreground, restoreStyles, style, visibleWidth } from "../formatters/ansi.js";
+import {
+	background,
+	expandTabs,
+	foreground,
+	restoreStyles,
+	style,
+	visibleWidth,
+} from "../formatters/ansi.js";
 import { defaultWidth } from "../formatters/width.js";
 import { wrapText } from "../formatters/wrap.js";
 import { profiles } from "../profiles/profiles.js";
@@ -38,7 +45,9 @@ export function panel(options = {}) {
 	const lines = options.lines ?? [];
 
 	if (options.profile === profiles.CI) {
-		return [...(options.title === undefined ? [] : [options.title]), ...lines].join("\n");
+		return expandTabs(
+			[...(options.title === undefined ? [] : [options.title]), ...lines].join("\n"),
+		);
 	}
 
 	const width = Math.max(options.width ?? defaultWidth, minimumWidth);

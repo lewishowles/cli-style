@@ -1,4 +1,4 @@
-import { visibleWidth } from "../formatters/ansi.js";
+import { expandTabs, visibleWidth } from "../formatters/ansi.js";
 import { getResultSymbol } from "../theme/results.js";
 import { row } from "./row.js";
 
@@ -72,7 +72,7 @@ function normaliseRows(rows) {
  */
 function displayedLabelWidth(entry, options) {
 	if (typeof entry.result !== "string" || entry.result === "") {
-		return visibleWidth(entry.label);
+		return visibleWidth(expandTabs(entry.label));
 	}
 
 	const entryOptions = {
@@ -82,5 +82,5 @@ function displayedLabelWidth(entry, options) {
 
 	const symbol = getResultSymbol(entry.result, entryOptions);
 
-	return visibleWidth([symbol, entry.label].join(" "));
+	return visibleWidth(expandTabs([symbol, entry.label].join(" ")));
 }

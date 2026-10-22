@@ -1,4 +1,10 @@
-import { foreground, padVisible, sliceVisible, visibleWidth } from "../formatters/ansi.js";
+import {
+	expandTabs,
+	foreground,
+	padVisible,
+	sliceVisible,
+	visibleWidth,
+} from "../formatters/ansi.js";
 import { defaultWidth, minimumWidth, normaliseWidth } from "../formatters/width.js";
 import { tableColours } from "../theme/colours.js";
 
@@ -72,15 +78,17 @@ function normaliseColumns(columns) {
 		return [];
 	}
 
-	return columns.filter(
-		(column) =>
-			column !== null &&
-			typeof column === "object" &&
-			typeof column.key === "string" &&
-			column.key !== "" &&
-			typeof column.label === "string" &&
-			column.label !== "",
-	);
+	return columns
+		.filter(
+			(column) =>
+				column !== null &&
+				typeof column === "object" &&
+				typeof column.key === "string" &&
+				column.key !== "" &&
+				typeof column.label === "string" &&
+				column.label !== "",
+		)
+		.map((column) => ({ ...column, label: expandTabs(column.label) }));
 }
 
 /**
@@ -297,7 +305,7 @@ function renderBlocks(columns, rows, options) {
  *     Display text.
  */
 function cellValue(value) {
-	return value === null || value === undefined ? "" : String(value);
+	return value === null || value === undefined ? "" : expandTabs(String(value));
 }
 
 /**

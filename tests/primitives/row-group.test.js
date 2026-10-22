@@ -3,6 +3,17 @@ import { describe, expect, test } from "bun:test";
 import { row, rowGroup, stripAnsi } from "../../src/index.js";
 
 describe("rowGroup", () => {
+	test("Aligns rows after expanding label tabs", () => {
+		const output = rowGroup({
+			rows: [
+				{ label: "A\tB", value: "one" },
+				{ label: "Short", value: "two" },
+			],
+		});
+
+		expect(output).toBe("A   B  one\nShort  two");
+	});
+
 	test("Aligns rows with different label lengths", () => {
 		const rows = [
 			{

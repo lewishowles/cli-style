@@ -3,6 +3,10 @@ import { describe, expect, test } from "bun:test";
 import { labelledLine, stripAnsi } from "../../src/index.js";
 
 describe("labelledLine", () => {
+	test("Expands tabs in the prefix and an unwrapped message", () => {
+		expect(labelledLine("A\tB", "C\tD", { wrap: false })).toBe("A   B: C   D");
+	});
+
 	test("Renders an icon, label, and message", () => {
 		const output = labelledLine("Notice", "Check the output.", {
 			colour: false,

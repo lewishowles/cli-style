@@ -6,6 +6,10 @@ const escapeCharacter = String.fromCharCode(27);
 const bellCharacter = String.fromCharCode(7);
 
 describe("Text wrapping", () => {
+	test("Expands tabs before measuring each source line", () => {
+		expect(wrapText("A\tB\n\tC", 5)).toEqual(["A   B", "    C"]);
+	});
+
 	test("Hard-splits text without whitespace", () => {
 		expect(wrapText("abcdefgh", 3)).toEqual(["abc", "def", "gh"]);
 	});

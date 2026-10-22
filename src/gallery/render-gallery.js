@@ -1199,7 +1199,16 @@ function renderPanelExamples(options) {
 		title: "Nested styles",
 	});
 
-	return [...toneExamples, nestedStylesExample];
+	// A panel holding a tab-indented code line, like a Playwright excerpt, with a caret
+	// under `await`, to show the bar and background staying intact and the caret
+	// staying under the same character once tabs become spaces.
+	const tabbedCodeExample = panel({
+		...options,
+		lines: ["\tconst result = await run();", "\t               ^"],
+		title: "Tabbed code",
+	});
+
+	return [...toneExamples, nestedStylesExample, tabbedCodeExample];
 }
 
 /**

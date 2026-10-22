@@ -3,6 +3,10 @@ import { describe, expect, test } from "bun:test";
 import { row, stripAnsi } from "../../src/index.js";
 
 describe("row", () => {
+	test("Expands tabs in labels and values when wrapping is off", () => {
+		expect(row("A\tB", "C\tD", { wrap: false })).toBe("A   B  C   D");
+	});
+
 	test("Renders a plain labelled value", () => {
 		const output = row("Package", "@lewishowles/components", {
 			colour: false,

@@ -1,4 +1,4 @@
-import { foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
+import { expandTabs, foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
 import { chartColours } from "../theme/colours.js";
 
 // Chart bars use the same compact default width as progress bars.
@@ -47,14 +47,16 @@ function normaliseRows(rows) {
 		return [];
 	}
 
-	return rows.filter(
-		(row) =>
-			row !== null &&
-			typeof row === "object" &&
-			typeof row.label === "string" &&
-			row.label !== "" &&
-			Number.isFinite(row.value),
-	);
+	return rows
+		.filter(
+			(row) =>
+				row !== null &&
+				typeof row === "object" &&
+				typeof row.label === "string" &&
+				row.label !== "" &&
+				Number.isFinite(row.value),
+		)
+		.map((row) => ({ ...row, label: expandTabs(row.label) }));
 }
 
 /**

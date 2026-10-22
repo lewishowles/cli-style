@@ -20,6 +20,9 @@ export const ansiPattern = new RegExp(
 // Matches the same sequences as a captured group, so splitting text on it keeps each sequence as its own piece.
 const ansiSplitPattern = new RegExp(`(${ansiPattern.source})`, "u");
 
+// The number of columns between tab stops when tabs are turned into spaces.
+const tabWidth = 4;
+
 // Matches a terminal link sequence and captures its address, which is empty when the sequence ends a link.
 const hyperlinkPattern = new RegExp(
 	`^${escapeCharacter}\\]8;[^;]*;([^${bellCharacter}${escapeCharacter}]*)`,
@@ -193,6 +196,51 @@ export function restoreStyles(value, stylesToRestore) {
  */
 export function stripAnsi(value) {
 	return value.replace(ansiPattern, "");
+}
+
+/**
+ * Replace each tab with spaces up to the next four-column stop, so renderers
+ * measure and pad the text as the terminal draws it. Stops count from the
+ * start of each line, and colour codes and links take no columns.
+ *
+ * @param  {string}  value
+ *     The text to expand, which may contain ANSI sequences.
+ * @returns  {string}
+ *     The text with no tabs left in it.
+ */
+export function expandTabs(value) {
+	if (!value.includes("\t")) {
+		return value;
+	}
+
+	// The column the next character lands on. It carries across colour codes and
+	// links, which take no columns, and goes back to 0 at each line break.
+	let column = 0;
+
+	return value
+		.split(ansiSplitPattern)
+		.map((part, index) => {
+			if (index % 2 === 1) {
+				return part;
+			}
+
+			let expanded = "";
+
+			for (const { segment } of graphemeSegmenter.segment(part)) {
+				if (segment === "\t") {
+					const spaces = tabWidth - (column % tabWidth);
+
+					expanded += " ".repeat(spaces);
+					column += spaces;
+				} else {
+					expanded += segment;
+					column = segment === "\n" || segment === "\r\n" ? 0 : column + visibleWidth(segment);
+				}
+			}
+
+			return expanded;
+		})
+		.join("");
 }
 
 /**

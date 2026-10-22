@@ -3,6 +3,19 @@ import { describe, expect, test } from "bun:test";
 import { foreground, stripAnsi, table } from "../../src/index.js";
 
 describe("table", () => {
+	test("Expands tabs before aligning headers and cells", () => {
+		const output = table({
+			columns: [
+				{ key: "a", label: "A\tB" },
+				{ key: "c", label: "C" },
+			],
+			rows: [{ a: "X\tY", c: "Z" }],
+			width: 30,
+		});
+
+		expect(output).toBe("A   B  C\n─────  ─\nX   Y  Z");
+	});
+
 	test("Renders aligned columns with a header rule", () => {
 		const output = table({
 			colour: false,

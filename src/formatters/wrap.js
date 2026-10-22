@@ -1,4 +1,4 @@
-import { ansiPattern, visibleWidth } from "./ansi.js";
+import { ansiPattern, expandTabs, visibleWidth } from "./ansi.js";
 
 // Width used when a caller doesn't provide one.
 const defaultWrapWidth = 64;
@@ -22,7 +22,7 @@ const lineBreaks = new Set(["\n", "\r\n"]);
  */
 export function wrapText(text, width = defaultWrapWidth) {
 	const wrapWidth = resolveWrapWidth(width);
-	const tokens = tokenise(String(text));
+	const tokens = tokenise(expandTabs(String(text)));
 	const lines = [];
 
 	let line = [];

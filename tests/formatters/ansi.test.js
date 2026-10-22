@@ -2,11 +2,22 @@ import { describe, expect, test } from "bun:test";
 
 import { background, foreground, stripAnsi, style } from "../../src/index.js";
 import {
+	expandTabs,
 	padVisible,
 	restoreStyles,
 	sliceVisible,
 	visibleWidth,
 } from "../../src/formatters/ansi.js";
+
+describe("Tab expansion", () => {
+	test("Counts wide text but ignores colour and link codes at each line's tab stops", () => {
+		const linkOpen = "\u001b]8;;https://example.com\u0007";
+		const linkClose = "\u001b]8;;\u0007";
+		const input = `A\u001b[31m界\u001b[0m\tB\n${linkOpen}Go${linkClose}\tC`;
+
+		expect(expandTabs(input)).toBe(`A\u001b[31m界\u001b[0m B\n${linkOpen}Go${linkClose}  C`);
+	});
+});
 
 describe("ANSI foreground colour", () => {
 	test("Applies dark semantic foreground colour when enabled", () => {

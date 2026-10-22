@@ -4,6 +4,13 @@ import { divider, stripAnsi } from "../../src/index.js";
 import { visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("divider", () => {
+	test("Expands a tabbed label before sizing the rule", () => {
+		const output = divider({ dividerWidth: 12, label: "A\tB" });
+
+		expect(output).toBe("A   B ------");
+		expect(visibleWidth(output)).toBe(12);
+	});
+
 	test("Renders a plain divider", () => {
 		const output = divider({
 			colour: false,

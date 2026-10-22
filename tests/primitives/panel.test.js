@@ -4,6 +4,22 @@ import { panel, resultTypes, rowGroup, status, stripAnsi } from "../../src/index
 import { visibleWidth } from "../../src/formatters/ansi.js";
 
 describe("panel", () => {
+	test("Keeps a caret aligned under tab-indented code within every panel line", () => {
+		const width = 32;
+
+		const output = panel({
+			colour: true,
+			lines: ["\tconst result = run();", "\t      ^"],
+			width,
+		});
+
+		const lines = stripAnsi(output).split("\n");
+
+		expect(output).not.toContain("\t");
+		expect(lines[1].indexOf("result")).toBe(lines[2].indexOf("^"));
+		expect(output.split("\n").map(visibleWidth)).toEqual(Array(lines.length).fill(width));
+	});
+
 	test("Renders a fixed-width panel with a title and padded content", () => {
 		const output = panel({
 			colour: false,

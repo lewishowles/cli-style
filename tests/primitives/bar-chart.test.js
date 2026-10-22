@@ -3,6 +3,19 @@ import { describe, expect, test } from "bun:test";
 import { barChart, stripAnsi } from "../../src/index.js";
 
 describe("barChart", () => {
+	test("Expands tabs before aligning chart labels", () => {
+		const output = barChart({
+			barWidth: 2,
+			rows: [
+				{ label: "A\tB", value: 2 },
+				{ label: "C", value: 1 },
+			],
+			unicode: false,
+		});
+
+		expect(output).toBe("A   B  ## 2\nC      #  1");
+	});
+
 	test("Renders labelled rows against a shared scale", () => {
 		const output = barChart({
 			barWidth: 10,

@@ -1,4 +1,4 @@
-import { foreground, restoreStyles, style, visibleWidth } from "../formatters/ansi.js";
+import { expandTabs, foreground, restoreStyles, style, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 
 // Falls back to the informational tone when no colour token is given.
@@ -34,7 +34,7 @@ const messageSeparator = " ";
 export function labelledLine(label = "", message = "", options = {}) {
 	const prefixText = createPrefix(label, options);
 	const prefix = renderPrefix(prefixText, options);
-	const messageText = String(message);
+	const messageText = expandTabs(String(message));
 
 	if (prefix === "") {
 		return messageText;
@@ -98,8 +98,8 @@ function renderPrefix(prefix, options) {
  *     Icon and label joined with a colon and space, or an empty string when both are empty.
  */
 function createPrefix(label, options) {
-	const labelText = String(label);
-	const icon = typeof options.icon === "string" ? options.icon : "";
+	const labelText = expandTabs(String(label));
+	const icon = typeof options.icon === "string" ? expandTabs(options.icon) : "";
 	const labelPart = labelText === "" ? "" : `${labelText}:`;
 
 	return [icon, labelPart].filter((part) => part !== "").join(" ");
