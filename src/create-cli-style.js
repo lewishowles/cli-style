@@ -1,6 +1,7 @@
 import { resolveProfile } from "./capability/resolve-profile.js";
 import { resolveTerminalCapabilities } from "./capability/terminal.js";
 import { runSpinner, spinner as startSpinner } from "./interactive/spinner.js";
+import { help } from "./patterns/help.js";
 import { profiles } from "./profiles/profiles.js";
 import { createReporter } from "./reporters/create-reporter.js";
 import { resolveColourValue } from "./theme/colours.js";
@@ -52,6 +53,7 @@ export function createCliStyle(options = {}) {
 
 	return {
 		options: resolvedOptions,
+		help: (data) => help(data, resolvedOptions),
 		print: (value) => {
 			console.log(value);
 		},

@@ -8,6 +8,7 @@ import { parseRenderRequest, renderJsonInput } from "../src/cli/render-command.j
 
 import {
 	parseGalleryRequest,
+	renderGalleryHelp,
 	selectInteractiveGalleryRequest,
 } from "../src/cli/gallery-command.js";
 
@@ -35,7 +36,7 @@ function print(value) {
 }
 
 if (command === undefined || command === "--help" || command === "-h") {
-	print(renderHelp());
+	print(renderHelp(ui));
 } else if (command === "adapter-path") {
 	try {
 		const request = parseAdapterPathRequest(args.slice(1));
@@ -48,9 +49,14 @@ if (command === undefined || command === "--help" || command === "-h") {
 } else if (command === "gallery") {
 	try {
 		const request = parseGalleryRequest(args.slice(1));
-		const selectedRequest = selectInteractiveGalleryRequest(request);
 
-		print(renderGallery(ui.options, selectedRequest));
+		if (request.help) {
+			print(renderGalleryHelp(ui));
+		} else {
+			const selectedRequest = selectInteractiveGalleryRequest(request);
+
+			print(renderGallery(ui.options, selectedRequest));
+		}
 	} catch (error) {
 		console.error(error.message);
 		process.exitCode = 1;
@@ -77,7 +83,7 @@ if (command === undefined || command === "--help" || command === "-h") {
 } else {
 	console.error(`Unknown command: ${command}`);
 	console.error("");
-	console.error(renderHelp());
+	console.error(renderHelp(ui));
 	process.exitCode = 1;
 }
 

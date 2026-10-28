@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 
 import { galleryFixtures, gallerySections, galleryVariants } from "../gallery/render-gallery.js";
+import { help } from "../patterns/help.js";
 import { isProfile, profiles } from "../profiles/profiles.js";
 
 // Global rendering flags accepted after `gallery` for focused review commands.
@@ -19,9 +20,13 @@ const globalRenderingFlags = new Set([
  * @param  {string[]}  args
  *     Arguments after the gallery command.
  * @returns  {object}
- *     Gallery rendering request.
+ *     Gallery rendering request, or `{ help: true }` when `--help` or `-h` is present.
  */
 export function parseGalleryRequest(args = []) {
+	if (args.includes("--help") || args.includes("-h")) {
+		return { help: true };
+	}
+
 	let hasVariant = false;
 
 	const request = {
@@ -73,6 +78,57 @@ export function parseGalleryRequest(args = []) {
 	validateRequest(request);
 
 	return request;
+}
+
+/**
+ * Render help for the gallery command with the active terminal style. Under the JSON
+ * profile the help is plain text, because the binary has no JSON form of its help.
+ *
+ * @param  {object}  ui
+ *     Renderer configured by the binary.
+ * @returns  {string}
+ *     Gallery command help.
+ */
+export function renderGalleryHelp(ui) {
+	const data = {
+		title: "cli-style gallery",
+		tagline: "Review every style under the current terminal capabilities.",
+		usage: "cli-style gallery [variant] [options]",
+		sections: [
+			{
+				heading: "variants",
+				rows: galleryVariants.map((variant) => ({
+					term: variant,
+					description: `Show the ${variant} output style.`,
+				})),
+			},
+			{
+				heading: "options",
+				rows: [
+					{ term: "--section <name>", description: "Show primitives or patterns." },
+					{ term: "--fixture <name>", description: "Show one named pattern fixture." },
+					{ term: "--profile <name>", description: "Render with a text profile." },
+					{ term: "--width <columns>", description: "Render with a fixed terminal width." },
+					{ term: "--light, --dark", description: "Override automatic terminal-theme detection." },
+					{ term: "--variants", description: "Show every capability variant." },
+					{
+						term: "--interactive",
+						description: "Select a section or fixture with fzf when available.",
+					},
+					{ term: "-h, --help", description: "Show this help." },
+				],
+			},
+		],
+		examples: [
+			"cli-style gallery --section patterns",
+			"cli-style gallery --fixture help --width 64",
+		],
+	};
+
+	// ui.help returns its data unchanged under the JSON profile, so render plain text directly.
+	return ui.options.profile === "json"
+		? help(data, { ...ui.options, profile: "plain" })
+		: ui.help(data);
 }
 
 /**

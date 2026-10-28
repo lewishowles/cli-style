@@ -104,6 +104,31 @@ Use `ui.text(role, value)` to style a piece of text by its purpose. For example,
 
 Set the title and heading accent with `createCliStyle({ accent })`. Each colour can be a theme colour name, an `ansi-256:N` value (N from 0 to 255), or a six-digit hex value. Pass one colour for both themes, such as `accent: "ansi-256:25"`, or a pair such as `accent: { light: "ansi-256:30", dark: "ansi-256:116" }`. An invalid colour or an incomplete pair throws a `TypeError`. Hex colours such as `#123456` need a truecolour terminal to display as intended.
 
+Use `ui.help()` to render command help from data:
+
+```js
+ui.print(
+	ui.help({
+		title: "project-tool",
+		tagline: "Inspect project files and checks.",
+		usage: "project-tool check <path> [options]",
+		sections: [
+			{
+				heading: "commands",
+				rows: [
+					{ term: "check <path>", description: "Inspect a project path." },
+					{ term: "list", description: "List available project checks." },
+				],
+			},
+		],
+		examples: ["project-tool check src/"],
+		hint: "Run project-tool --help for more commands.",
+	}),
+);
+```
+
+The renderer capitalises section headings, starts every description in a section at the same column, and wraps descriptions to the terminal width. When that column would be narrower than 20 characters, each description moves onto its own line under its term. A row can also take an `annotation`, shown dimmed after its description. Usage and example lines start with a `%` prompt, dim their `<value>` and `[optional]` parts, and never wrap, so they can be copied whole. The `json` profile returns the input data unchanged. `cli-style --help` and `cli-style gallery --help` use the same layout; `cli-style gallery --fixture help --variants` shows it under each gallery variant.
+
 For `render` commands, width follows this priority: JSON payload `width`, `--width`,
 `stdout.columns`, positive `COLUMNS`, then `80`, so piped output stays within the caller's requested
 size when the payload supplies a width.

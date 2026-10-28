@@ -92,11 +92,20 @@ describe("Initialisation", () => {
 
 describe("Render contracts", () => {
 	test("Renders CLI help as a string", () => {
-		const output = renderHelp();
+		const output = renderHelp(createCliStyle({ colour: false }));
 
-		expect(output).toContain("Usage:");
+		expect(typeof output).toBe("string");
+		expect(output).toContain("\nUsage\n");
 		expect(output).toContain("cli-style gallery");
 		expect(output).toContain("cli-style render");
+	});
+
+	test("Renders plain CLI help when the renderer uses the JSON profile", () => {
+		const output = renderHelp(createCliStyle({ profile: "json" }));
+
+		expect(typeof output).toBe("string");
+		expect(output).toContain("\nUsage\n");
+		expect(output).not.toContain("\u001b[");
 	});
 
 	test("Exports divider primitive", () => {

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { parseGalleryRequest } from "../../src/cli/gallery-command.js";
+import { parseGalleryRequest, renderGalleryHelp } from "../../src/cli/gallery-command.js";
+import { createCliStyle } from "../../src/create-cli-style.js";
 import { visibleWidth } from "../../src/formatters/ansi.js";
 import { renderGallery } from "../../src/gallery/render-gallery.js";
 
@@ -14,6 +15,30 @@ describe("parseGalleryRequest", () => {
 			variants: false,
 			width: undefined,
 		});
+	});
+
+	test("Recognises gallery help", () => {
+		expect(parseGalleryRequest(["--help"])).toEqual({ help: true });
+		expect(parseGalleryRequest(["-h"])).toEqual({ help: true });
+	});
+
+	test("Renders gallery help as plain text under the JSON profile", () => {
+		const output = renderGalleryHelp(createCliStyle({ profile: "json" }));
+
+		expect(typeof output).toBe("string");
+		expect(output).toContain("\nUsage\n");
+		expect(output).not.toContain("\u001b[");
+	});
+
+	test("Uses the main help wording for shared gallery flags", () => {
+		const output = renderGalleryHelp(createCliStyle({ colour: false }));
+
+		expect(output).toContain("Show one named pattern fixture.");
+		expect(output).toContain("Render with a text profile.");
+		expect(output).toContain("Render with a fixed terminal width.");
+		expect(output).toContain("Show every capability variant.");
+		expect(output).toContain("Select a section or fixture with fzf when available.");
+		expect(output).toContain("--light, --dark");
 	});
 
 	test("Parses variants, sections, fixtures, and variants mode", () => {

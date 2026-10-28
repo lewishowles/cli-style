@@ -5,6 +5,7 @@ import { compactDataTable } from "../patterns/compact-data-table.js";
 import { confirmationResult } from "../patterns/confirmation-result.js";
 import { diagnosticReport } from "../patterns/diagnostic-report.js";
 import { diffBlock } from "../patterns/diff-block.js";
+import { help } from "../patterns/help.js";
 import { nextStepBlock } from "../patterns/next-step-block.js";
 import { quoteBlock } from "../patterns/quote-block.js";
 import { taskSummary } from "../patterns/task-summary.js";
@@ -138,6 +139,7 @@ export const galleryFixtures = [
 	"confirmation-result",
 	"next-step-block",
 	"diff-block",
+	"help",
 	"quote-block",
 	"sparkline",
 	"spinner",
@@ -476,6 +478,30 @@ function renderPatterns(options, fixture) {
 		options,
 	);
 
+	const helpOutput = help(
+		{
+			title: "project-tool",
+			tagline: "Inspect project files and checks.",
+			usage: "project-tool check <path> [options]",
+			sections: [
+				{
+					heading: "commands",
+					rows: [
+						{
+							term: "check <path>",
+							description: "Inspect a project path.",
+							annotation: "read-only",
+						},
+						{ term: "list", description: "List available project checks." },
+					],
+				},
+			],
+			examples: ["project-tool check src/"],
+			hint: "Run project-tool --help for more commands.",
+		},
+		options,
+	);
+
 	const reporter = createReporter(options);
 
 	reporter.divider("Project setup", "Claude + Codex");
@@ -604,6 +630,7 @@ function renderPatterns(options, fixture) {
 		"confirmation-result": ["Confirmation result", confirmation],
 		"diagnostic-report": ["Diagnostic report", report],
 		"diff-block": ["Diff block", diff],
+		help: ["Help", helpOutput],
 		"next-step-block": ["Next-step block", nextStep],
 		"quote-block": [
 			"Quote block",
@@ -652,6 +679,9 @@ function renderPatterns(options, fixture) {
 		"",
 		"Diff block",
 		frameExample(diff, options),
+		"",
+		"Help",
+		frameExample(helpOutput, options),
 		"",
 		"Quote block",
 		frameExample(fixtures["quote-block"][1], options),

@@ -37,6 +37,7 @@ export { compactDataTable } from "./patterns/compact-data-table.js";
 export { confirmationResult } from "./patterns/confirmation-result.js";
 export { diagnosticReport } from "./patterns/diagnostic-report.js";
 export { diffBlock } from "./patterns/diff-block.js";
+export { help } from "./patterns/help.js";
 export { nextStepBlock } from "./patterns/next-step-block.js";
 export { quoteBlock } from "./patterns/quote-block.js";
 export { taskSummary } from "./patterns/task-summary.js";
