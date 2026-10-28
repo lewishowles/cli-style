@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.19.0 - 2026-10-28
+
+### Added
+
+- Added `ui.text` to style text by role: `title`, `heading`, `command`, `placeholder`, `secondary`, `annotation`, `prompt`, `hint`, and `text`.
+- Added the `accent` option to `createCliStyle()`. Set one colour or a `{ light, dark }` pair; the default is teal.
+- Added `ui.help` to build help screens from plain data. It is also exported as `help`.
+- Added `cli-style gallery --help`.
+
+`ui.text`, `ui.help`, and `accent` are JavaScript only; the Python and Swift adapters have no equivalents yet.
+
+### Changed
+
+- Panels, section headings, tables, rows, statuses, feedback, and hints now share the same text roles, so existing output looks different:
+  - Panel titles, pattern titles such as command results and diagnostic reports, section headings, and table headers use the accent colour. In CI output, all of these except table headers stay plain.
+  - Hints are dim italic.
+  - Row labels, status details, feedback titles, the table rule, and table columns after the first are dim instead of grey.
+  - Success, warning, and error text keep their colours.
+- The package's own `--help` output now uses the help renderer.
+
+### Deprecated
+
+- `tableColours` no longer matches how tables render and will be removed in a later release. Use the `ui.text` roles instead.
+
 ## 0.18.1 - 2026-10-22
 
 ### Fixed

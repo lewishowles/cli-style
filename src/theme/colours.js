@@ -174,7 +174,13 @@ export const panelColours = {
 	warning: "warning",
 };
 
-// Table colours for dense operational data.
+/**
+ * The colour tokens that tables used before they moved to the shared text
+ * roles. These values no longer match what tables render.
+ *
+ * @deprecated Use the `ui.text` roles instead. This export will be removed in
+ * a later release.
+ */
 export const tableColours = {
 	border: "border",
 	header: "muted",
