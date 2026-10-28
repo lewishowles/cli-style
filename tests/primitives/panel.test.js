@@ -96,6 +96,7 @@ describe("panel", () => {
 
 		expect(output).toContain("\u001b[38;5;210m");
 		expect(output).toContain("\u001b[38;5;252m");
+		expect(output).toContain("\u001b[38;5;116mError");
 		expect(output).toContain("\u001b[48;5;234m");
 		expect(stripAnsi(output)).toBe(
 			[
@@ -127,7 +128,7 @@ describe("panel", () => {
 		expect(stripAnsi(output)).toContain("▌  Checks  unit");
 	});
 
-	test("Switches the panel background, text colour and title bold back on after coloured text inside a line", () => {
+	test("Restores the panel body colours after inner resets and accents the title", () => {
 		const statusLine = status(resultTypes.SUCCESS, "Done", { colour: true });
 
 		const rows = rowGroup({
@@ -141,20 +142,22 @@ describe("panel", () => {
 		const options = { colour: true, lines: [statusLine, rows], title: statusLine, width: 32 };
 		const output = panel(options);
 		const outputLines = output.split("\n");
-		const fullReset = "\u001b[0m";
 		const bodyStyle = "\u001b[48;5;234m\u001b[38;5;252m";
+		// The title line, the status line and one line per row.
+		const sourceLineCount = 2 + rows.split("\n").length;
 
-		// The title and the first body line both hold the status line; only the title line
-		// switches bold back on as well.
-		for (const [index, sourceLine] of [statusLine, statusLine, ...rows.split("\n")].entries()) {
+		for (let index = 0; index < sourceLineCount; index++) {
 			const panelLine = outputLines[index + 1];
-			const restoredStyle = `${fullReset}${bodyStyle}${index === 0 ? "\u001b[1m" : ""}`;
-			const innerResetCount = sourceLine.split(fullReset).length - 1;
+			const resetCount = panelLine.split("\u001b[0m").length - 1;
+			const bodyStyleCount = panelLine.split(bodyStyle).length - 1;
 
-			expect(panelLine.split(restoredStyle).length - 1).toBe(innerResetCount);
+			// The side bar and the panel's background and text colour wrappers each add one reset outside the content.
+			expect(bodyStyleCount).toBe(resetCount - 3);
 
-			if (index > 0) {
-				expect(panelLine).not.toContain(`${fullReset}${bodyStyle}\u001b[1m`);
+			if (index === 0) {
+				expect(panelLine).toContain("\u001b[38;5;116m");
+			} else {
+				expect(panelLine).not.toContain("\u001b[38;5;116m");
 			}
 		}
 

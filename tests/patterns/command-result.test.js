@@ -91,6 +91,32 @@ describe("commandResult", () => {
 		);
 	});
 
+	test("Uses title and heading roles in coloured output", () => {
+		const output = commandResult(
+			{ command: "bun run test:unit", details: ["Passed"], result: resultTypes.SUCCESS },
+			{ accent: "ansi-256:25", colour: true },
+		);
+
+		expect(output).toContain("\u001b[1m\u001b[38;5;25mCommand result");
+		expect(output).toContain("\u001b[38;5;25mDetails");
+	});
+
+	test("Keeps the title and section heading plain in coloured CI output", () => {
+		const output = commandResult(
+			{ command: "bun run test:unit", details: ["Passed"], result: resultTypes.SUCCESS },
+			{ colour: true, profile: profiles.CI },
+		);
+
+		const lines = output.split("\n");
+		const title = lines[0];
+		const sectionHeading = lines.find((line) => line.includes("Details"));
+
+		expect(title).toBe("Command result");
+		expect(sectionHeading).toBe("Details");
+		expect(title).not.toContain("\u001b[");
+		expect(sectionHeading).not.toContain("\u001b[");
+	});
+
 	test("Returns structured input unchanged for the JSON profile", () => {
 		const result = {
 			command: "bun run test:unit",

@@ -1,5 +1,6 @@
-import { foreground, restoreStyles, style } from "../formatters/ansi.js";
+import { restoreStyles, style } from "../formatters/ansi.js";
 import { getResultSymbol, resultTypes } from "../theme/results.js";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 import { labelledLine } from "./labelled-line.js";
 import { panel } from "./panel.js";
 
@@ -16,11 +17,14 @@ import { panel } from "./panel.js";
  *     Rendered hint.
  */
 export function hint(message = "", options = {}) {
-	return labelledLine("Hint", message, {
+	// The hint style dims the whole line, so the label and icon get no colour of their own.
+	const line = labelledLine("Hint", message, {
 		icon: "i",
-		tone: "info",
 		...options,
+		colour: false,
 	});
+
+	return renderTextRole(textRoles.HINT, line, options);
 }
 
 /**
@@ -48,13 +52,15 @@ export function emptyState(title = "No results", detail = "", options = {}) {
 		return `${prefix}${detailText}`;
 	}
 
-	// The prefix with its bold and muted tone switched back on after a coloured title.
-	const restoredPrefix = restoreStyles(prefix, [
-		style("", "bold", options),
-		foreground("", "muted", options),
-	]);
+	// The prefix with its bold switched back on after a coloured title.
+	const restoredPrefix = restoreStyles(prefix, [style("", "bold", options)]);
 
-	const renderedPrefix = style(foreground(restoredPrefix, "muted", options), "bold", options);
+	// The symbol and title, dimmed and bold so they stand apart from the detail.
+	const renderedPrefix = style(
+		renderTextRole(textRoles.SECONDARY, restoredPrefix, options),
+		"bold",
+		options,
+	);
 
 	return `${renderedPrefix}${detailText}`;
 }

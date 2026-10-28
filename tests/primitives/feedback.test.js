@@ -82,8 +82,8 @@ describe("Feedback primitives", () => {
 			colour: true,
 		});
 
-		expect(hintOutput).toContain("\u001b[38;5;117m");
-		expect(emptyOutput).toContain("\u001b[38;5;246m");
+		expect(hintOutput.startsWith("\u001b[2m\u001b[3m")).toBe(true);
+		expect(emptyOutput).toContain("\u001b[2m");
 		expect(errorOutput).toContain("\u001b[38;5;210m");
 		expect(stripAnsi(hintOutput)).toBe("i Hint: Review the warning.");
 		expect(stripAnsi(emptyOutput)).toBe("– No results");
@@ -96,7 +96,7 @@ describe("Feedback primitives", () => {
 			unicode: false,
 		});
 
-		expect(output).toContain("\u001b[31mGone\u001b[0m\u001b[1m\u001b[38;5;246m again");
+		expect(output).toContain("\u001b[31mGone\u001b[0m\u001b[2m\u001b[1m again");
 		expect(stripAnsi(output)).toBe("- Gone again Try later.");
 	});
 });

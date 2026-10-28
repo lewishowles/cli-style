@@ -1,12 +1,6 @@
-import {
-	expandTabs,
-	foreground,
-	padVisible,
-	sliceVisible,
-	visibleWidth,
-} from "../formatters/ansi.js";
+import { expandTabs, padVisible, sliceVisible, visibleWidth } from "../formatters/ansi.js";
 import { defaultWidth, minimumWidth, normaliseWidth } from "../formatters/width.js";
-import { tableColours } from "../theme/colours.js";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 
 // Columns use a compact but readable gap.
 const columnSeparator = "  ";
@@ -219,8 +213,8 @@ function renderTable(columns, rows, widths, options) {
 	const ruleCharacter = options.unicode === false ? "-" : "─";
 	const rule = widths.map((width) => ruleCharacter.repeat(width)).join(columnSeparator);
 
-	const renderedRule =
-		options.colour === true ? foreground(rule, tableColours.border, options) : rule;
+	// The rule under the header, dimmed so it stays behind the text.
+	const renderedRule = renderTextRole(textRoles.SECONDARY, rule, options);
 
 	const body = rows.flatMap((row) => {
 		const lines = columns.map((column, index) =>
@@ -319,11 +313,7 @@ function cellValue(value) {
  *     Rendered header.
  */
 function renderHeader(value, options) {
-	if (options.colour !== true) {
-		return value;
-	}
-
-	return foreground(value, tableColours.header, options);
+	return renderTextRole(textRoles.HEADING, value, options);
 }
 
 /**
@@ -339,11 +329,8 @@ function renderHeader(value, options) {
  *     Rendered cell.
  */
 function renderCell(value, columnIndex, options) {
-	if (options.colour !== true) {
-		return value;
-	}
+	// The first column names the row, so it reads as normal text; later columns are dimmed detail.
+	const role = columnIndex === 0 ? textRoles.TEXT : textRoles.SECONDARY;
 
-	const colour = columnIndex === 0 ? tableColours.primaryText : tableColours.secondaryText;
-
-	return foreground(value, colour, options);
+	return renderTextRole(role, value, options);
 }

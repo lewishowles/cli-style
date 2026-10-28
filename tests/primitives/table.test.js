@@ -222,10 +222,31 @@ describe("table", () => {
 			width: 80,
 		});
 
-		expect(output).toContain("\u001b[38;5;246mName ");
-		expect(output).toContain("\u001b[38;5;239m");
-		expect(output).toContain("\u001b[39mBuild");
+		expect(output).toContain("\u001b[38;5;116mName ");
+		expect(output).toContain("\u001b[2m─────  ──────\u001b[0m");
+		expect(output).toContain("\u001b[2mPassed\u001b[0m");
+		expect(output).toContain("Build");
 		expect(stripAnsi(output)).toBe(["Name   Status", "─────  ──────", "Build  Passed"].join("\n"));
+	});
+
+	test("Uses a custom accent for headers in wide and narrow tables", () => {
+		const options = {
+			accent: "ansi-256:25",
+			colour: true,
+			columns: [
+				{ key: "name", label: "Name" },
+				{ key: "status", label: "Status" },
+			],
+			rows: [{ name: "Build", status: "Passed" }],
+		};
+
+		const wide = table({ ...options, width: 80 });
+		const narrow = table({ ...options, width: 12 });
+
+		expect(wide).toContain("\u001b[38;5;25mName");
+		expect(narrow).toContain("\u001b[38;5;25mName");
+		expect(wide).toContain("\u001b[2mPassed\u001b[0m");
+		expect(stripAnsi(narrow)).toContain("Name    Build");
 	});
 
 	test("Aligns coloured headers and values like plain text", () => {

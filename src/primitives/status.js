@@ -1,5 +1,6 @@
 import { foreground, restoreStyles, style } from "../formatters/ansi.js";
 import { getResultSymbol, getResultToken, resultTypes } from "../theme/results.js";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 
 /**
  * Render a result status line.
@@ -42,5 +43,7 @@ export function status(resultType = resultTypes.UNKNOWN, detail = "", options = 
 	const colouredPrefix = foreground(restoredPrefix, token.tone, options);
 	const boldPrefix = style(colouredPrefix, "bold", options);
 
-	return `${boldPrefix}${detailText}`;
+	return detailText === ""
+		? boldPrefix
+		: `${boldPrefix}${renderTextRole(textRoles.SECONDARY, detailText, options)}`;
 }

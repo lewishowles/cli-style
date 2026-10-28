@@ -3,13 +3,13 @@ import {
 	expandTabs,
 	foreground,
 	restoreStyles,
-	style,
 	visibleWidth,
 } from "../formatters/ansi.js";
 import { defaultWidth } from "../formatters/width.js";
 import { wrapText } from "../formatters/wrap.js";
 import { profiles } from "../profiles/profiles.js";
 import { panelColours } from "../theme/colours.js";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 
 // The narrowest panel that still leaves one column for content beside the accent and padding.
 const minimumWidth = 6;
@@ -85,8 +85,14 @@ function renderLine(line, width, isTitle, options) {
 		// Spaces that fill the line to the content width on screen. A wide character can
 		// overflow a very narrow panel, so the count never drops below zero.
 		const padding = " ".repeat(Math.max(0, contentWidth - visibleWidth(visibleLine)));
+
+		// The title line takes the title style; body lines keep the panel's body colour.
+		const renderedLine = isTitle
+			? renderTextRole(textRoles.TITLE, visibleLine, options)
+			: visibleLine;
+
 		// The line with its inner margins, ready for the panel colours.
-		const content = `  ${visibleLine}${padding}  `;
+		const content = `  ${renderedLine}${padding}  `;
 
 		if (!useColour) {
 			return `${accent}${content}`;
@@ -99,7 +105,6 @@ function renderLine(line, width, isTitle, options) {
 		const restoredContent = restoreStyles(content, [
 			background("", panelColours.background, options),
 			foreground("", panelColours.body, options),
-			isTitle ? style("", "bold", options) : "",
 		]);
 
 		const renderedContent = foreground(
@@ -108,7 +113,7 @@ function renderLine(line, width, isTitle, options) {
 			options,
 		);
 
-		return `${renderedAccent}${isTitle ? style(renderedContent, "bold", options) : renderedContent}`;
+		return `${renderedAccent}${renderedContent}`;
 	});
 }
 

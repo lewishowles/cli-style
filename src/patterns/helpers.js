@@ -1,5 +1,6 @@
 import { bulletList } from "../primitives/bullet-list.js";
 import { profiles } from "../profiles/profiles.js";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 
 /**
  * Join a primary label and optional detail.
@@ -93,7 +94,11 @@ export function renderSection(title, lines, options, listItems = true) {
 			})
 		: lines.join("\n");
 
-	return [heading, content].join("\n");
+	// Section headings take the heading style, except in CI output, which stays plain for logs and searches.
+	const renderedHeading =
+		options.profile === profiles.CI ? heading : renderTextRole(textRoles.HEADING, heading, options);
+
+	return [renderedHeading, content].join("\n");
 }
 
 /**
@@ -107,5 +112,11 @@ export function renderSection(title, lines, options, listItems = true) {
  *     Rendered title.
  */
 export function renderTitle(title, options) {
-	return options.profile === profiles.AGENT ? `# ${title}` : title;
+	// Agent output marks the title as a Markdown heading.
+	const heading = options.profile === profiles.AGENT ? `# ${title}` : title;
+
+	// CI output is written for logs and searches, so its title stays plain.
+	return options.profile === profiles.CI
+		? heading
+		: renderTextRole(textRoles.TITLE, heading, options);
 }

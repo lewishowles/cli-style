@@ -156,6 +156,19 @@ describe("diagnosticReport", () => {
 		);
 	});
 
+	test("Uses title and section heading roles in coloured output", () => {
+		const output = diagnosticReport(
+			{
+				checks: [{ name: "unit", result: resultTypes.SUCCESS }],
+				title: "Project diagnostics",
+			},
+			{ accent: "ansi-256:25", colour: true },
+		);
+
+		expect(output).toContain("\u001b[1m\u001b[38;5;25mProject diagnostics");
+		expect(output).toContain("\u001b[38;5;25mChecks");
+	});
+
 	test("Returns structured input unchanged for the JSON profile", () => {
 		const report = {
 			checks: [

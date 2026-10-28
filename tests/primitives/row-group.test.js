@@ -127,6 +127,23 @@ describe("rowGroup", () => {
 		expect(stripAnsi(output).split("\n")[0]).toBe("One    => value");
 	});
 
+	test("Dims plain labels while keeping explicit colours and result tones", () => {
+		const output = rowGroup({
+			colour: true,
+			rows: [
+				{ label: "Source", value: "main" },
+				{ label: "Override", labelColour: "success", value: "yes" },
+				{ label: "Failed", result: "failed", value: "details" },
+			],
+			unicode: false,
+		});
+
+		expect(output).toContain("\u001b[2mSource");
+		expect(output).toContain("\u001b[38;5;114mOverride");
+		expect(output).toContain("\u001b[38;5;210mx Failed");
+		expect(stripAnsi(output)).toContain("Source    main");
+	});
+
 	test("Passes wrapping options through to each row", () => {
 		const output = rowGroup({
 			colour: false,

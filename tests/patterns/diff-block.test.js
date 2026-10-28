@@ -183,6 +183,7 @@ describe("diffBlock", () => {
 
 		expect(output).toContain("\u001b[38;5;114m+1");
 		expect(output).toContain("\u001b[38;5;210m-1");
+		expect(output).toContain("\u001b[1m\u001b[38;5;116mRelease diff (");
 		expect(stripAnsi(output)).toContain("Release diff (+1 -1)");
 
 		for (const profile of [profiles.CI, profiles.PLAIN]) {

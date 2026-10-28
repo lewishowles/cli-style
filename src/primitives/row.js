@@ -1,9 +1,7 @@
 import { expandTabs, foreground, padVisible, visibleWidth } from "../formatters/ansi.js";
 import { wrapText } from "../formatters/wrap.js";
 import { getResultSymbol, getResultToken } from "../theme/results.js";
-
-// Row labels use the same subdued tone as table headers by default.
-const defaultLabelColour = "muted";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 
 // Rows use a compact gap that still reads cleanly in plain terminals.
 const defaultSeparator = "  ";
@@ -140,7 +138,12 @@ function renderLabel(label, options) {
 		return label;
 	}
 
-	return foreground(label, getLabelColour(options), options);
+	// A colour from the caller or the row's result wins over the default dimmed label.
+	const colour = getLabelColour(options);
+
+	return colour === undefined
+		? renderTextRole(textRoles.SECONDARY, label, options)
+		: foreground(label, colour, options);
 }
 
 /**
@@ -172,8 +175,9 @@ function renderValue(value, options) {
  *
  * @param  {object}  options
  *     Rendering options.
- * @returns  {string}
- *     Colour token for the label.
+ * @returns  {string|undefined}
+ *     Colour token for the label, or undefined when the label uses the
+ *     default dimmed style.
  */
 function getLabelColour(options) {
 	if (options.labelColour !== undefined) {
@@ -184,7 +188,7 @@ function getLabelColour(options) {
 		return getResultToken(options.result).tone;
 	}
 
-	return defaultLabelColour;
+	return undefined;
 }
 
 /**

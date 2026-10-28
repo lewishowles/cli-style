@@ -74,8 +74,20 @@ describe("status", () => {
 			unicode: false,
 		});
 
-		expect(output).toBe("\u001b[1m\u001b[38;5;210mx Failed\u001b[0m\u001b[0m Secrets scan");
+		expect(output).toBe(
+			"\u001b[1m\u001b[38;5;210mx Failed\u001b[0m\u001b[0m\u001b[2m Secrets scan\u001b[0m",
+		);
 		expect(stripAnsi(output)).toBe("x Failed Secrets scan");
+	});
+
+	test("Keeps successful and warning results coloured while dimming their details", () => {
+		const success = status(resultTypes.SUCCESS, "Passed", { colour: true });
+		const warning = status(resultTypes.WARNING, "Review", { colour: true });
+
+		expect(success).toContain("\u001b[38;5;114m✓ Success");
+		expect(warning).toContain("\u001b[38;5;215m⚠ Warning");
+		expect(success).toContain("\u001b[2m Passed\u001b[0m");
+		expect(warning).toContain("\u001b[2m Review\u001b[0m");
 	});
 
 	test("Restores the prefix weight and tone after caller-coloured label text", () => {

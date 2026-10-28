@@ -97,6 +97,16 @@ describe("nextStepBlock", () => {
 		).toBe(nextStep);
 	});
 
+	test("Uses title and section heading roles in coloured output", () => {
+		const output = nextStepBlock(
+			{ commands: ["bun run test:unit"], next: "Run verification" },
+			{ accent: "ansi-256:25", colour: true },
+		);
+
+		expect(output).toContain("\u001b[1m\u001b[38;5;25mNext step");
+		expect(output).toContain("\u001b[38;5;25mCommands");
+	});
+
 	test("Returns an empty string for invalid text input", () => {
 		expect(nextStepBlock(null)).toBe("");
 		expect(nextStepBlock([])).toBe("");

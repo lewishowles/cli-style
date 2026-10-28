@@ -37,7 +37,7 @@ describe("row", () => {
 			colour: true,
 		});
 
-		expect(output).toBe("\u001b[38;5;246mPackage\u001b[0m  @lewishowles/components");
+		expect(output).toBe("\u001b[2mPackage\u001b[0m  @lewishowles/components");
 		expect(stripAnsi(output)).toBe("Package  @lewishowles/components");
 	});
 
@@ -47,7 +47,7 @@ describe("row", () => {
 			valueColour: "success",
 		});
 
-		expect(output).toBe("\u001b[38;5;246mStatus\u001b[0m  \u001b[38;5;114mpassed\u001b[0m");
+		expect(output).toBe("\u001b[2mStatus\u001b[0m  \u001b[38;5;114mpassed\u001b[0m");
 		expect(stripAnsi(output)).toBe("Status  passed");
 	});
 
