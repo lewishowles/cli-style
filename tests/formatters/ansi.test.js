@@ -45,6 +45,12 @@ describe("ANSI foreground colour", () => {
 		expect(output).toBe("\u001b[38;2;18;52;86mValue\u001b[0m");
 	});
 
+	test("Applies a direct ANSI-256 foreground colour", () => {
+		const output = foreground("x", "ansi-256:30", { colour: true });
+
+		expect(output).toBe("\u001b[38;5;30mx\u001b[0m");
+	});
+
 	test("Returns original text when colour is disabled", () => {
 		const output = foreground("Passed", "success", {
 			colour: false,
@@ -91,6 +97,11 @@ describe("ANSI styles", () => {
 		expect(output).toBe("\u001b[1mHeading\u001b[0m");
 	});
 
+	test("Applies terminal-native italic and removes it when colour is disabled", () => {
+		expect(style("Hint", "italic", { colour: true })).toBe("\u001b[3mHint\u001b[0m");
+		expect(style("Hint", "italic", { colour: false })).toBe("Hint");
+	});
+
 	test("Returns original text when style is unsupported", () => {
 		const output = style("Heading", "missing", {
 			colour: true,
@@ -134,6 +145,18 @@ describe("ANSI style restoration", () => {
 
 		expect(restoreStyles("A\u001b[49mB\u001b[22mC\u001b[39mD", stylesToRestore)).toBe(
 			"A\u001b[49m\u001b[48;2;18;52;86mB\u001b[22m\u001b[1m\u001b[2mC\u001b[39m\u001b[38;2;171;205;239mD",
+		);
+	});
+
+	test("Restores italic after its own close without changing bold or dim", () => {
+		const stylesToRestore = [
+			style("", "bold", { colour: true }),
+			style("", "dim", { colour: true }),
+			style("", "italic", { colour: true }),
+		];
+
+		expect(restoreStyles("A\u001b[23mB\u001b[22mC", stylesToRestore)).toBe(
+			"A\u001b[23m\u001b[3mB\u001b[22m\u001b[1m\u001b[2mC",
 		);
 	});
 

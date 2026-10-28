@@ -58,9 +58,12 @@ describe("Colour tokens", () => {
 		expect(getColourToken("text", { theme: themes.LIGHT })).toBe("default-foreground");
 	});
 
-	test("Resolves token references and direct hex values", () => {
+	test("Resolves token references and direct colour values", () => {
 		expect(resolveColourValue("success", { theme: themes.LIGHT })).toBe("ansi-256:28");
 		expect(resolveColourValue("#123456")).toBe("#123456");
+		expect(resolveColourValue("ansi-256:30")).toBe("ansi-256:30");
+		expect(resolveColourValue("ansi-256:256")).toBeNull();
+		expect(resolveColourValue("ansi-256:007")).toBeNull();
 		expect(resolveColourValue("missing")).toBeNull();
 	});
 });

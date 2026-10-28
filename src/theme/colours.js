@@ -28,6 +28,9 @@ export const themes = {
 const defaultBackground = "default-background";
 const defaultForeground = "default-foreground";
 
+// A direct ANSI-256 colour, such as "ansi-256:30". The index has no leading zeroes; the 0 to 255 range is checked separately.
+const ansi256ColourPattern = /^ansi-256:(0|[1-9][0-9]{0,2})$/u;
+
 // Theme palettes keep normal text on the user's terminal foreground.
 const palettes = {
 	[themes.AUTO]: {
@@ -55,7 +58,7 @@ const palettes = {
 		chipWarning: defaultBackground,
 	},
 	[themes.DARK]: {
-		accent: "ansi-256:183",
+		accent: "ansi-256:116",
 		background: defaultBackground,
 		border: "ansi-256:239",
 		danger: "ansi-256:210",
@@ -79,7 +82,7 @@ const palettes = {
 		chipWarning: "ansi-256:58",
 	},
 	[themes.LIGHT]: {
-		accent: "ansi-256:25",
+		accent: "ansi-256:30",
 		background: defaultBackground,
 		border: "ansi-256:250",
 		danger: "ansi-256:160",
@@ -235,10 +238,10 @@ export function getToneColour(tone, options = {}) {
 }
 
 /**
- * Resolve a colour token or direct hex value.
+ * Resolve a colour token, ANSI-256 palette index, or direct hex value.
  *
  * @param  {string}  colour
- *     Colour token name or hex colour.
+ *     Colour token name, ANSI-256 palette index, or hex colour.
  * @param  {object}  options
  *     Rendering options.
  * @returns  {string|null}
@@ -247,6 +250,12 @@ export function getToneColour(tone, options = {}) {
 export function resolveColourValue(colour, options = {}) {
 	if (colour?.startsWith("#")) {
 		return colour;
+	}
+
+	if (colour?.startsWith("ansi-256:")) {
+		const match = ansi256ColourPattern.exec(colour);
+
+		return match !== null && Number(match[1]) <= 255 ? colour : null;
 	}
 
 	return getColourToken(colour, options);

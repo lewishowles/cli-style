@@ -41,8 +41,11 @@ const backgroundClose = "\u001b[49m";
 // The sequence that switches off both bold and dim text.
 const weightClose = "\u001b[22m";
 
-// Matches a full reset or a sequence that switches off only the text colour, background or bold and dim.
-const closingStylePattern = new RegExp(`${escapeCharacter}\\[(?:0|22|39|49)?m`, "gu");
+// The sequence that switches off italic text.
+const italicClose = "\u001b[23m";
+
+// Matches a full reset or a sequence that switches off one kind of text style.
+const closingStylePattern = new RegExp(`${escapeCharacter}\\[(?:0|22|23|39|49)?m`, "gu");
 
 // Splits text into the characters people see, so a joined emoji or an accented letter counts as one.
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
@@ -57,6 +60,7 @@ const zeroWidthPattern = /^[\p{Mark}\p{Default_Ignorable_Code_Point}]+$/u;
 const styleCodes = {
 	bold: "\u001b[1m",
 	dim: "\u001b[2m",
+	italic: "\u001b[3m",
 };
 
 /**
@@ -65,7 +69,7 @@ const styleCodes = {
  * @param  {string}  value
  *     Text to wrap.
  * @param  {string}  colour
- *     Colour token name or hex colour.
+ *     Colour token name, ANSI-256 palette index, or hex colour.
  * @param  {object}  options
  *     Formatting options.
  * @param  {boolean}  options.colour
@@ -83,7 +87,7 @@ export function foreground(value, colour, options = {}) {
  * @param  {string}  value
  *     Text to wrap.
  * @param  {string}  colour
- *     Colour token name or hex colour.
+ *     Colour token name, ANSI-256 palette index, or hex colour.
  * @param  {object}  options
  *     Formatting options.
  * @param  {boolean}  options.colour
@@ -124,7 +128,7 @@ export function style(value, style, options = {}) {
  * outer style carries on past text coloured by this package, chalk, picocolors or
  * `util.styleText`. After a full reset, written as `\u001b[0m` or `\u001b[m`, every given
  * style comes back on. After a sequence that ends only the text colour, the background,
- * or bold and dim, only the given styles of that kind come back on, so other colours the
+ * bold and dim, or italic, only the given styles of that kind come back on, so other colours the
  * inner text left on stay on.
  *
  * @param  {string}  value
@@ -150,6 +154,8 @@ export function restoreStyles(value, stylesToRestore) {
 	let backgroundCodes = "";
 	// The bold and dim styles, switched back on after a bold and dim close.
 	let weightCodes = "";
+	// The italic style, switched back on after an italic close.
+	let italicCodes = "";
 
 	// Sorts each style by the number at the start of its code. The text colour and
 	// background ranges include 39 and 49 because the default colour opens with them.
@@ -166,6 +172,8 @@ export function restoreStyles(value, stylesToRestore) {
 			backgroundCodes += openingCode;
 		} else if (styleNumber === 1 || styleNumber === 2) {
 			weightCodes += openingCode;
+		} else if (styleNumber === 3) {
+			italicCodes += openingCode;
 		}
 	}
 
@@ -180,6 +188,10 @@ export function restoreStyles(value, stylesToRestore) {
 
 		if (closingCode === weightClose) {
 			return `${closingCode}${weightCodes}`;
+		}
+
+		if (closingCode === italicClose) {
+			return `${closingCode}${italicCodes}`;
 		}
 
 		return `${closingCode}${allOpeningCodes}`;
@@ -373,7 +385,7 @@ export function sliceVisible(value, width) {
  * @param  {string}  value
  *     Text to wrap.
  * @param  {string}  colour
- *     Colour token name or hex colour.
+ *     Colour token name, ANSI-256 palette index, or hex colour.
  * @param  {object}  options
  *     Formatting options.
  * @param  {Function}  createCode

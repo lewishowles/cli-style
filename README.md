@@ -88,6 +88,22 @@ ui.print(output);
 
 Renderer methods return strings. `ui.print()`, `ui.write()`, and CLI commands handle stdout and stderr.
 
+Use `ui.text(role, value)` to style a piece of text by its purpose. For example, `ui.text("heading", "Options")` uses the accent colour. The available roles are:
+
+| Role          | Use for                                   |
+| ------------- | ----------------------------------------- |
+| `title`       | The main title, in bold accent colour.    |
+| `heading`     | A section heading, in accent colour.      |
+| `command`     | A command name, in bold.                  |
+| `placeholder` | A replaceable value in a command, dimmed. |
+| `secondary`   | Supporting text, dimmed.                  |
+| `annotation`  | A short note beside a value, dimmed.      |
+| `prompt`      | A prompt marker before a command, dimmed. |
+| `hint`        | A closing suggestion, dimmed and italic.  |
+| `text`        | Ordinary text without added styling.      |
+
+Set the title and heading accent with `createCliStyle({ accent })`. Each colour can be a theme colour name, an `ansi-256:N` value (N from 0 to 255), or a six-digit hex value. Pass one colour for both themes, such as `accent: "ansi-256:25"`, or a pair such as `accent: { light: "ansi-256:30", dark: "ansi-256:116" }`. An invalid colour or an incomplete pair throws a `TypeError`. Hex colours such as `#123456` need a truecolour terminal to display as intended.
+
 For `render` commands, width follows this priority: JSON payload `width`, `--width`,
 `stdout.columns`, positive `COLUMNS`, then `80`, so piped output stays within the caller's requested
 size when the payload supplies a width.

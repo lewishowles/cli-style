@@ -27,6 +27,7 @@ import { step, stepProgress, stepStates } from "../primitives/step-progress.js";
 import { table } from "../primitives/table.js";
 import { createReporter } from "../reporters/create-reporter.js";
 import { resultTypes } from "../theme/results.js";
+import { renderTextRole, textRoles } from "../theme/roles.js";
 
 // Chip tone examples should expose every configured pill colour.
 const chipToneExamples = [
@@ -51,6 +52,9 @@ const chipToneExamples = [
 		tone: "danger",
 	},
 ];
+
+// A purple accent pair, so the gallery can show a project's own accent next to the default teal.
+const customAccentExample = { dark: "#b98cff", light: "#663399" };
 
 // Status examples should expose every configured result tone and symbol.
 const statusExamples = [
@@ -754,8 +758,16 @@ function frameExample(output, options) {
  *     Primitive gallery output.
  */
 function renderPrimitives(options) {
+	const customAccentOptions = { ...options, accent: customAccentExample };
+
 	return [
 		"Primitives",
+		"",
+		"Text roles and accent",
+		...Object.values(textRoles).map(
+			(role) => `${role}: ${renderTextRole(role, "The quick brown fox", options)}`,
+		),
+		`Custom accent: ${renderTextRole(textRoles.HEADING, "The quick brown fox", customAccentOptions)}`,
 		"",
 		"Chips",
 		renderChipExamples(options),
